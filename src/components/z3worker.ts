@@ -12,7 +12,7 @@ let solver: any = null;
 function startZ3() {
     const ctx: any = self as any;
     // Imports all names from z3w.js (includes Z3, etc)
-    ctx.importScripts('http://localhost:3000/z3w.js');
+    ctx.importScripts(ctx.location.origin + "/z3w.js");
     // @ts-ignore
     solver = Z3({
         ENVIRONMENT: "WORKER",
@@ -29,6 +29,9 @@ function onRuntimeInitialized() {
     postMessage(MessageKind.INITIALIZED, "")
 }
 
+/**
+ * Generic function to post a message back to the caller of this worker
+ * */
 function postMessage(kind: MessageKind, msg: string) {
     const ctx: any = self as any;
     let message: Z3Message = { kind: kind, msg: msg };
@@ -37,7 +40,6 @@ function postMessage(kind: MessageKind, msg: string) {
 
 
 self.addEventListener('message', function(e) {
-    const ctx: Worker = self as any;
     const message: Z3Message = e.data;
     switch (message.kind) {
         case MessageKind.INIT:
