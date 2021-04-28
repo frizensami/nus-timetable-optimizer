@@ -37,4 +37,6 @@ solver.FS.writeFile(INPUT_FNAME, input, { encoding: "utf8" });
 solver.callMain(args);
 ```
 
-- Ok, when I try this (after disabling eslint for the file), get this error `in the web, we need the wasm binary to be preloaded and set on Module['wasmBinary']. emcc.py will do that for you when generating HTML (but not JS)`
+- Ok, when I try this and set ENVIRONMENT to WEB (after disabling eslint for the file), get this error `in the web, we need the wasm binary to be preloaded and set on Module['wasmBinary']. emcc.py will do that for you when generating HTML (but not JS)`
+- If I use ENVIRONMENT as WORKER... 
+- **WORKING**: Need to use a web worker (with `worker-loader`). Have to put the z3w.js and z3w.wasm files inside "public" folder, then modify the z3w.js file to link to http://localhost:3000/z3w.wasm instead of the original string of `z3w.wasm`.
