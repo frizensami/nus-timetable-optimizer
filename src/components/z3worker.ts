@@ -38,12 +38,26 @@ function postMessage(kind: MessageKind, msg: string) {
     ctx.postMessage(message)
 }
 
+function runZ3(input: string) {
+    const INPUT_FNAME = "input.smt2";
+    const args = ['-smt2', INPUT_FNAME]
+    // This writes the required smtlib2 code to the emscripten virtual filesystem
+    solver.FS.writeFile(INPUT_FNAME, input, { encoding: "utf8" });
+    // Finally, runs the solver. The print / printErr function will be called as required
+    solver.callMain(args);
+}
 
+/**
+ * Main handler for all incoming messages
+ * */
 self.addEventListener('message', function(e) {
     const message: Z3Message = e.data;
     switch (message.kind) {
         case MessageKind.INIT:
             startZ3();
+            break;
+        case MessageKind.OPTIMIZE:
+            runZ3(message.msg);
             break;
         default:
             break;
