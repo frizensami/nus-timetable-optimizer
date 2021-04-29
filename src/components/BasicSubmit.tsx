@@ -8,6 +8,8 @@ import { Z3Message, MessageKind } from "./z3Protocol"
 
 import './BasicSubmit.css'
 
+import { smtTest } from '../core/smt_test'
+
 
 /*
  * BasicSubmit is a React Functional Component (FC)
@@ -18,24 +20,24 @@ export const BasicSubmit: React.FC<{}> = () => {
     let worker: any = null;
 
     const testSmt = `
-(declare-fun x () Int)
-(declare-fun y () Int)
-(declare-fun z () Int)
-(assert (>= (* 2 x) (+ y z)))
-(declare-fun f (Int) Int)
-(declare-fun g (Int Int) Int)
-(assert (< (f x) (g x x)))
-(assert (> (f y) (g x x)))
-(check-sat)
-(get-model)
-(push)
-(assert (= x y))
-(check-sat)
-(get-model)
-(check-sat)
-(pop)
-(exit)
-`;
+        (declare-fun x () Int)
+        (declare-fun y () Int)
+        (declare-fun z () Int)
+        (assert (>= (* 2 x) (+ y z)))
+        (declare-fun f (Int) Int)
+        (declare-fun g (Int Int) Int)
+        (assert (< (f x) (g x x)))
+        (assert (> (f y) (g x x)))
+        (check-sat)
+        (get-model)
+        (push)
+        (assert (= x y))
+        (check-sat)
+        (get-model)
+        (check-sat)
+        (pop)
+        (exit)
+    `;
 
     function receiveWorkerMessage(e: any) {
         const message: Z3Message = e.data
@@ -65,9 +67,11 @@ export const BasicSubmit: React.FC<{}> = () => {
 
     function onSubmit() {
         console.log("Initializing z3 worker");
-        worker = new Z3Worker()
-        worker.onmessage = receiveWorkerMessage;
-        postMessage(worker, MessageKind.INIT, "");
+        // worker = new Z3Worker()
+        // worker.onmessage = receiveWorkerMessage;
+        // postMessage(worker, MessageKind.INIT, "");
+
+        console.log(smtTest());
         // console.log(worker)
     }
 
