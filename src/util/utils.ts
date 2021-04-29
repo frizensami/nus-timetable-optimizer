@@ -22,3 +22,14 @@ export function groupBy(list: Array<any>, keyGetter: Function) {
     });
     return map;
 }
+
+/**
+ * Swaps the keys and values of an object
+ * */
+export function flipRecord(obj: any): any {
+  const ret: any = {};
+  Object.keys(obj).forEach(key => {
+    ret[obj[key]] = key;
+  });
+  return ret;
+}
