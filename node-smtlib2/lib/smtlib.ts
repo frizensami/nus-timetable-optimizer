@@ -49,7 +49,7 @@ function Assert(assert: SNode): SExpr {
     return new SExpr('assert', assert);
 }
 function AssertSoft(assert: SNode, weight: number, id: string): SExpr {
-    return new SExpr('assert', assert, ":weight", weight.toString(), ":id", id);
+    return new SExpr('assert-soft', assert, ":weight", weight.toString(), ":id", id);
 }
 function Predicate(pred: SNode, ...args: SNode[]): SNode {
     if (args.length === 0)
