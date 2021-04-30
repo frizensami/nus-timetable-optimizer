@@ -1,5 +1,5 @@
 import React from 'react';
-import { Segment, Table } from 'semantic-ui-react'
+import { Segment, Table, Header } from 'semantic-ui-react'
 
 interface TimetableProps {
     start_hour: number,
@@ -23,13 +23,14 @@ function Timetable({ start_hour, end_hour }: TimetableProps) {
     return (
         <div className="timetable">
             <Segment raised>
-                <Table celled definition>
+                <Header as='h2' textAlign="center">Timetable Output</Header>
+                <Table celled definition striped>
                     <Table.Header>
                         <Table.Row textAlign='center'>
                                 <Table.HeaderCell/>
                             {
-                                hours.map((hour) => {
-                                    return <Table.HeaderCell>{hour}</Table.HeaderCell>
+                                hours.map((hour, i) => {
+                                    return <Table.HeaderCell key={i}>{hour}</Table.HeaderCell>
                                 })
                             }
                         </Table.Row>
@@ -38,12 +39,12 @@ function Timetable({ start_hour, end_hour }: TimetableProps) {
                     <Table.Body>
                         {
                             // Runs for each day
-                            [...Array(days)].map((_, i) => {
+                            [...Array(days)].map((_, i1) => {
                                 return (
-                                    <Table.Row>
-                                        <Table.Cell>{daysOfWeek[i]}</Table.Cell>
-                                        {hours.map((_) => {
-                                            return <Table.Cell textAlign='center'>{"CS3203"}</Table.Cell>
+                                    <Table.Row key={i1}>
+                                        <Table.Cell key={i1}>{daysOfWeek[i1]}</Table.Cell>
+                                        {hours.map((_, i2) => {
+                                            return <Table.Cell key={(2**i1)*(3**i2)} textAlign='center'>{"CS3203"}</Table.Cell>
                                         })}
                                     </Table.Row>
                                 )

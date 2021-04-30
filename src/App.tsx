@@ -3,8 +3,9 @@ import logo from './logo.svg';
 // import './App.css';             
 import 'semantic-ui-less/semantic.less'
 
-import { BasicSubmit } from './components/BasicSubmit'
 import Timetable from './components/Timetable'
+import { Solver } from './components/Solver'
+import { Divider } from 'semantic-ui-react'
 
 function App() {
     return (
@@ -12,7 +13,8 @@ function App() {
             <div className="ui basic segment">
                 <h1 className="ui center aligned header"> NUSMods Timetable Arranger </h1>
                 <Timetable start_hour={8} end_hour={22} />
-                <BasicSubmit />
+                <Divider/>
+                <Solver />
             </div>
         </div>
         // <div className="App">

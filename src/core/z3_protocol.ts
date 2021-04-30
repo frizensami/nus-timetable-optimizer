@@ -9,6 +9,10 @@ export enum MessageKind {
     PRINT = "PRINT",
     // Error
     ERR = "ERR",
+    // Z3 finished runnung
+    EXIT = "EXIT",
+    // Z3 aborted
+    ABORT = "ABORT",
 }
 
 /**

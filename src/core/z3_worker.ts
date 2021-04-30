@@ -1,6 +1,6 @@
  /* eslint-disable no-restricted-globals */
 
-import { Z3Message, MessageKind } from "./z3Protocol"
+import { Z3Message, MessageKind } from "./z3_protocol"
 // import Z3 from "../z3/z3w.js"
 
 let solver: any = null;
@@ -18,7 +18,8 @@ function startZ3() {
         ENVIRONMENT: "WORKER",
         onRuntimeInitialized: onRuntimeInitialized,
         print: function(message: string) { postMessage(MessageKind.PRINT, message); },
-        printErr: function(message: string) { postMessage(MessageKind.ERR, message); }
+        printErr: function(message: string) { postMessage(MessageKind.ERR, message); },
+        postRun: function() { postMessage(MessageKind.EXIT, "") }
     });
 }
 
@@ -45,6 +46,8 @@ function runZ3(input: string) {
     solver.FS.writeFile(INPUT_FNAME, input, { encoding: "utf8" });
     // Finally, runs the solver. The print / printErr function will be called as required
     solver.callMain(args);
+    // Run when the solver is done
+    postMessage(MessageKind.EXIT, "");
 }
 
 /**
