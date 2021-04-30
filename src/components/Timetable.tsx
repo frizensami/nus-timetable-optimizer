@@ -4,12 +4,15 @@ import { Segment, Table, Header } from 'semantic-ui-react'
 interface TimetableProps {
     start_hour: number,
     end_hour: number,
+    timetable: any
 }
 
-function Timetable({ start_hour, end_hour }: TimetableProps) {
+function Timetable({ start_hour, end_hour, timetable }: TimetableProps) {
     let hours: Array<String> = [];
     const days = 5;
     const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+    console.log("timetable")
+    console.log(timetable)
     for (let hour = start_hour; hour < end_hour; hour++) {
         // For each hour we need the hour and the 1/2 hour mark
         if (hour < 10) {
@@ -44,7 +47,11 @@ function Timetable({ start_hour, end_hour }: TimetableProps) {
                                     <Table.Row key={i1}>
                                         <Table.Cell key={i1}>{daysOfWeek[i1]}</Table.Cell>
                                         {hours.map((_, i2) => {
-                                            return <Table.Cell key={(2**i1)*(3**i2)} textAlign='center'>{"CS3203"}</Table.Cell>
+                                            if (Object.keys(timetable).length === 0) {
+                                                return <Table.Cell key={(2**i1)*(3**i2)} textAlign='center'>{""}</Table.Cell>;
+                                            } else {
+                                                return <Table.Cell key={(2**i1)*(3**i2)} textAlign='center'>{timetable.tt[i1][i2]}</Table.Cell>;
+                                            }
                                         })}
                                     </Table.Row>
                                 )

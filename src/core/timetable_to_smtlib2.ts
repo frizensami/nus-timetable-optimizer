@@ -1,6 +1,7 @@
 import { LessonWeek, Lesson, Module, GenericTimetable } from './generic_timetable'
+
 import { flipRecord } from '../util/utils'
-import { Z3Timetable, SlotConstraint } from './z3_timetable'
+import { Z3Timetable, SlotConstraint, UNASSIGNED } from './z3_timetable'
 
 /**
  * Convert a generic timetable to a string representing smtlib2 code
@@ -126,4 +127,77 @@ export class TimetableSmtlib2Converter {
     }
 
 
+    /**
+     * Convert the string output by the Z3 solver into a timetable-like output
+     * */
+    z3_output_to_timetable(z3_output: string): TimetableOutput {
+        const parse = require("sexpr-plus").parse;
+        const parsed_expr = parse(z3_output)
+        console.log(parsed_expr)
+        const is_sat = parsed_expr[0].content === "sat"; // parsed_expr[0] === {type: "atom", content: "sat", location: {…}}
+        let variable_assignments_exprs = parsed_expr[1].content; // parsed_expr[1] === {type: "list", content: Array(19), location: {…}}
+        variable_assignments_exprs.shift(); // Removes first "model" expr: {type: "atom", content: "model", location: {…}}
+        let variable_assignments: Record<string, number> = {};
+        variable_assignments_exprs.forEach((expr: any) => {
+            // Example expr: {type: "list", content: Array(5), location: {…}}
+            // Inside Array(5):
+            /*  0: {type: "atom", content: "define-fun", location: {…}}
+                1: {type: "atom", content: "h33", location: {…}}
+                2: {type: "list", content: Array(0), location: {…}}
+                3: {type: "atom", content: "Int", location: {…}}
+                4: {type: "atom", content: "1024", location: {…}}
+            */
+            // We assume all model returns values have this structure, and are assigning varnames to ints
+            const var_name: string = expr.content[1].content
+            const var_value_expr: any = expr.content[4].content
+            let var_value: number = -2;
+            // Var_value could be an integer or an expression where the second element is the value of a negative number
+            console.log(var_value_expr)
+            if (typeof var_value_expr === "string") {
+                var_value = parseInt(var_value_expr)
+            } else {
+                var_value = -1 * parseInt(var_value_expr[1].content)
+            }
+
+            variable_assignments[var_name] = var_value;
+        })
+        console.log(variable_assignments);
+
+
+        // 2D array of days (assuming that doesn't change...) x half-hours per day
+        let tt = new Array(5);
+        for (let i = 0; i < tt.length; i++) {
+            tt[i] = Array((this.end_hour - this.start_hour) * 2).fill("");
+        }
+
+        // Create the final output timetable based on hour assignments
+        Object.keys(variable_assignments).forEach((key: string) => {
+            // Hour assignment
+            if (key.startsWith('h')) {
+                const halfhouridx = parseInt(key.substr(1));
+                const [offset, day] = this.z3_time_to_generic_time(halfhouridx)
+                const val = variable_assignments[key];
+                if (val == UNASSIGNED) return; // Un-assigned slot
+                const assignment: string = this.reverse_who_id_table[val]
+                if (assignment === undefined) throw new Error(`Undefined assignment for variable_assignments[${key}] = ${variable_assignments[key]}`)
+                tt[day][offset] = assignment.split("__").join("\n");
+            }
+        })
+
+        console.log(tt);
+        
+        const output: TimetableOutput = {
+            is_sat: is_sat,
+            tt: tt
+        }
+        return output
+
+    }
+
+
+}
+
+export interface TimetableOutput {
+    is_sat: boolean,
+    tt: Array<Array<string>>
 }

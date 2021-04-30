@@ -1,4 +1,4 @@
-import { TimetableSmtlib2Converter } from './timetable_to_smtlib2'
+import { TimetableOutput, TimetableSmtlib2Converter } from './timetable_to_smtlib2'
 import { GenericTimetable } from './generic_timetable'
 import { Z3Message, MessageKind } from "./z3_protocol"
 
@@ -23,8 +23,8 @@ export class Z3Manager {
     static conv: TimetableSmtlib2Converter
     static smtString: string
     static callbacks: Z3Callbacks
-    static printBuffer: string = ""
-    static errBuffer: string = ""
+    static printBuffer: string
+    static errBuffer: string
     static worker?: Z3Worker = null;
 
 
@@ -39,6 +39,8 @@ export class Z3Manager {
             DAY_END_HOUR) // End at 2200 (10 pm)
         Z3Manager.smtString = Z3Manager.conv.generateSmtLib2String();
         Z3Manager.callbacks = callbacks;
+        Z3Manager.printBuffer = "";
+        Z3Manager.errBuffer = "";
         // Set up worker if it's not set up
         if (!Z3Manager.worker) {
             Z3Manager.worker = new Z3Worker()
@@ -73,6 +75,10 @@ export class Z3Manager {
                 break;
             case MessageKind.EXIT:
                 console.log("Z3 messages on exit: ")
+                if (Z3Manager.printBuffer === "" && Z3Manager.errBuffer === "") {
+                    console.log("Premature exit - Z3 was initializing (this is normal)")
+                    return; // Premature exit (probably initialization)
+                }
                 if (Z3Manager.printBuffer !== "") {
                     console.log(Z3Manager.printBuffer);
                 }
@@ -81,6 +87,9 @@ export class Z3Manager {
                 }
                 // Call the output callback
                 Z3Manager.callbacks.onOutput(Z3Manager.printBuffer + "\n" + Z3Manager.errBuffer);
+                // Process the output text we just got from the Z3 solver
+                const timetable: TimetableOutput = Z3Manager.conv.z3_output_to_timetable(Z3Manager.printBuffer);
+                Z3Manager.callbacks.onTimetableOutput(timetable);
                 break;
             default:
                 break;
@@ -101,4 +110,5 @@ export interface Z3Callbacks {
     onZ3Initialized: any
     onSmtlib2InputCreated(s: string): any
     onOutput(s: string): any
+    onTimetableOutput(timetable: TimetableOutput): any
 }

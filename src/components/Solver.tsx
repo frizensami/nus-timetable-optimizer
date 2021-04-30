@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react'
 
-import { smtTest } from '../core/smt_test'
+import { TimetableOutput } from '../core/timetable_to_smtlib2'
 import { Segment, Button, Container, Divider } from 'semantic-ui-react'
-import { Lesson, Module, GenericTimetable } from '../core/generic_timetable'
+import { GenericTimetable } from '../core/generic_timetable'
 import { Z3Manager, Z3Callbacks } from '../core/z3_manager'
 import { NUSModsFrontend } from '../frontends/nusmods_frontend'
 import './Solver.css'
 
 
-export const Solver: React.FC<{}> = () => {
+export const Solver: React.FC<{onNewTimetable(timetable: any): any}> = ({onNewTimetable}) => {
 
     let [smtlibInput, setSmtlibInput] = useState<String>("");
     let [smtlibOutput, setSmtlibOutput] = useState<String>("");
@@ -25,10 +25,17 @@ export const Solver: React.FC<{}> = () => {
         setSmtlibOutput(smtStr)
     }
 
+    function onTimetableOutput(timetable: TimetableOutput) {
+        // setSmtlibOutput(smtStr)
+        console.log(timetable)
+        onNewTimetable(timetable);
+    }
+
     const callbacks: Z3Callbacks = {
         onZ3Initialized: onZ3Initialized,
         onSmtlib2InputCreated: updateInputSmtlib2,
-        onOutput: onOutput
+        onOutput: onOutput,
+        onTimetableOutput: onTimetableOutput
     }
 
     function onSubmit() {

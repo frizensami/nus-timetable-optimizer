@@ -1,6 +1,6 @@
 const smt = require('smtlib');
 
-const UNASSIGNED: number = -1;
+export const UNASSIGNED: number = -1;
 
 /**
  * Represents the constraints for a timetable in Z3
