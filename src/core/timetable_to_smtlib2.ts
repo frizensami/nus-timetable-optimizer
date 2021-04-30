@@ -101,6 +101,16 @@ export class TimetableSmtlib2Converter {
         }
     }
 
+    /*
+      Conversion from times like 0 --> (1, 0) (1st slot of the day 0-indexed, Monday)
+    */
+    z3_time_to_generic_time(z3_time: number): [number, number] {
+        // Day is easy: each day has(self.end_hour - self.start_hour) * 2) slots
+        const day = Math.floor(z3_time / ((this.end_hour - this.start_hour) * 2))
+        const offset = z3_time % ((this.end_hour - this.start_hour) * 2)
+        return [offset, day]
+    }
+
     /**
      * Simple conversion of string into a monday-index-0 number
      * */
