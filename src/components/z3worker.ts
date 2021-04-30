@@ -57,6 +57,7 @@ self.addEventListener('message', function(e) {
             startZ3();
             break;
         case MessageKind.OPTIMIZE:
+            console.log("Optimizing...")
             runZ3(message.msg);
             break;
         default:

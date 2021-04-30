@@ -107,7 +107,10 @@ export class Z3Timetable {
         let constraintStr = ""
         this.solver.forEachStatement((stmt: string) => constraintStr += stmt + "\n");
         constraintStr = constraintStr.substring(constraintStr.indexOf("\n") + 1);
-        return variablesStr + constraintStr;
+
+        // Final string to run the solver
+        let solveStr = "(check-sat)\n(get-model)\n(exit)"
+        return variablesStr + constraintStr + solveStr;
     }
 
 }

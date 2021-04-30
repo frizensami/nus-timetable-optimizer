@@ -13,7 +13,7 @@ test('A module is loaded asynchronously correctly', async () => {
 
     let nusmods_fe = new NUSModsFrontend();
     await nusmods_fe.add_module("CS3203", "2020-2021", 1, true);
-    console.log(nusmods_fe)
+    // console.log(nusmods_fe)
     expect(nusmods_fe.modules).toHaveLength(1);
     expect(nusmods_fe.modules[0].lessons['Lecture']).toHaveLength(1);
     expect(nusmods_fe.modules[0].lessons['Recitation']).toHaveLength(2);

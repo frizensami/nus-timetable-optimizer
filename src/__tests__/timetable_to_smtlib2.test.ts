@@ -58,7 +58,9 @@ test("Creates smtlib2 string correctly for one module with one tutorial clashing
 (assert (or (= SL_1024_1025 1024) (= SL_1024_1025 1025)))
 (assert (= (= SL_1024_1025 1024) (and (= h3 1024) (= h4 1024))))
 (assert (= (= SL_1024_1025 1025) (and (= h5 1025) (= h6 1025))))
-`
+(check-sat)
+(get-model)
+(exit)`
     expect(smtlib2str).toEqual(smtlib2str_expected)
 
 

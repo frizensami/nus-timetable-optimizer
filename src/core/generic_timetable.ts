@@ -66,7 +66,7 @@ export class Module {
             // Iterate through each lesson number in that type
             const grouped_lesson_nums = groupBy(lessons_for_lessontype, (v: Lesson) => v.lesson_id)
             grouped_lesson_nums.forEach((lessons_for_lessonnum: Array<Lesson>, _lessonNum, _) => {
-                if (lessons_for_lessonnum.length == 1) {
+                if (lessons_for_lessonnum.length === 1) {
                     // If only one lesson number of this type, leave it alone
                     lessons_for_timetable[lessontype].push(lessons_for_lessonnum[0])
                 } else {

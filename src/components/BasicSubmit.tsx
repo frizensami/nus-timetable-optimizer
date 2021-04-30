@@ -45,7 +45,11 @@ export const BasicSubmit: React.FC<{}> = () => {
         switch (message.kind) {
             case MessageKind.INITIALIZED:
                 console.log("Z3 Initialized!");
-                postMessage(worker, MessageKind.OPTIMIZE, testSmt);
+                smtTest().then((smtString) => {
+                    console.log("Running SMT with smtString:")
+                    console.log(smtString)
+                    postMessage(worker, MessageKind.OPTIMIZE, smtString);
+                });
                 break;
             case MessageKind.PRINT:
                 console.log("Message from Z3 solver: ");
@@ -67,11 +71,10 @@ export const BasicSubmit: React.FC<{}> = () => {
 
     function onSubmit() {
         console.log("Initializing z3 worker");
-        // worker = new Z3Worker()
-        // worker.onmessage = receiveWorkerMessage;
-        // postMessage(worker, MessageKind.INIT, "");
+        worker = new Z3Worker()
+        worker.onmessage = receiveWorkerMessage;
+        postMessage(worker, MessageKind.INIT, "");
 
-        console.log(smtTest());
         // console.log(worker)
     }
 

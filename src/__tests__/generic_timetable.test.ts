@@ -6,7 +6,7 @@ test('Can create a new Lesson as expected', () => {
     const start_d = new Date(2018, 11, 12, 10, 30);
     const end_d = new Date(2018, 11, 12, 12, 30);
     let lesson = new Lesson("1", "Lecture", [[start_d, end_d]], ["Monday"], LessonWeek.ALL);
-    console.log(lesson);
+    // console.log(lesson);
     expect(lesson).toBeDefined();
 });
 

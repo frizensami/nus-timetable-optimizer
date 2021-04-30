@@ -43,10 +43,22 @@ export class NUSModsFrontend {
     async read_module_json(module_code: string, acad_year: string): Promise<object> {
         const baseUrl = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
         const finalUrl = `${baseUrl}/modules/${acad_year}/${module_code}.json`;
-        console.log(`Fetching ${finalUrl}`)
+        // console.log(`Fetching ${finalUrl}`)
         const response = await fetch(finalUrl)
         const mod = await response.json();
         return mod;
+    }
+
+    /**
+     * Creates a GenericTimetable from the current state
+     * */
+    create_timetable(min_workload: number, max_workload: number): GenericTimetable {
+        const g = new GenericTimetable(
+            this.modules,
+            min_workload,
+            max_workload,
+        )
+        return g
     }
 
     /**

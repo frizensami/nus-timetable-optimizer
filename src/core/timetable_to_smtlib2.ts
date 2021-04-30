@@ -30,7 +30,7 @@ export class TimetableSmtlib2Converter {
                 const lessons_of_lessontype: Array<Lesson> = mod.lessons[lessonType];
                 lessons_of_lessontype.forEach((lesson: Lesson, lessonidx: number) => {
                     const key = [mod.module_id, lessonType, lesson.lesson_id].join("__");
-                    this.who_id_table[key] = moduleidx << 20 | lessontypeidx << 10 | lessonidx;
+                    this.who_id_table[key] = (moduleidx << 20) | (lessontypeidx << 10) | lessonidx;
                 });
             });
         });
@@ -82,7 +82,7 @@ export class TimetableSmtlib2Converter {
      * */
     generic_time_to_z3_time(timeval: Date, day: string): number {
         const hour = timeval.getHours();
-        const half_hour_addon = timeval.getMinutes() == 30 ? 1 : 0;
+        const half_hour_addon = timeval.getMinutes() === 30 ? 1 : 0;
         // We assume lessons within start to end hour each day
         if (hour < this.start_hour || hour > this.end_hour) {
             throw new Error(`Lesson either starts before start_hour ${hour} < ${this.start_hour} or ends after end_hour ${hour} > ${this.end_hour}`);
