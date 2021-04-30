@@ -1,13 +1,26 @@
 import { LessonWeek, Lesson, Module, GenericTimetable } from '../core/generic_timetable'
 import { groupBy } from '../util/utils'
 
+export interface ModuleToAdd {
+    module_code: string,
+    acad_year: string,
+    semester: number,
+    is_compulsory: boolean
+}
+
 export class NUSModsFrontend {
     modules: Array<Module> = [];
+
+    async add_modules(modules_to_add: Array<ModuleToAdd>) {
+        for (let mod of modules_to_add) {
+           await this.add_module(mod) 
+        }
+    }
 
     /**
      * Lookup a module JSON in our server and add it and its lessons to our list of modules
      * */
-    async add_module(module_code: string, acad_year: string, semester: number, is_compulsory: boolean) {
+    async add_module({module_code, acad_year, semester, is_compulsory}: ModuleToAdd) {
         const data: any = await this.read_module_json(module_code, acad_year)
         const semdata = data["semesterData"][semester - 1]
         const timetable = semdata["timetable"]

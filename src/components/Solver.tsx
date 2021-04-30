@@ -8,7 +8,7 @@ import { NUSModsFrontend } from '../frontends/nusmods_frontend'
 import './Solver.css'
 
 
-export const Solver: React.FC<{onNewTimetable(timetable: any): any}> = ({onNewTimetable}) => {
+export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNewTimetable }) => {
 
     let [smtlibInput, setSmtlibInput] = useState<String>("");
     let [smtlibOutput, setSmtlibOutput] = useState<String>("");
@@ -42,7 +42,20 @@ export const Solver: React.FC<{onNewTimetable(timetable: any): any}> = ({onNewTi
         console.log("Initializing z3 worker");
         // console.log(worker)
         let nusmods_fe = new NUSModsFrontend();
-        nusmods_fe.add_module("CS3203", "2020-2021", 1, true).then(() => {
+        let mod1 = {
+            module_code: "CS3203",
+            acad_year: "2020-2021",
+            semester: 1,
+            is_compulsory: true
+        }
+        let mod2 = {
+            module_code: "CS2106",
+            acad_year: "2020-2021",
+            semester: 1,
+            is_compulsory: true
+        }
+
+        nusmods_fe.add_modules([mod1, mod2]).then(() => {
             console.log(nusmods_fe);
             const gt: GenericTimetable = nusmods_fe.create_timetable(5, 10);
             Z3Manager.init(gt, callbacks);
