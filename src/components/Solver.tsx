@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react'
 
 import { TimetableOutput } from '../core/timetable_to_smtlib2'
-import { Segment, Button, Container, Divider } from 'semantic-ui-react'
+import { Segment, Button, Container, Divider, Grid } from 'semantic-ui-react'
 import { GenericTimetable } from '../core/generic_timetable'
 import { Z3Manager, Z3Callbacks } from '../core/z3_manager'
 import { NUSModsFrontend } from '../frontends/nusmods_frontend'
 import { CodeDisplay } from './CodeDisplay'
+import { ModuleConstraints } from './ModuleConstraints'
+import { GlobalConstraints } from './GlobalConstraints'
 import './Solver.css'
 
 
@@ -72,21 +74,31 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
             <Container>
                 <Segment raised>
                     <h3 className="ui center aligned header"> Modules & Constraints </h3>
-                    <Button onClick={onSubmit} attached="bottom">Run Solver</Button>
+                    <Grid columns={2} stackable celled>
+                        <Grid.Row>
+                            <Grid.Column textAlign="center">
+                                <ModuleConstraints/>
+                            </Grid.Column>
+                            <Grid.Column textAlign="center">
+                                <GlobalConstraints/>
+                            </Grid.Column>
+                        </Grid.Row>
+                    </Grid>
+
+                <Button onClick={onSubmit} color="green" attached="bottom">Run Solver</Button>
                 </Segment>
             </Container>
 
             <Divider />
 
             <Container>
-                <CodeDisplay code={smtlibInput} color="black" headerText="SMTLIB2 Input"/>
+                <CodeDisplay code={smtlibInput} color="grey" headerText="SMTLIB2 Input (Debug)" />
             </Container>
-
 
             <Divider />
 
             <Container>
-                <CodeDisplay code={smtlibOutput} color="brown" headerText="SMTLIB2 Output"/>
+                <CodeDisplay code={smtlibOutput} color="black" headerText="SMTLIB2 Output (Debug)" />
             </Container>
         </div>
     );

@@ -13,16 +13,18 @@ export class NUSModsFrontend {
 
     async add_modules(modules_to_add: Array<ModuleToAdd>) {
         for (let mod of modules_to_add) {
-           await this.add_module(mod) 
+            await this.add_module(mod) 
         }
     }
 
     /**
      * Lookup a module JSON in our server and add it and its lessons to our list of modules
      * */
-    async add_module({module_code, acad_year, semester, is_compulsory}: ModuleToAdd) {
-        const data: any = await this.read_module_json(module_code, acad_year)
-        const semdata = data["semesterData"][semester - 1]
+    async add_module({module_code, acad_year, semester, is_compulsory}: ModuleToAdd): Promise<boolean> {
+        const data: any = await NUSModsFrontend.read_module_json(module_code, acad_year, semester)
+        if (data === {}) return false; // No module to add - didn't fit our specifications
+
+        const semdata = data["semesterData"].find((v: any) => v.semester === semester);
         const timetable = semdata["timetable"]
 
         // Create generic lessons
@@ -48,19 +50,29 @@ export class NUSModsFrontend {
             is_compulsory,
         )
         this.modules.push(m)
+
+        return true; // Managed to add the module
     }
 
     /**
      * Read module data as public json files from our server
      * */
-    async read_module_json(module_code: string, acad_year: string): Promise<object> {
+    static async read_module_json(module_code: string, acad_year: string, semester: number): Promise<object> {
         const baseUrl = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
         const finalUrl = `${baseUrl}/modules/${acad_year}/${module_code}.json`;
         // console.log(`Fetching ${finalUrl}`)
-        const response = await fetch(finalUrl)
-        const mod = await response.json();
-        return mod;
+        try {
+            const response = await fetch(finalUrl)
+            const mod = await response.json();
+            // We check if the mod exists
+            const exists = mod["semesterData"].find((v: any) => v.semester === semester) !== undefined;
+            // If it doesn't return an empty dict, or return the mod itself
+            return exists ? mod : {};
+        } catch {
+            return {};
+        }
     }
+
 
     /**
      * Creates a GenericTimetable from the current state

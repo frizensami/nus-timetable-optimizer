@@ -65,7 +65,7 @@ function Timetable({ start_hour, end_hour, timetable }: TimetableProps) {
                 </Segment>
                 <Dimmer active={!timetable.is_sat}>
                     <Header as='h2' inverted color='red'>
-                        No valid timetable found: run the solver or change your constraints.
+                        No valid timetable found: run the solver or adjust your constraints.
                     </Header>
                 </Dimmer>
             </Dimmer.Dimmable>
