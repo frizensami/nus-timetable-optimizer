@@ -5,13 +5,14 @@ import { Segment, Button, Container, Divider } from 'semantic-ui-react'
 import { GenericTimetable } from '../core/generic_timetable'
 import { Z3Manager, Z3Callbacks } from '../core/z3_manager'
 import { NUSModsFrontend } from '../frontends/nusmods_frontend'
+import { CodeDisplay } from './CodeDisplay'
 import './Solver.css'
 
 
 export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNewTimetable }) => {
 
-    let [smtlibInput, setSmtlibInput] = useState<String>("");
-    let [smtlibOutput, setSmtlibOutput] = useState<String>("");
+    let [smtlibInput, setSmtlibInput] = useState<string>("No input yet.");
+    let [smtlibOutput, setSmtlibOutput] = useState<string>("No output yet.");
 
     function onZ3Initialized() {
         Z3Manager.solve()
@@ -78,24 +79,14 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
             <Divider />
 
             <Container>
-                <Segment raised inverted style={{ overflow: 'auto', maxHeight: 200 }}>
-                    <h3 className="ui center aligned header"> SMTLIB2 Input </h3>
-                    <div className="display-linebreak">
-                        {smtlibInput.replace(/ /g, "\u00a0")}
-                    </div>
-                </Segment>
+                <CodeDisplay code={smtlibInput} color="black" headerText="SMTLIB2 Input"/>
             </Container>
 
 
             <Divider />
 
             <Container>
-                <Segment raised inverted color="grey" style={{ overflow: 'auto', maxHeight: 200 }}>
-                    <h3 className="ui center aligned header"> SMTLIB2 Output </h3>
-                    <div className="display-linebreak">
-                        {smtlibOutput.replace(/ /g, "\u00a0")}
-                    </div>
-                </Segment>
+                <CodeDisplay code={smtlibOutput} color="brown" headerText="SMTLIB2 Output"/>
             </Container>
         </div>
     );
