@@ -50,7 +50,7 @@ function Timetable({ start_hour, end_hour, timetable }: TimetableProps) {
                                         <Table.Row key={i1}>
                                             <Table.Cell key={i1} textAlign='center'>{daysOfWeek[i1]}</Table.Cell>
                                             {hours.map((_, i2) => {
-                                                if (Object.keys(timetable).length === 0) {
+                                                if (Object.keys(timetable).length === 0 || !timetable.is_sat) {
                                                     return <Table.Cell key={(2 ** (i1 + 1)) * (3 ** (i2 + 1))} textAlign='center'>{""}</Table.Cell>;
                                                 } else {
                                                     return <Table.Cell key={(2 ** (i1 + 1)) * (3 ** (i2 + 1))} textAlign='center'>{timetable.tt[i1][i2]}</Table.Cell>;
