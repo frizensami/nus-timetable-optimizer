@@ -109,8 +109,11 @@ export class Z3Timetable {
         constraintStr = constraintStr.substring(constraintStr.indexOf("\n") + 1);
 
         // Final string to run the solver
+        const randomInt = Math.floor(Math.random() * 100000000)
+        // let randomPrefix = `(set-option :random-seed ${randomInt})\n(set-option :smt.arith.random_initial_value true)\n`
+        let randomPrefix = `(set-option :auto_config false)\n(set-option :smt.phase_selection 5)\n(set-option :smt.random-seed ${randomInt})\n`;
         let solveStr = "(check-sat)\n(get-model)\n(exit)"
-        return variablesStr + constraintStr + solveStr;
+        return randomPrefix + variablesStr + constraintStr + solveStr;
     }
 
 }

@@ -181,7 +181,10 @@ export class TimetableSmtlib2Converter {
                 const val = variable_assignments[key];
                 if (val == UNASSIGNED) return; // Un-assigned slot
                 const assignment: string = this.reverse_who_id_table[val]
-                if (assignment === undefined) throw new Error(`Undefined assignment for variable_assignments[${key}] = ${variable_assignments[key]}`)
+                if (assignment === undefined) {
+                    return;
+                    // throw new Error(`Undefined assignment for variable_assignments[${key}] = ${variable_assignments[key]}`)
+                }
                 tt[day][offset] = assignment.split("__").join("\n");
             }
         })
