@@ -98,10 +98,13 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
             }
         });
         setModules(mods);
+        onModulesChange(mods);
     }
 
     function removeModule(mod: ConstraintModule) {
-        setModules(modules.filter(m => m !== mod));
+        let newmods = modules.filter(m => m !== mod)
+        setModules(newmods)
+        onModulesChange(newmods);
     }
 
     return (

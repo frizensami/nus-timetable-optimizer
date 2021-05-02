@@ -28,16 +28,7 @@ export class Z3Manager {
     static worker?: Z3Worker = null;
 
 
-    /** 
-     * Register a generic timetable a set of callbacks to be called for different states in the Z3 solver lifecycle
-     * */
-    static init(gt: GenericTimetable, callbacks: Z3Callbacks) {
-        Z3Manager.gt = gt;
-        Z3Manager.conv = new TimetableSmtlib2Converter(gt,
-            DAYS * HOURS_PER_DAY * 2, // Number of "half-hour" slots
-            DAY_START_HOUR, // Start at 8am
-            DAY_END_HOUR) // End at 2200 (10 pm)
-        Z3Manager.smtString = Z3Manager.conv.generateSmtLib2String();
+    static initZ3(callbacks: Z3Callbacks) {
         Z3Manager.callbacks = callbacks;
         Z3Manager.printBuffer = "";
         Z3Manager.errBuffer = "";
@@ -46,16 +37,31 @@ export class Z3Manager {
             Z3Manager.worker = new Z3Worker()
             Z3Manager.worker.onmessage = Z3Manager.receiveWorkerMessage;
         }
-        // Run callback to update the generated smtlib2 string
-        Z3Manager.callbacks.onSmtlib2InputCreated(Z3Manager.smtString)
-    }
-
-    static initZ3() {
         Z3Manager.managerPostMessage(MessageKind.INIT, "");
     }
 
+
+    /** 
+     * Register a generic timetable a set of callbacks to be called for different states in the Z3 solver lifecycle
+     * */
+    static loadTimetable(gt: GenericTimetable) {
+        console.log("Loaded timetable")
+        console.log(gt)
+        Z3Manager.gt = gt;
+        Z3Manager.conv = new TimetableSmtlib2Converter(Z3Manager.gt,
+            DAYS * HOURS_PER_DAY * 2, // Number of "half-hour" slots
+            DAY_START_HOUR, // Start at 8am
+            DAY_END_HOUR) // End at 2200 (10 pm)
+        Z3Manager.smtString = Z3Manager.conv.generateSmtLib2String();
+        // Run callback to update the generated smtlib2 string
+        Z3Manager.callbacks.onSmtlib2InputCreated(Z3Manager.smtString)
+        Z3Manager.printBuffer = "";
+        Z3Manager.errBuffer = "";
+    }
+
+
     static solve() {
-        Z3Manager.managerPostMessage(MessageKind.OPTIMIZE, this.smtString);
+        Z3Manager.managerPostMessage(MessageKind.OPTIMIZE, Z3Manager.smtString);
     }
 
 

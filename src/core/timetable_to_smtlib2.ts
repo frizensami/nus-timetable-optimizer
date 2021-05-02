@@ -135,6 +135,8 @@ export class TimetableSmtlib2Converter {
         const parsed_expr = parse(z3_output)
         console.log(parsed_expr)
         const is_sat = parsed_expr[0].content === "sat"; // parsed_expr[0] === {type: "atom", content: "sat", location: {…}}
+        if (!is_sat) return { is_sat: false, tt: [] }; // Nothing to do here
+         
         let variable_assignments_exprs = parsed_expr[1].content; // parsed_expr[1] === {type: "list", content: Array(19), location: {…}}
         variable_assignments_exprs.shift(); // Removes first "model" expr: {type: "atom", content: "model", location: {…}}
         let variable_assignments: Record<string, number> = {};
