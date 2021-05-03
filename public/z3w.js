@@ -717,7 +717,9 @@ var Z3 = function (Z3) {
     }
     function integrateWasmJS() {
         var wasmTextFile = "z3w.wast";
-        var wasmBinaryFile = "http://localhost:3000/z3w.wasm";
+        // var wasmBinaryFile = "http://localhost:3000/z3w.wasm";
+        var wasmBinaryFile = self.location.origin + "/z3w.wasm";
+        console.log(wasmBinaryFile);
         var asmjsCodeFile = "z3w.temp.asm.js";
         if (typeof Module["locateFile"] === "function") {
             if (!isDataURI(wasmTextFile)) {

@@ -101,7 +101,7 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
                             0: <Segment raised>
                                 <Button disabled attached="top">Solver Loading</Button>,
                                 <Dimmer active>
-                                    <Loader content='Solver Initializing...' />
+                                    <Loader content='Solver Initializing... (this can take one or two minutes)' />
                                 </Dimmer>
                             </Segment>,
                             1: <Button onClick={onSubmit} color="green" attached="top">Run Solver</Button>,

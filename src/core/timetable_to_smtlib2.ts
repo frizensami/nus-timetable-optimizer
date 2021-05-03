@@ -2,6 +2,7 @@ import { LessonWeek, Lesson, Module, GenericTimetable } from './generic_timetabl
 
 import { flipRecord } from '../util/utils'
 import { Z3Timetable, SlotConstraint, UNASSIGNED } from './z3_timetable'
+import { DAYS } from './z3_manager'
 
 /**
  * Convert a generic timetable to a string representing smtlib2 code
@@ -122,6 +123,7 @@ export class TimetableSmtlib2Converter {
             "wednesday": 2,
             "thursday": 3,
             "friday": 4,
+            "saturday": 5,
         }
         return day_idxs[day.toLowerCase()];
     }
@@ -167,7 +169,7 @@ export class TimetableSmtlib2Converter {
 
 
         // 2D array of days (assuming that doesn't change...) x half-hours per day
-        let tt = new Array(5);
+        let tt = new Array(DAYS);
         for (let i = 0; i < tt.length; i++) {
             tt[i] = Array((this.end_hour - this.start_hour) * 2).fill("");
         }

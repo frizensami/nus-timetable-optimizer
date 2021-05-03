@@ -6,10 +6,10 @@ import { Z3Message, MessageKind } from "./z3_protocol"
 // @ts-ignore
 import Z3Worker from "worker-loader!./z3_worker";
 
-const DAYS = 5  // One week
-const HOURS_PER_DAY = 14  // 8 am --> 10 pm
-const DAY_START_HOUR = 8
-const DAY_END_HOUR = 22
+export const DAYS = 6  // One week mon - sat
+export const HOURS_PER_DAY = 14  // 8 am --> 10 pm
+export const DAY_START_HOUR = 8
+export const DAY_END_HOUR = 22
 
 /**
  * The Z3 manager takes a generic timetable as input and manages the lifecycle of running the

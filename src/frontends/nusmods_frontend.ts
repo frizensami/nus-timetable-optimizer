@@ -1,5 +1,11 @@
 import { LessonWeek, Lesson, Module, GenericTimetable } from '../core/generic_timetable'
 import { groupBy } from '../util/utils'
+// @ts-ignore
+import ExpiredStorage from 'expired-storage'
+
+const EXPIRY_HOURS = 24;
+const EXPIRY_MINUTES = EXPIRY_HOURS * 60
+const EXPIRY_SECS = EXPIRY_MINUTES * 60 
 
 export interface ModuleToAdd {
     module_code: string,
@@ -55,11 +61,63 @@ export class NUSModsFrontend {
     }
 
     /**
-     * Read module data as public json files from our server
+     * Read module data from local storage first, then nusmods API
      * */
     static async read_module_json(module_code: string, acad_year: string, semester: number): Promise<object> {
+        const localjson = NUSModsFrontend.read_module_local(module_code, acad_year, semester);
+        if (Object.keys(localjson).length === 0) {
+            const remotejson = await NUSModsFrontend.read_module_nusmods_api(module_code, acad_year, semester);
+            NUSModsFrontend.store_module_local(module_code, acad_year, semester, remotejson);
+            return remotejson;
+        } else {
+            return localjson;
+        }
+    }
+
+    /**
+     * Read module data as public json files from our server
+     * */
+    static async read_module_server(module_code: string, acad_year: string, semester: number): Promise<object> {
         const baseUrl = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
         const finalUrl = `${baseUrl}/modules/${acad_year}/${module_code}.json`;
+        // console.log(`Fetching ${finalUrl}`)
+        try {
+            const response = await fetch(finalUrl)
+            const mod = await response.json();
+            // We check if the mod exists
+            const exists = mod["semesterData"].find((v: any) => v.semester === semester) !== undefined;
+            // If it doesn't return an empty dict, or return the mod itself
+            return exists ? mod : {};
+        } catch {
+            return {};
+        }
+    }
+
+    /**
+     * Try to retrieve module information from local storage first
+     * */
+    static read_module_local(module_code: string, acad_year: string, semester: number): Promise<object> {
+        let expiredStorage = new ExpiredStorage();
+        const key = `${module_code}__${acad_year}__${semester}`;
+        const mod = expiredStorage.getJson(key)
+        expiredStorage.clearExpired(); // take the chance to remove expired vals
+        return (mod === undefined || mod === null) ? {} : mod;
+    }
+
+    /**
+     * Try to retrieve module information from local storage first
+     * */
+    static store_module_local(module_code: string, acad_year: string, semester: number, json: object) {
+        let expiredStorage = new ExpiredStorage();
+        const key = `${module_code}__${acad_year}__${semester}`;
+        expiredStorage.setJson(key, json, EXPIRY_SECS);
+        
+        
+    }
+
+    static async read_module_nusmods_api(module_code: string, acad_year: string, semester: number): Promise<object> {
+        const baseUrl = "https://api.nusmods.com/v2"
+        const finalUrl = `${baseUrl}/${acad_year}/modules/${module_code}.json`;
         // console.log(`Fetching ${finalUrl}`)
         try {
             const response = await fetch(finalUrl)

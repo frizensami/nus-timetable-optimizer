@@ -121,7 +121,7 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
 
                 { /* Display module selector */}
                 <Grid.Row>
-                    <Input action type='text' onChange={(e) => setModuleText(e.target.value)} onKeyPress={onKeyPress} placeholder='Type module code'>
+                    <Input stackable action type='text' onChange={(e) => setModuleText(e.target.value)} onKeyPress={onKeyPress} placeholder='Type module code'>
                         <input />
                         <Select compact options={ay_xs} defaultValue={defaultAyValue} onChange={(e, { value }) => setAyText(value as number)} />
                         <Select compact options={sem_xs} defaultValue={defaultSemValue} onChange={(e, { value }) => setSemText(value as number)} />

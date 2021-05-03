@@ -10,8 +10,8 @@ interface TimetableProps {
 function Timetable({ start_hour, end_hour, timetable }: TimetableProps) {
     // let [dimmerActive, setDimmerActive] = useState(false);
     let hours: Array<String> = [];
-    const days = 5;
-    const daysOfWeek = ["MON", "TUE", "WED", "THU", "FRI"]
+    const days = 6;
+    const daysOfWeek = ["MON", "TUE", "WED", "THU", "FRI", "SAT"]
     console.log("timetable")
     console.log(timetable)
     for (let hour = start_hour; hour < end_hour; hour++) {

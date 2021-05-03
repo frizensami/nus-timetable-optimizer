@@ -1,8 +1,12 @@
 # NUSMods Timetable Arranger - Web Version
 
 ## Objectives
-- Allow users to arrange their NUS timetable based on constraints (keep lunch-time free, no classes before 9 am, etc.)
-- This system should run primarily on the user's infrastructure (i.e., in their browser) to keep server load low. This is necessary due to the CPU-heavy SMT solver method being used.
+- Allow users to arrange their NUS timetable based on their specified constraints, e.g.,
+      - Keep lunch hours free
+      - No classes before 9 am, etc
+      - Try to get a free day
+- This system should run primarily on the user's own infrastructure (i.e., in their browser) 
+      - Purpose: keep server load low. Necessary due to SMT solving being CPU-heavy.
 
 ## Architecture
 - **React frontend** that should call little to no APIs on the backend that serves it (i.e., backend should primarily exist just to serve the app as-is)
