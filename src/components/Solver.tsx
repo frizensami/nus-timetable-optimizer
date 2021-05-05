@@ -133,13 +133,13 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
             <Divider />
 
             <Container>
-                <CodeDisplay code={smtlibInput} color="grey" headerText="SMTLIB2 Input (Debug)" />
+                <CodeDisplay code={smtlibInput} theme="dark" headerText="SMTLIB2 Input (Debug)" />
             </Container>
 
             <Divider />
 
             <Container>
-                <CodeDisplay code={smtlibOutput} color="black" headerText="SMTLIB2 Output (Debug)" />
+                <CodeDisplay code={smtlibOutput} theme="light" headerText="SMTLIB2 Output (Debug)" />
             </Container>
         </div>
     );

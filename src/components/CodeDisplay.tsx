@@ -2,18 +2,35 @@ import React, { useState, useEffect } from 'react'
 import './Solver.css'
 import { Segment, Button, Container, Divider } from 'semantic-ui-react'
 
-export const CodeDisplay: React.FC<{ code: string, color: string, headerText: string }> = ({ code, color, headerText }) => {
+import AceEditor from "react-ace";
+import "ace-builds/src-noconflict/mode-python";
+import "ace-builds/src-noconflict/theme-monokai";
+import "ace-builds/src-noconflict/theme-tomorrow";
+
+export const CodeDisplay: React.FC<{ code: string, theme: string, headerText: string }> = ({ code, theme, headerText }) => {
+
+    // <Segment raised inverted color={color as any} style={{ overflow: 'auto', maxHeight: 200 }}>
+    //     <div className="display-linebreak">
+    //         {code.replace(/ /g, "\u00a0")}
+    //     </div>
+    // </Segment>
 
     return (
 
-        <Segment raised inverted color={color as any}>
+        <Segment raised inverted={theme == "dark"}>
             <h3 className="ui center aligned header"> {headerText}</h3>
             <Divider />
-            <Segment raised inverted color={color as any} style={{ overflow: 'auto', maxHeight: 200 }}>
-                <div className="display-linebreak">
-                    {code.replace(/ /g, "\u00a0")}
-                </div>
-            </Segment>
+            <AceEditor
+                mode="python"
+                theme={theme == "dark" ? "monokai" : "tomorrow"}
+                value={code}
+                setOptions={{
+                    readOnly: true,
+                    fontSize: 18
+                }}
+                style={{"width": "100%"}}
+            />
+
         </Segment>
     )
 }

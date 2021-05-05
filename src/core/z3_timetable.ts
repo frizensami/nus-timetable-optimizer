@@ -73,7 +73,7 @@ export class Z3Timetable {
      * */
     add_constraints_fulfil_only_one(slots: Array<SlotConstraint>, boolean_selector?: string, chain_constraints: boolean = false) {
         // If we are selecting between who_ids 0, 1024, and 2048, the selector variable will be named SL_0_1024_2048
-        const selector_var: string = "SL_" + slots.map((slot) => slot.who_id).join("_")
+        const selector_var: string = "SL_" + slots.map((slot) => slot.who_id_string).join("_")
 
         // Indicate that we need to declare this later as an unconstrained variable (but we constrain it here instead)
         this.add_possible_values_to_variable(selector_var)
