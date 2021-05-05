@@ -1,1 +1,1 @@
-npm run build; echo "build/" | netlify deploy --prod
+npm run build; sleep 5; echo "build/" | netlify deploy --prod
