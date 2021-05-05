@@ -67,9 +67,11 @@ export class NUSModsFrontend {
         const localjson = NUSModsFrontend.read_module_local(module_code, acad_year, semester);
         if (Object.keys(localjson).length === 0) {
             const remotejson = await NUSModsFrontend.read_module_nusmods_api(module_code, acad_year, semester);
+            console.log("Retrieved module from NUSMods API, stored locally.")
             NUSModsFrontend.store_module_local(module_code, acad_year, semester, remotejson);
             return remotejson;
         } else {
+            console.log("Retrieved module from localStorage!")
             return localjson;
         }
     }

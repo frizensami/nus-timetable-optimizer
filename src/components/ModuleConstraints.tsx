@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import './Solver.css'
-import { Segment, Button, Container, Divider, Dropdown, Grid, Menu, Input, Select, Header, Message, Card, Checkbox, Item, Transition } from 'semantic-ui-react'
+import { Segment, Button, Container, Divider, Dropdown, Grid, Menu, Input, Form, Select, Header, Message, Card, Checkbox, Item, Transition } from 'semantic-ui-react'
 import { NUSModsFrontend } from '../frontends/nusmods_frontend'
 
 interface ModuleConstraintsProps {
@@ -20,8 +20,8 @@ export interface ConstraintModule {
  * Also contains a selector (combined here to keep state contained) for the modules
  * */
 export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }) => {
-    let ay_xs: Array<any> = [{ key: 1, text: "AY 2020-2021", value: 1 }]
-    let sem_xs: Array<any> = [{ key: 1, text: "Sem 1", value: 1 }, { key: 2, text: "Sem 2", value: 2 }]
+    let ay_xs: Array<any> = [{ key: 1, text: "2020-2021", value: 1 }]
+    let sem_xs: Array<any> = [{ key: 1, text: "1", value: 1 }, { key: 2, text: "2", value: 2 }]
     const defaultAyValue = 1
     const defaultSemValue = 1
 
@@ -41,7 +41,7 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
         const ay = ay_xs.find(x => x.value == ayValue);
         const sem = sem_xs.find(x => x.value == semValue);
         console.log(`${moduleText} - ${ay.text} - ${sem.text}`);
-        let mod: ConstraintModule = { module_code: moduleText.toUpperCase(), acad_year: ay.text.split(' ')[1], semester: semValue, required: true }
+        let mod: ConstraintModule = { module_code: moduleText.toUpperCase(), acad_year: ay.text, semester: semValue, required: true }
 
         const containsModAlready: boolean = modules.some((m: ConstraintModule) => m.module_code === mod.module_code);
         if (containsModAlready) {
@@ -113,21 +113,63 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
         }
     }
 
+    // <Grid.Row>
+    //     <Input stackable action type='text' onChange={(e) => setModuleText(e.target.value)} onKeyPress={onKeyPress} placeholder='Type module code'>
+    //         <input />
+    //         <Select compact options={ay_xs} defaultValue={defaultAyValue} onChange={(e, { value }) => setAyText(value as number)} />
+    //         <Select compact options={sem_xs} defaultValue={defaultSemValue} onChange={(e, { value }) => setSemText(value as number)} />
+    //         <Button type="submit" positive onClick={handleClick}>Add Module</Button>
+    //     </Input>
+    // </Grid.Row>
+
     return (
         <div>
             <Header as="h3" textAlign="center"> Module Selector </Header>
+
+            <Divider />
+
+
+            { /* Display module selector */}
+            <Form>
+                <Form.Group>
+                    <Form.Field
+                        id='form-input-module-name'
+                        control={Input}
+                        label='Module Code'
+                        placeholder='(e.g., CS3230)'
+                        onChange={(e: any) => setModuleText(e.target.value)} onKeyPress={onKeyPress}
+                    />
+                    <Form.Field
+                        control={Select}
+                        options={ay_xs}
+                        defaultValue={defaultAyValue}
+                        label='Academic Year'
+                        onChange={(_: any, { value }: any) => setAyText(value as number)}
+
+                        fluid
+                    />
+                    <Form.Field
+                        control={Select}
+                        options={sem_xs}
+                        defaultValue={defaultSemValue}
+                        label='Semester'
+                        onChange={(_: any, { value }: any) => setSemText(value as number)}
+
+                        fluid
+                    />
+                    <Form.Field
+                        id='form-button-control-public'
+                        control={Button}
+                        content='Add Module'
+                        positive onClick={handleClick}
+                        label="&nbsp;"
+
+                    />
+                </Form.Group>
+
+            </Form>
+
             <Grid stackable textAlign="center">
-
-
-                { /* Display module selector */}
-                <Grid.Row>
-                    <Input stackable action type='text' onChange={(e) => setModuleText(e.target.value)} onKeyPress={onKeyPress} placeholder='Type module code'>
-                        <input />
-                        <Select compact options={ay_xs} defaultValue={defaultAyValue} onChange={(e, { value }) => setAyText(value as number)} />
-                        <Select compact options={sem_xs} defaultValue={defaultSemValue} onChange={(e, { value }) => setSemText(value as number)} />
-                        <Button type="submit" onClick={handleClick}> Add Module</Button>
-                    </Input>
-                </Grid.Row>
 
                 { /* Display error messages */}
                 <Grid.Row>
