@@ -2,7 +2,7 @@ import { LessonWeek, Lesson, Module, GenericTimetable } from './generic_timetabl
 
 import { flipRecord } from '../util/utils'
 import { Z3Timetable, SlotConstraint, UNASSIGNED } from './z3_timetable'
-import { DAYS } from './z3_manager'
+import { DAYS, DAY_IDXS, IDX_DAYS } from './constants'
 
 /**
  * Convert a generic timetable to a string representing smtlib2 code
@@ -23,7 +23,17 @@ export class TimetableSmtlib2Converter {
         this.who_id_table = {}
         this.reverse_who_id_table = {}
         this.populate_who_id_tables()
-        this.z3tt = new Z3Timetable(total_half_hour_slots)
+
+        let time_str_vals: Array<string> = Array.from(new Array(total_half_hour_slots), (_: number, i: number) => {
+            const [offset, day] = this.z3_time_to_generic_time(i);
+            const dayOfWeek = this.idx_to_day_str(day);
+            const hour: number = Math.floor(offset / 2) + this.start_hour;
+            const hourStr: string = hour < 10 ? "0" + hour.toString() : hour.toString();
+            const minuteStr: string = offset % 2 === 0 ? "00" : "30"
+            return dayOfWeek + "_" + hourStr + minuteStr
+        });
+                                         
+        this.z3tt = new Z3Timetable(total_half_hour_slots, time_str_vals)
     }
 
     populate_who_id_tables() {
@@ -41,7 +51,7 @@ export class TimetableSmtlib2Converter {
         // console.log(this.reverse_who_id_table);
     }
 
-    generateSmtLib2String(): string {
+    generateSmtLib2String(randomize: boolean = true): string {
         this.gt.modules.forEach((mod: Module) => {
             if (!mod.is_compulsory) {
                 throw new Error("Non compulsory modules not implemented yet!"); // TODO implement
@@ -53,7 +63,7 @@ export class TimetableSmtlib2Converter {
                 });
             }
         })
-        const smtlib2Str = this.z3tt.generateSmtlib2String();
+        const smtlib2Str = this.z3tt.generateSmtlib2String(randomize);
         return smtlib2Str;
     }
 
@@ -73,7 +83,7 @@ export class TimetableSmtlib2Converter {
                 const end_time = this.generic_time_to_z3_time(g_end_time, lesson.days[idx]);
                 start_end_times.push([start_time, end_time]);
             })
-            const sc: SlotConstraint = { start_end_times: start_end_times, who_id: who_id };
+            const sc: SlotConstraint = { start_end_times: start_end_times, who_id: who_id, who_id_string: key };
             scs.push(sc)
         })
         return scs;
@@ -117,15 +127,14 @@ export class TimetableSmtlib2Converter {
      * Simple conversion of string into a monday-index-0 number
      * */
     day_str_to_idx(day: string): number {
-        const day_idxs: Record<string, number> = {
-            "monday": 0,
-            "tuesday": 1,
-            "wednesday": 2,
-            "thursday": 3,
-            "friday": 4,
-            "saturday": 5,
-        }
-        return day_idxs[day.toLowerCase()];
+        return DAY_IDXS[day.toLowerCase()];
+    }
+
+    /**
+     * Simple conversion of string into a monday-index-0 number
+     * */
+    idx_to_day_str(idx: number): string {
+        return IDX_DAYS[idx];
     }
 
 
@@ -177,8 +186,9 @@ export class TimetableSmtlib2Converter {
         // Create the final output timetable based on hour assignments
         Object.keys(variable_assignments).forEach((key: string) => {
             // Hour assignment
-            if (key.startsWith('h')) {
-                const halfhouridx = parseInt(key.substr(1));
+            if (key.startsWith('t')) {
+                const key_split = key.split("_")[0];
+                const halfhouridx = parseInt(key_split.substr(1));
                 const [offset, day] = this.z3_time_to_generic_time(halfhouridx)
                 const val = variable_assignments[key];
                 if (val == UNASSIGNED) return; // Un-assigned slot

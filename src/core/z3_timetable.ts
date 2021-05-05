@@ -12,8 +12,17 @@ export class Z3Timetable {
     variables_solver: any // Just for variables assignment - hack to get the variables assignment ABOVE the constraints
     solver: any // For the actual constraints
 
-    constructor(total_time_units: number) {
-        this.timevars = Array.from(new Array(total_time_units), (_: number, i: number) => "h" + i);
+    constructor(total_time_units: number, time_unit_names?: Array<string>) {
+        // Create time variable names based on just the raw time unit, or pass in a list of strings to be appended to the raw time hours
+        if (time_unit_names !== undefined) {
+            if (time_unit_names.length !== total_time_units) {
+                throw new Error("Size of time_unit_names array must be equal to total_time_units!");
+            } else {
+                this.timevars = Array.from(new Array(total_time_units), (_: number, i: number) => "t" + i + "_" + time_unit_names[i]);
+            }
+        } else {
+           this.timevars =  Array.from(new Array(total_time_units), (_: number, i: number) => "t" + i)
+        }
         this.assigned_vars_set = new Set();
         this.variables_solver = new smt.BaseSolver('QF_ALL_SUPPORTED');
         this.solver = new smt.BaseSolver('QF_ALL_SUPPORTED');
@@ -51,7 +60,7 @@ export class Z3Timetable {
      * */
     add_constraints_fulfil_only_one(slots: Array<SlotConstraint>) {
         // If we are selecting between who_ids 0, 1024, and 2048, the selector variable will be named SL_0_1024_2048
-        const selector_var: string = "SL_" + slots.map((slot) => slot.who_id).join("_")
+        const selector_var: string = "SL_" + slots.map((slot) => slot.who_id_string).join("_")
 
         // Make sure we declare this value later to be an integer
         this.assigned_vars_set.add(selector_var)
@@ -92,7 +101,7 @@ export class Z3Timetable {
     /**
     * Removes the first line (QF_ALL_SUPPORTED) from the output SMTLIB2 text
     * */
-    generateSmtlib2String(): string {
+    generateSmtlib2String(randomize: boolean = true): string {
         // For each variable that we use, we need to generate an indicate that it's an integer
         this.assigned_vars_set.forEach((timevar: string) => {
             this.variables_solver.add(smt.DeclareFun(timevar, [], 'Int'))
@@ -111,7 +120,7 @@ export class Z3Timetable {
         // Final string to run the solver
         const randomInt = Math.floor(Math.random() * 100000000)
         // let randomPrefix = `(set-option :random-seed ${randomInt})\n(set-option :smt.arith.random_initial_value true)\n`
-        let randomPrefix = `(set-option :auto_config false)\n(set-option :smt.phase_selection 5)\n(set-option :smt.random-seed ${randomInt})\n`;
+        let randomPrefix = randomize ? `(set-option :auto_config false)\n(set-option :smt.phase_selection 5)\n(set-option :smt.random-seed ${randomInt})\n` : "";
         let solveStr = "(check-sat)\n(get-model)\n(exit)"
         return randomPrefix + variablesStr + constraintStr + solveStr;
     }
@@ -122,4 +131,5 @@ export class Z3Timetable {
 export interface SlotConstraint {
     start_end_times: Array<[number, number]> // Array of start and end times
     who_id: number
+    who_id_string: string // string representing the who_id number as a user-interpretable string
 }
