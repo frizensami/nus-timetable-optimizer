@@ -60,6 +60,9 @@ function Predicate(pred: SNode, ...args: SNode[]): SNode {
 function Implies(lhs: SNode, rhs: SNode): SExpr {
     return new SExpr('=>', lhs, rhs);
 }
+function If(conditional: SNode, iftrue: SNode, iffalse: SNode): SExpr {
+    return new SExpr('ite', conditional, iftrue, iffalse);
+}
 function And(...args: SNode[]): SNode {
     if (args.length === 1)
         return args[0];
@@ -100,6 +103,17 @@ function StringLiteral(str: string): SNode {
 function Named(name: SNode, expr: SNode): SExpr {
     return new SExpr('!', expr, ':named', name);
 }
+function Maximize(term: SNode): SExpr {
+   return new SExpr('maximize', term) 
+}
+function Minimize(term: SNode): SExpr {
+   return new SExpr('minimize', term) 
+}
+function Sum(...args: SNode[]): SNode {
+    if (args.length === 1)
+        return args[0];
+    return new SExpr('+', ...args);
+}
 function CheckSat(): SExpr {
     return new SExpr('check-sat');
 }
@@ -118,6 +132,7 @@ export {
     Implies,
     And,
     Or,
+    If,
     Not,
     Eq,
     NEq,
@@ -128,5 +143,8 @@ export {
     Named,
     SetType,
     StringLiteral,
+    Maximize,
+    Minimize,
+    Sum,
     CheckSat
 };

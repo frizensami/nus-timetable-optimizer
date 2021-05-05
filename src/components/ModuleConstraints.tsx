@@ -107,11 +107,11 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
         onModulesChange(newmods);
     }
 
-    function onKeyPress(event: any) {
-        if (event.key === 'Enter') {
-            handleClick();
-        }
-    }
+    // function onKeyPress(event: any) {
+    //     if (event.key === 'Enter') {
+    //         handleClick();
+    //     }
+    // }
 
     // <Grid.Row>
     //     <Input stackable action type='text' onChange={(e) => setModuleText(e.target.value)} onKeyPress={onKeyPress} placeholder='Type module code'>
@@ -137,7 +137,7 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
                         control={Input}
                         label='Module Code'
                         placeholder='(e.g., CS3230)'
-                        onChange={(e: any) => setModuleText(e.target.value)} onKeyPress={onKeyPress}
+                        onChange={(e: any) => setModuleText(e.target.value)}
                     />
                     <Form.Field
                         control={Select}

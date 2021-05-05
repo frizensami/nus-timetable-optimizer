@@ -32,7 +32,7 @@ export class TimetableSmtlib2Converter {
             const minuteStr: string = offset % 2 === 0 ? "00" : "30"
             return dayOfWeek + "_" + hourStr + minuteStr
         });
-                                         
+
         this.z3tt = new Z3Timetable(total_half_hour_slots, time_str_vals)
     }
 
@@ -53,15 +53,16 @@ export class TimetableSmtlib2Converter {
 
     generateSmtLib2String(randomize: boolean = true): string {
         this.gt.modules.forEach((mod: Module) => {
-            if (!mod.is_compulsory) {
-                throw new Error("Non compulsory modules not implemented yet!"); // TODO implement
-            } else {
-                Object.keys(mod.lessons).forEach((lessonType: string, lessontypeidx: number, _) => {
-                    const lessons_of_lessontype: Array<Lesson> = mod.lessons[lessonType];
-                    const slot_constraints: Array<SlotConstraint> = this.module_lessons_to_slotconstraints(mod, lessons_of_lessontype);
+            Object.keys(mod.lessons).forEach((lessonType: string) => {
+                const lessons_of_lessontype: Array<Lesson> = mod.lessons[lessonType];
+                const slot_constraints: Array<SlotConstraint> = this.module_lessons_to_slotconstraints(mod, lessons_of_lessontype);
+                if (mod.is_compulsory) {
                     this.z3tt.add_constraints_fulfil_only_one(slot_constraints);
-                });
-            }
+                } else {
+                    // Make these slot constraints depend on this module ID (creates a boolean selector based on the mod id)
+                    this.z3tt.add_constraints_fulfil_only_one(slot_constraints, mod.module_id);
+                }
+            });
         })
         const smtlib2Str = this.z3tt.generateSmtlib2String(randomize);
         return smtlib2Str;
@@ -147,7 +148,7 @@ export class TimetableSmtlib2Converter {
         console.log(parsed_expr)
         const is_sat = parsed_expr[0].content === "sat"; // parsed_expr[0] === {type: "atom", content: "sat", location: {…}}
         if (!is_sat) return { is_sat: false, tt: [] }; // Nothing to do here
-         
+
         let variable_assignments_exprs = parsed_expr[1].content; // parsed_expr[1] === {type: "list", content: Array(19), location: {…}}
         variable_assignments_exprs.shift(); // Removes first "model" expr: {type: "atom", content: "model", location: {…}}
         let variable_assignments: Record<string, number> = {};
@@ -191,7 +192,7 @@ export class TimetableSmtlib2Converter {
                 const halfhouridx = parseInt(key_split.substr(1));
                 const [offset, day] = this.z3_time_to_generic_time(halfhouridx)
                 const val = variable_assignments[key];
-                if (val == UNASSIGNED) return; // Un-assigned slot
+                if (val === UNASSIGNED) return; // Un-assigned slot
                 const assignment: string = this.reverse_who_id_table[val]
                 if (assignment === undefined) {
                     return;
@@ -202,7 +203,7 @@ export class TimetableSmtlib2Converter {
         })
 
         console.log(tt);
-        
+
         const output: TimetableOutput = {
             is_sat: is_sat,
             tt: tt
