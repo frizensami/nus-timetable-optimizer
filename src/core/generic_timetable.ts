@@ -22,8 +22,8 @@ export class Lesson {
     weeks: LessonWeek;
 
     constructor(lesson_id: string, lesson_type: string, start_end_times: Array<[Date, Date]>, days: Array<string>, weeks: LessonWeek) {
-        this.lesson_id = lesson_id
-        this.lesson_type = lesson_type
+        this.lesson_id = lesson_id.replace(/\s/g, '')
+        this.lesson_type = lesson_type.replace(/\s/g, '')
         this.start_end_times = start_end_times
         this.days = days
         this.weeks = weeks
@@ -43,7 +43,7 @@ export class Module {
     is_compulsory: boolean;
 
     constructor(module_id: string, workload: number, in_lessons: Array<Lesson>, is_compulsory: boolean) {
-        this.module_id = module_id
+        this.module_id = module_id.replace(/\s/g, '')
         this.workload = workload
         this.lessons = this.process_lessons(in_lessons)
         this.is_compulsory = is_compulsory
