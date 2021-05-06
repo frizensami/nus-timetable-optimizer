@@ -100,7 +100,7 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                         control={Input}
                         label='Minimum Workload (MCs)'
                         type="number"
-                        defaultValue={16}
+                        defaultValue={defaultConstraints.minWorkload}
                         min="0"
                         step="1"
                         onChange={(e: any) => updateMinWorkload(e.target.value)}
@@ -112,7 +112,7 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                         control={Input}
                         label='Maximum Workload (MCs)'
                         type="number"
-                        defaultValue={30}
+                        defaultValue={defaultConstraints.maxWorkload}
                         min="0"
                         step="1"
                         onChange={(e: any) => updateMaxWorkload(e.target.value)}

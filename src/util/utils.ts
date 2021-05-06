@@ -33,3 +33,8 @@ export function flipRecord(obj: any): any {
   });
   return ret;
 }
+
+/**
+ * Module name to color
+ * */
+

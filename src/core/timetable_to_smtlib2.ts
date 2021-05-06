@@ -52,6 +52,7 @@ export class TimetableSmtlib2Converter {
     }
 
     generateSmtLib2String(randomize: boolean = true): string {
+        // Add all the time constraints from each module
         this.gt.modules.forEach((mod: Module) => {
             Object.keys(mod.lessons).forEach((lessonType: string) => {
                 const lessons_of_lessontype: Array<Lesson> = mod.lessons[lessonType];
@@ -64,22 +65,39 @@ export class TimetableSmtlib2Converter {
                 }
             });
 
-            // TODO add module workload
 
-            // Add requirements for free day: this ensures that we won't get SAT unless an entire day is free
-            if (this.gt.constraints.freeDayActive) {
-                // Model this as a "fulfil only one" constraint, but all the slots are assigned to WHO_ID == UNASSIGND
-                const slot_constraints: Array<SlotConstraint> = this.generate_free_day_slotconstraints();
-                this.z3tt.add_constraints_fulfil_only_one(slot_constraints);
-            }
-
-            if (this.gt.constraints.timeConstraintActive) {
-                const slot_constraint: SlotConstraint | undefined = this.generate_timeconstraint_slotconstraint();
-                if (slot_constraint !== undefined) {
-                    this.z3tt.add_constraints_fulfil_only_one([slot_constraint]);
-                }
-            }
         })
+
+        // TODO add module workload
+        if (this.gt.constraints.workloadActive) {
+            // Non-compulsory modules make up the if-then-else
+            const optional_workloads: Array<[string, number]> = this.gt.modules
+                .filter((mod: Module) => !mod.is_compulsory)
+                .map((mod: Module) => [mod.module_id, mod.workload])
+            // Compulsory modules make up the baseline workload
+            const compulsory_workload_sum: number = this.gt.modules
+                .filter((mod: Module) => mod.is_compulsory)
+                .map((mod: Module) => mod.workload)
+                .reduce((a, n) => a + Number(n), 0)
+            console.log(compulsory_workload_sum)
+            // Indicate that each boolean selector from the loop above has a cost if chosen
+            this.z3tt.set_boolean_selector_costs(optional_workloads, compulsory_workload_sum, this.gt.constraints.minWorkload, this.gt.constraints.maxWorkload)
+        }
+
+
+        // Add requirements for free day: this ensures that we won't get SAT unless an entire day is free
+        if (this.gt.constraints.freeDayActive) {
+            // Model this as a "fulfil only one" constraint, but all the slots are assigned to WHO_ID == UNASSIGND
+            const slot_constraints: Array<SlotConstraint> = this.generate_free_day_slotconstraints();
+            this.z3tt.add_constraints_fulfil_only_one(slot_constraints);
+        }
+
+        if (this.gt.constraints.timeConstraintActive) {
+            const slot_constraint: SlotConstraint | undefined = this.generate_timeconstraint_slotconstraint();
+            if (slot_constraint !== undefined) {
+                this.z3tt.add_constraints_fulfil_only_one([slot_constraint]);
+            }
+        }
         const smtlib2Str = this.z3tt.generateSmtlib2String(randomize);
         return smtlib2Str;
     }
@@ -134,7 +152,7 @@ export class TimetableSmtlib2Converter {
 
             // Generate the slot constraints for each day
             const startidx = day * (HOURS_PER_DAY * 2) + startOffset;
-            const endidx = startidx + (endOffset - startOffset); 
+            const endidx = startidx + (endOffset - startOffset);
             const sc: SlotConstraint = { start_end_times: [[startidx, endidx]], who_id: who_id, who_id_string: name }
             scs.push(sc)
         }
@@ -161,7 +179,7 @@ export class TimetableSmtlib2Converter {
         for (let day = 0; day < DAYS; day++) {
 
             // Compute the two time windows necessary to block off start and end of day
-            
+
             // Start-of-day time starts at the initial index of the day, up until the offset
             const startidx = day * (HOURS_PER_DAY * 2);
             const startidx_endidx = startidx + startOffset;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import './Solver.css'
-import { Segment, Button, Container, Divider, Dropdown, Grid, Menu, Input, Form, Select, Header, Message, Card, Checkbox, Item, Transition } from 'semantic-ui-react'
+import { Segment, Button, Container, Divider, Dropdown, Grid, List, Menu, Input, Form, Select, Header, Message, Card, Checkbox, Item, Transition } from 'semantic-ui-react'
 import { NUSModsFrontend } from '../frontends/nusmods_frontend'
 
 interface ModuleConstraintsProps {
@@ -138,7 +138,7 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
                         label='Module Code'
                         placeholder='(e.g., CS3230)'
                         onChange={(e: any) => setModuleText(e.target.value)}
-        fluid
+                        fluid
                         width={5}
                     />
                     <Form.Field
@@ -200,44 +200,50 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
 
 
                 { /* Display each module as a card within the grid */}
-                {
-                    modules.map((mod: ConstraintModule, idx: number) => {
-                        return (
+                <Transition.Group
+                    duration={1000}
+                    size='huge'
+                    verticalAlign='middle'
+                >
+                    {
+                        modules.map((mod: ConstraintModule, idx: number) => {
+                            return (
 
-                            <Grid.Row centered key={idx} columns="equal">
-                                <Grid.Column textAlign="center" width={16}>
-                                    <Card centered fluid>
-                                        <Card.Content>
-                                            <Card.Header> {mod.module_code + " " + mod.json["title"]} </Card.Header>
-                                            <Card.Meta> {"AY " + mod.acad_year + " Semester " + mod.semester} </Card.Meta>
-                                        </Card.Content>
-                                        <Card.Content extra>
-                                            <Grid stackable textAlign="center">
-                                                <Grid.Row columns="equal">
+                                <Grid.Row centered key={idx} columns="equal">
+                                    <Grid.Column textAlign="center" width={16}>
+                                        <Card centered fluid>
+                                            <Card.Content>
+                                                <Card.Header> {mod.module_code + " " + mod.json["title"]} </Card.Header>
+                                                <Card.Meta> {"AY " + mod.acad_year + " | Semester " + mod.semester + " | Workload: " + mod.json['moduleCredit'] + " MC"} </Card.Meta>
+                                            </Card.Content>
+                                            <Card.Content extra>
+                                                <Grid stackable textAlign="center">
+                                                    <Grid.Row columns="equal">
 
 
-                                                    <Grid.Column width={8}>
-                                                        <Button basic color='red' onClick={() => removeModule(mod)}>
-                                                            Remove Module
+                                                        <Grid.Column width={8}>
+                                                            <Button basic color='red' onClick={() => removeModule(mod)}>
+                                                                Remove Module
                                                     </Button>
-                                                    </Grid.Column>
+                                                        </Grid.Column>
 
-                                                    <Grid.Column textAlign="center" width={8}>
-                                                        <Button toggle active={mod.required} onClick={() => toggleRequired(mod)}>
-                                                            {mod.required ? "Required" : "Optional"}
-                                                        </Button>
-                                                    </Grid.Column>
+                                                        <Grid.Column textAlign="center" width={8}>
+                                                            <Button toggle active={mod.required} onClick={() => toggleRequired(mod)}>
+                                                                {mod.required ? "Required" : "Optional"}
+                                                            </Button>
+                                                        </Grid.Column>
 
-                                                </Grid.Row>
-                                            </Grid>
-                                        </Card.Content>
-                                    </Card>
-                                </Grid.Column>
-                            </Grid.Row>
-                        )
+                                                    </Grid.Row>
+                                                </Grid>
+                                            </Card.Content>
+                                        </Card>
+                                    </Grid.Column>
+                                </Grid.Row>
+                            )
 
-                    })
-                }
+                        })
+                    }
+                </Transition.Group>
             </Grid>
         </div>
     )

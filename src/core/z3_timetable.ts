@@ -12,7 +12,7 @@ export const BOOLVAR_ASSIGNED_WEIGHT: number = 100000;
  * */
 export class Z3Timetable {
     timevars: Array<string> // ["t0", "t1", ....]
-    assigned_vars_possiblevalues: Record<string, Set<number>> // What allowed values can each time val
+    assigned_intvars_possiblevalues: Record<string, Set<number>> // What allowed values can each time val
     bool_selectors_set: Set<string> // Basically module names e.g, CS3203, to select or de-select a module
     variables_solver: any // Just for variables assignment - hack to get the variables assignment ABOVE the constraints
     solver: any // For the actual constraints
@@ -28,7 +28,7 @@ export class Z3Timetable {
         } else {
             this.timevars = Array.from(new Array(total_time_units), (_: number, i: number) => "t" + i)
         }
-        this.assigned_vars_possiblevalues = {};
+        this.assigned_intvars_possiblevalues = {};
         this.bool_selectors_set = new Set();
         this.variables_solver = new smt.BaseSolver('QF_ALL_SUPPORTED');
         this.solver = new smt.BaseSolver('QF_ALL_SUPPORTED');
@@ -128,18 +128,34 @@ export class Z3Timetable {
 
     }
 
+    set_boolean_selector_costs(workloads: Array<[string, number]>, base_workload: number, minWorkload: number, maxWorkload: number) {
+        // Create a variable for the cost of the boolean selectors, add it to declarations list
+        const workload_sum_name = "workloadsum"
+        this.assigned_intvars_possiblevalues[workload_sum_name] = new Set();
+
+        // Assert that the workload sum is the sum of the if-then-else of the boolean selectors involved
+        let terms = [base_workload]
+        workloads.forEach(([varname, workload]) => terms.push(smt.If("OPT_" + varname, workload, 0)));
+        let sumOfTerms = smt.Sum(...terms);
+        this.solver.assert(smt.Eq(workload_sum_name, sumOfTerms));
+
+        // Assert that the workload should be >= than the minimum workload and <= the maximum workload
+        this.solver.assert(smt.GEq(workload_sum_name, minWorkload))
+        this.solver.assert(smt.LEq(workload_sum_name, maxWorkload))
+    }
+
     /**
      * Creates a list of variables to declare as Ints later.
      * They can be constrained to have a certain set of values.
      * If not constrained, the set will be empty
      * */
     add_possible_values_to_variable(varname: string, values: Array<number> = []) {
-        if (this.assigned_vars_possiblevalues[varname] === undefined) {
+        if (this.assigned_intvars_possiblevalues[varname] === undefined) {
             // Make sure we at least have the UNASSIGNED possible value for the var
-            this.assigned_vars_possiblevalues[varname] = new Set(values);
+            this.assigned_intvars_possiblevalues[varname] = new Set(values);
         } else {
             // No set union. have to add each val independently
-            values.forEach((val: number) => this.assigned_vars_possiblevalues[varname].add(val));
+            values.forEach((val: number) => this.assigned_intvars_possiblevalues[varname].add(val));
         }
     }
 
@@ -154,14 +170,15 @@ export class Z3Timetable {
             this.variables_solver.add(smt.DeclareFun(boolvar, [], 'Bool'))
             // this.variables_solver.add(smt.AssertSoft(boolvar, BOOLVAR_ASSIGNED_WEIGHT, 'defaultval'));
         })
+
         // For each variable that we use, we need to generate an indicate that it's an integer
         // We also need to assert-soft that each variable should be UNASSIGNED if possible
-        Object.keys(this.assigned_vars_possiblevalues).forEach((varname: string) => {
+        Object.keys(this.assigned_intvars_possiblevalues).forEach((varname: string) => {
             // Declare variable
             this.variables_solver.add(smt.DeclareFun(varname, [], 'Int'))
 
             // Constrain the possible values of the var if the set is nonempty
-            const var_values: Set<number> = this.assigned_vars_possiblevalues[varname];
+            const var_values: Set<number> = this.assigned_intvars_possiblevalues[varname];
             if (var_values.size > 0) {
                 // [(= t1 7) (= t1 8) (= t1 9)...]
                 const possible_vals_eq = Array.from(var_values).map((val: number) => smt.Eq(varname, val));

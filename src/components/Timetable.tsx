@@ -51,9 +51,15 @@ function Timetable({ start_hour, end_hour, timetable }: TimetableProps) {
                                             <Table.Cell key={i1} textAlign='center'>{daysOfWeek[i1]}</Table.Cell>
                                             {hours.map((_, i2) => {
                                                 if (Object.keys(timetable).length === 0 || !timetable.is_sat) {
+                                                    // Empty timetable
                                                     return <Table.Cell key={(2 ** (i1 + 1)) * (3 ** (i2 + 1))} textAlign='center'>{""}</Table.Cell>;
                                                 } else {
-                                                    return <Table.Cell key={(2 ** (i1 + 1)) * (3 ** (i2 + 1))} textAlign='center'>{timetable.tt[i1][i2]}</Table.Cell>;
+                                                    const cellStr = timetable.tt[i1][i2];
+                                                    if (cellStr.startsWith("TOO") || cellStr.startsWith("FREE")) {
+                                                        return <Table.Cell active key={(2 ** (i1 + 1)) * (3 ** (i2 + 1))} textAlign='center'>{""}</Table.Cell>;
+                                                    } else {
+                                                        return <Table.Cell key={(2 ** (i1 + 1)) * (3 ** (i2 + 1))} textAlign='center'>{timetable.tt[i1][i2]}</Table.Cell>;
+                                                    }
                                                 }
                                             })}
                                         </Table.Row>

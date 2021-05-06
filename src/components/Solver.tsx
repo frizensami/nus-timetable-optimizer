@@ -92,9 +92,6 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
 
             <Container>
                 <Segment raised>
-
-                    <h3 className="ui center aligned header"> Modules & Constraints </h3>
-
                     {
 
                         {
