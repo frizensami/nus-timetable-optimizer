@@ -7,7 +7,7 @@ import { Z3Manager, Z3Callbacks } from '../core/z3_manager'
 import { NUSModsFrontend, ModuleToAdd } from '../frontends/nusmods_frontend'
 import { CodeDisplay } from './CodeDisplay'
 import { ModuleConstraints, ConstraintModule } from './ModuleConstraints'
-import { GlobalConstraints } from './GlobalConstraints'
+import { GlobalConstraints, GlobalConstraintsList, defaultConstraints } from './GlobalConstraints'
 import './Solver.css'
 
 enum Z3State {
@@ -23,6 +23,7 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
     let [smtlibOutput, setSmtlibOutput] = useState<string>("No output yet.");
     let [modules, setModules] = useState<Array<ModuleToAdd>>([]);
     let [z3State, setZ3State] = useState<Z3State>(Z3State.PRE_INIT);
+    let [constraints, setConstraints] = useState<GlobalConstraintsList>(defaultConstraints);
 
 
 
@@ -66,7 +67,7 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
 
         nusmods_fe.add_modules(modules).then(() => {
             console.log(nusmods_fe);
-            const gt: GenericTimetable = nusmods_fe.create_timetable(5, 10);
+            const gt: GenericTimetable = nusmods_fe.create_timetable(constraints.minWorkload, constraints.maxWorkload, constraints.freeDayActive);
             Z3Manager.loadTimetable(gt);
             setZ3State(Z3State.SOLVING);
             Z3Manager.solve()
@@ -86,7 +87,6 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
         }));
     }
 
-
     return (
         <div className="solver">
 
@@ -104,7 +104,7 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
                                     <Loader content='Solver Initializing... (this can take one or two minutes)' />
                                 </Dimmer>
                             </Segment>,
-                            1: <Button onClick={onSubmit} color="green" attached="top">Run Solver</Button>,
+                            1: <Button onClick={onSubmit} primary size="big" attached="top">Run Solver</Button>,
                             2: <Segment raised>
                                 <Button disabled attached="top">Solver Running</Button>,
                                 <Dimmer active>
@@ -116,13 +116,13 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
 
 
 
-                    <Grid columns={2} stackable celled>
+                    <Grid columns="equal" stackable celled>
                         <Grid.Row>
                             <Grid.Column textAlign="center">
                                 <ModuleConstraints onModulesChange={onModulesChange} />
                             </Grid.Column>
                             <Grid.Column textAlign="center">
-                                <GlobalConstraints />
+                                <GlobalConstraints onUpdateConstraints={setConstraints} />
                             </Grid.Column>
                         </Grid.Row>
                     </Grid>
@@ -133,13 +133,13 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
             <Divider />
 
             <Container>
-                <CodeDisplay code={smtlibInput} theme="dark" headerText="SMTLIB2 Input (Debug)" />
+                <CodeDisplay code={smtlibInput} theme="dark" headerText="Solver SMTLIB2 Input (Debug)" />
             </Container>
 
             <Divider />
 
             <Container>
-                <CodeDisplay code={smtlibOutput} theme="light" headerText="SMTLIB2 Output (Debug)" />
+                <CodeDisplay code={smtlibOutput} theme="light" headerText="Solver SMTLIB2 Output (Debug)" />
             </Container>
         </div>
     );

@@ -137,11 +137,12 @@ export class NUSModsFrontend {
     /**
      * Creates a GenericTimetable from the current state
      * */
-    create_timetable(min_workload: number, max_workload: number): GenericTimetable {
+    create_timetable(min_workload: number, max_workload: number, free_day: boolean = false): GenericTimetable {
         const g = new GenericTimetable(
             this.modules,
             min_workload,
             max_workload,
+            free_day
         )
         return g
     }

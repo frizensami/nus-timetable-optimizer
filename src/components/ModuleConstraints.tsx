@@ -138,6 +138,8 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
                         label='Module Code'
                         placeholder='(e.g., CS3230)'
                         onChange={(e: any) => setModuleText(e.target.value)}
+        fluid
+                        width={5}
                     />
                     <Form.Field
                         control={Select}
@@ -145,7 +147,7 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
                         defaultValue={defaultAyValue}
                         label='Academic Year'
                         onChange={(_: any, { value }: any) => setAyText(value as number)}
-
+                        width={4}
                         fluid
                     />
                     <Form.Field
@@ -155,21 +157,23 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
                         label='Semester'
                         onChange={(_: any, { value }: any) => setSemText(value as number)}
 
+                        width={3}
                         fluid
                     />
                     <Form.Field
                         id='form-button-control-public'
                         control={Button}
                         content='Add Module'
-                        positive onClick={handleClick}
+                        primary onClick={handleClick}
                         label="&nbsp;"
-
+                        fluid
+                        width={4}
                     />
                 </Form.Group>
 
             </Form>
 
-            <Grid stackable textAlign="center">
+            <Grid stackable centered textAlign="center">
 
                 { /* Display error messages */}
                 <Grid.Row>
@@ -200,7 +204,7 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
                     modules.map((mod: ConstraintModule, idx: number) => {
                         return (
 
-                            <Grid.Row key={idx} columns="equal">
+                            <Grid.Row centered key={idx} columns="equal">
                                 <Grid.Column textAlign="center" width={16}>
                                     <Card centered fluid>
                                         <Card.Content>
@@ -211,18 +215,19 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
                                             <Grid stackable textAlign="center">
                                                 <Grid.Row columns="equal">
 
-                                                    <Grid.Column width={8}>
-                                                        <Button toggle active={mod.required} onClick={() => toggleRequired(mod)}>
-                                                            {mod.required ? "Required" : "Optional"}
-                                                        </Button>
-                                                    </Grid.Column>
 
                                                     <Grid.Column width={8}>
                                                         <Button basic color='red' onClick={() => removeModule(mod)}>
                                                             Remove Module
                                                     </Button>
-
                                                     </Grid.Column>
+
+                                                    <Grid.Column textAlign="center" width={8}>
+                                                        <Button toggle active={mod.required} onClick={() => toggleRequired(mod)}>
+                                                            {mod.required ? "Required" : "Optional"}
+                                                        </Button>
+                                                    </Grid.Column>
+
                                                 </Grid.Row>
                                             </Grid>
                                         </Card.Content>

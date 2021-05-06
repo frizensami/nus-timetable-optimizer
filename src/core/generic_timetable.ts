@@ -112,10 +112,12 @@ export class GenericTimetable {
     modules: Array<Module>;
     min_workload: number;
     max_workload: number;
+    want_free_day: boolean;
 
-    constructor(modules: Array<Module>, min_workload: number, max_workload: number) {
+    constructor(modules: Array<Module>, min_workload: number, max_workload: number, want_free_day: boolean = false) {
         this.modules = modules
         this.min_workload = min_workload
         this.max_workload = max_workload
+        this.want_free_day = want_free_day
     }
 }

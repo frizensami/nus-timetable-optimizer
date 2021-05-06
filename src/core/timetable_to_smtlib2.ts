@@ -1,8 +1,8 @@
 import { LessonWeek, Lesson, Module, GenericTimetable } from './generic_timetable'
 
 import { flipRecord } from '../util/utils'
-import { Z3Timetable, SlotConstraint, UNASSIGNED } from './z3_timetable'
-import { DAYS, DAY_IDXS, IDX_DAYS } from './constants'
+import { Z3Timetable, SlotConstraint, UNASSIGNED, FREE } from './z3_timetable'
+import { DAYS, DAY_IDXS, HOURS_PER_DAY, IDX_DAYS } from './constants'
 
 /**
  * Convert a generic timetable to a string representing smtlib2 code
@@ -63,6 +63,15 @@ export class TimetableSmtlib2Converter {
                     this.z3tt.add_constraints_fulfil_only_one(slot_constraints, mod.module_id);
                 }
             });
+
+            // TODO add module workload
+
+            // TODO add free day requirements
+            if (this.gt.want_free_day) {
+                // Model this as a "fulfil only one" constraint, but all the slots are assigned to WHO_ID == UNASSIGND
+                const slot_constraints: Array<SlotConstraint> = this.generate_free_day_slotconstraints();
+                this.z3tt.add_constraints_fulfil_only_one(slot_constraints);
+            }
         })
         const smtlib2Str = this.z3tt.generateSmtlib2String(randomize);
         return smtlib2Str;
@@ -87,6 +96,26 @@ export class TimetableSmtlib2Converter {
             const sc: SlotConstraint = { start_end_times: start_end_times, who_id: who_id, who_id_string: key };
             scs.push(sc)
         })
+        return scs;
+    }
+
+    generate_free_day_slotconstraints(): Array<SlotConstraint> {
+        let scs: Array<SlotConstraint> = [];
+
+
+
+        // For each day of the week, add a slot constraint blocking out the whole day
+        // Free Saturday is too easy, remove it
+        for (let day = 0; day < DAYS - 1; day++) {
+            const name =  "FREE_" + this.idx_to_day_str(day);
+            const who_id = FREE - day;
+            this.who_id_table[name] = who_id;
+            this.reverse_who_id_table[who_id] = name;
+            const startidx = day * (HOURS_PER_DAY * 2);
+            const endidx = startidx + HOURS_PER_DAY * 2; // TODO: maybe BUG if overflow to next day, check
+            const sc: SlotConstraint = { start_end_times: [[startidx, endidx]], who_id: who_id, who_id_string: name }
+            scs.push(sc)
+        }
         return scs;
     }
 

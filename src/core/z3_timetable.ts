@@ -1,6 +1,7 @@
 const smt = require('smtlib');
 
-export const UNASSIGNED: number = - 1;
+export const UNASSIGNED: number = -1;
+export const FREE: number = -2;
 export const VAR_UNASSIGNED_WEIGHT: number = 1;
 export const BOOLVAR_ASSIGNED_WEIGHT: number = 100000;
 
@@ -84,8 +85,10 @@ export class Z3Timetable {
         if (boolean_selector !== undefined) {
             let selector = "OPT_" + boolean_selector; // Ensure we have an OPT prefix to indicate an optional mod
             this.bool_selectors_set.add(selector); // Make sure we declare the selector later
+            // Asserts that IF the boolean selector is true, then all the possible values it can take must have at least 1 true (functionally only 1)
             this.solver.assert(smt.Eq(selector, smt.Or(...selector_var_possible_values)));
         } else {
+            // Asserts unconditionally that the selector must take one of the possible values
             this.solver.assert(smt.Or(...selector_var_possible_values));
         }
 
