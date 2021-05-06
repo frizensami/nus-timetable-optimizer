@@ -1,24 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import './Solver.css'
 import { Segment, Button, Container, Divider, Dropdown, Grid, Menu, Input, Form, Select, Header, Message, Card, Checkbox, Item, Transition } from 'semantic-ui-react'
-
-export interface GlobalConstraintsList {
-    workloadActive: boolean,
-    minWorkload: number,
-    maxWorkload: number
-    freeDayActive: boolean
-}
+import * as Constants from '../core/constants'
+import { GlobalConstraintsList, defaultConstraints } from '../core/generic_timetable'
 
 export interface GlobalConstraintsProps {
     onUpdateConstraints(newState: GlobalConstraintsList): any
 }
 
-export const defaultConstraints: GlobalConstraintsList = {
-    workloadActive: false,
-    minWorkload: 16,
-    maxWorkload: 30,
-    freeDayActive: false
-};
+
 
 /**
  * Responsible for setting constraints globally for all modules
@@ -26,6 +16,25 @@ export const defaultConstraints: GlobalConstraintsList = {
 export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateConstraints }) => {
 
     let [constraints, setConstraints] = useState<GlobalConstraintsList>(defaultConstraints);
+
+    const generateTimeSelections = () => {
+        const times: Array<any> = []
+        for (let hour = Constants.DAY_START_HOUR; hour < Constants.DAY_END_HOUR; hour++) {
+            const hourStr = hour <= 12 ? hour.toString() : (hour - 12).toString();
+            const am_pm = hour >= 12 ? "PM" : "AM"
+            times.push({ key: hour * 2, text: `${hourStr}:00 ${am_pm}`, value: hour * 2, })
+            times.push({ key: hour * 2 + 1, text: `${hourStr}:30 ${am_pm}`, value: hour * 2 + 1, })
+        }
+        // Add the last time slot of the day
+        const hour = Constants.DAY_END_HOUR;
+        const am_pm = hour >= 12 ? "PM" : "AM"
+        const hourStr = hour <= 12 ? hour.toString() : (hour - 12).toString();
+        times.push({ key: hour * 2, text: `${hourStr}:00 ${am_pm}`, value: hour * 2, })
+
+        return times
+
+    }
+    const timeSelections = generateTimeSelections();
 
     function _setConstraints(newState: GlobalConstraintsList) {
         onUpdateConstraints(newState)
@@ -52,20 +61,46 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
         _setConstraints(newState)
     }
 
+    function toggleTimeConstraintActive() {
+        const newState = { ...constraints, timeConstraintActive: !constraints.timeConstraintActive }
+        _setConstraints(newState)
+    }
+
+    function setStartTime(v: any) {
+        console.log(v);
+        const hour = Math.floor(v / 2)
+        const hourStr = hour < 10 ? "0" + hour.toString() : hour.toString();
+        const min = v % 2 == 0 ? "00" : "30";
+        const timeStr = `${hourStr}${min}`
+        const newState = { ...constraints, startTime: timeStr }
+        _setConstraints(newState)
+    }
+
+
+    function setEndTime(v: any) {
+        console.log(v);
+        const hour = Math.floor(v / 2)
+        const hourStr = hour < 10 ? "0" + hour.toString() : hour.toString();
+        const min = v % 2 == 0 ? "00" : "30";
+        const timeStr = `${hourStr}${min}`
+        const newState = { ...constraints, endTime: timeStr }
+        _setConstraints(newState)
+    }
+
     return (
         <div>
             <Header as="h3" textAlign="center"> Constraints </Header>
 
             <Divider />
 
-            <Form textAlign>
+            <Form>
                 <Form.Group>
                     <Form.Field
                         id='form-input-min-workload'
                         control={Input}
                         label='Minimum Workload (MCs)'
                         type="number"
-                        placeholder='16'
+                        defaultValue={16}
                         min="0"
                         step="1"
                         onChange={(e: any) => updateMinWorkload(e.target.value)}
@@ -77,7 +112,7 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                         control={Input}
                         label='Maximum Workload (MCs)'
                         type="number"
-                        placeholder='30'
+                        defaultValue={30}
                         min="0"
                         step="1"
                         onChange={(e: any) => updateMaxWorkload(e.target.value)}
@@ -94,7 +129,45 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                         fluid
                         width={4}
                     />
+                </Form.Group>
 
+
+                <Divider />
+
+
+                <Form.Group>
+                    <Form.Field
+                        id='form-input-earliest-start'
+                        control={Select}
+                        options={timeSelections}
+                        defaultValue={timeSelections[0].key}
+                        label='Earliest Lesson Start Time'
+                        width={6}
+                        fluid
+                        search
+                        onChange={(_: any, { value }: any) => setStartTime(value)}
+                    />
+                    <Form.Field
+                        id='form-input-latest-end'
+                        control={Select}
+                        options={timeSelections}
+                        defaultValue={timeSelections[timeSelections.length - 1].key}
+                        label='Latest Lesson End Time'
+                        fluid
+                        width={6}
+                        search
+                        onChange={(_: any, { value }: any) => setEndTime(value)}
+                    />
+                    <Form.Field
+                        control={Button}
+                        label='&nbsp;'
+                        toggle
+                        active={constraints.timeConstraintActive}
+                        onClick={toggleTimeConstraintActive}
+                        content={constraints.timeConstraintActive ? "Active" : "Inactive"}
+                        fluid
+                        width={4}
+                    />
                 </Form.Group>
 
 
@@ -103,7 +176,7 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                 <Form.Group widths="equal">
                     <Form.Field
                         control={Button}
-                        label='Force solver to find at least 1 free day (Mon - Fri)? (likely to make days longer)'
+                        label='Force solver to find at least 1 free day (Mon - Fri)?'
                         toggle
                         active={constraints.freeDayActive}
                         onClick={toggleFreeDayActive}
@@ -111,6 +184,9 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                         fluid
                     />
                 </Form.Group>
+
+
+
 
 
                 <Divider />

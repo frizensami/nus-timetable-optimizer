@@ -1,4 +1,4 @@
-import { LessonWeek, Lesson, Module, GenericTimetable } from '../core/generic_timetable'
+import { LessonWeek, Lesson, Module, GenericTimetable, GlobalConstraintsList } from '../core/generic_timetable'
 import { groupBy } from '../util/utils'
 // @ts-ignore
 import ExpiredStorage from 'expired-storage'
@@ -137,12 +137,10 @@ export class NUSModsFrontend {
     /**
      * Creates a GenericTimetable from the current state
      * */
-    create_timetable(min_workload: number, max_workload: number, free_day: boolean = false): GenericTimetable {
+    create_timetable(constraints: GlobalConstraintsList): GenericTimetable {
         const g = new GenericTimetable(
             this.modules,
-            min_workload,
-            max_workload,
-            free_day
+            constraints,
         )
         return g
     }

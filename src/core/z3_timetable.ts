@@ -2,6 +2,7 @@ const smt = require('smtlib');
 
 export const UNASSIGNED: number = -1;
 export const FREE: number = -2;
+export const TOOEARLY_LATE: number = -20;
 export const VAR_UNASSIGNED_WEIGHT: number = 1;
 export const BOOLVAR_ASSIGNED_WEIGHT: number = 100000;
 

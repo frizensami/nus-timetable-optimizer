@@ -1,7 +1,7 @@
 import { LessonWeek, Lesson, Module, GenericTimetable } from './generic_timetable'
 
 import { flipRecord } from '../util/utils'
-import { Z3Timetable, SlotConstraint, UNASSIGNED, FREE } from './z3_timetable'
+import { Z3Timetable, SlotConstraint, UNASSIGNED, FREE, TOOEARLY_LATE } from './z3_timetable'
 import { DAYS, DAY_IDXS, HOURS_PER_DAY, IDX_DAYS } from './constants'
 
 /**
@@ -66,11 +66,18 @@ export class TimetableSmtlib2Converter {
 
             // TODO add module workload
 
-            // TODO add free day requirements
-            if (this.gt.want_free_day) {
+            // Add requirements for free day: this ensures that we won't get SAT unless an entire day is free
+            if (this.gt.constraints.freeDayActive) {
                 // Model this as a "fulfil only one" constraint, but all the slots are assigned to WHO_ID == UNASSIGND
                 const slot_constraints: Array<SlotConstraint> = this.generate_free_day_slotconstraints();
                 this.z3tt.add_constraints_fulfil_only_one(slot_constraints);
+            }
+
+            if (this.gt.constraints.timeConstraintActive) {
+                const slot_constraint: SlotConstraint | undefined = this.generate_timeconstraint_slotconstraint();
+                if (slot_constraint !== undefined) {
+                    this.z3tt.add_constraints_fulfil_only_one([slot_constraint]);
+                }
             }
         })
         const smtlib2Str = this.z3tt.generateSmtlib2String(randomize);
@@ -99,25 +106,84 @@ export class TimetableSmtlib2Converter {
         return scs;
     }
 
+    /**
+     * Generates an entire set of slot constraints where the solver is asked to pick exactly 1
+     * This ensures that at least 1 day is free.
+     * NOTE: this method cares about the start-end of day timeconstraints, and will not generate variables for those slots.
+     *       Otherwise, we will get UNSAT when we assert that those times are both free_day slots and too_early / too_late slots
+     * */
     generate_free_day_slotconstraints(): Array<SlotConstraint> {
         let scs: Array<SlotConstraint> = [];
-
-
-
         // For each day of the week, add a slot constraint blocking out the whole day
         // Free Saturday is too easy, remove it
         for (let day = 0; day < DAYS - 1; day++) {
-            const name =  "FREE_" + this.idx_to_day_str(day);
-            const who_id = FREE - day;
+            const name = "FREE_" + this.idx_to_day_str(day); // Timeslots for this day will be named FREE_monday for e.g,
+            const who_id = FREE - day; // FREE == -2, so we generate a separate who_id for each day by subtracting
+
+            // To display the results in the table we need to map the who_id and reverse tables
             this.who_id_table[name] = who_id;
             this.reverse_who_id_table[who_id] = name;
-            const startidx = day * (HOURS_PER_DAY * 2);
-            const endidx = startidx + HOURS_PER_DAY * 2; // TODO: maybe BUG if overflow to next day, check
+
+            let startOffset = 0;
+            let endOffset = (HOURS_PER_DAY * 2);
+            if (this.gt.constraints.timeConstraintActive) {
+                startOffset = this.hhmm_to_offset(this.gt.constraints.startTime);
+                endOffset = this.hhmm_to_offset(this.gt.constraints.endTime);
+                console.log(`Start offset: ${startOffset}, endOffset: ${endOffset}`)
+            }
+
+            // Generate the slot constraints for each day
+            const startidx = day * (HOURS_PER_DAY * 2) + startOffset;
+            const endidx = startidx + (endOffset - startOffset); 
             const sc: SlotConstraint = { start_end_times: [[startidx, endidx]], who_id: who_id, who_id_string: name }
             scs.push(sc)
         }
         return scs;
     }
+
+    /**
+     * Generates a single slot constraint representing time blocked off for too-early / too-late in the day for classes.
+     * */
+    generate_timeconstraint_slotconstraint(): SlotConstraint | undefined {
+        let start_end_times: Array<[number, number]> = []
+        const name = "TOO_EARLY_OR_LATE";
+        const who_id = TOOEARLY_LATE;
+        this.who_id_table[name] = who_id;
+        this.reverse_who_id_table[who_id] = name;
+
+
+        // Not even constraining any of the day, ignore
+        const startOffset = this.hhmm_to_offset(this.gt.constraints.startTime);
+        const endOffset = this.hhmm_to_offset(this.gt.constraints.endTime);
+        if (startOffset === 0 && (endOffset - startOffset) === HOURS_PER_DAY * 2) return undefined;
+
+        // For each day of the week, add a slot constraint blocking out hours before and after our ideal timings
+        for (let day = 0; day < DAYS; day++) {
+
+            // Compute the two time windows necessary to block off start and end of day
+            
+            // Start-of-day time starts at the initial index of the day, up until the offset
+            const startidx = day * (HOURS_PER_DAY * 2);
+            const startidx_endidx = startidx + startOffset;
+            if (startidx_endidx - startidx > 0) {
+                start_end_times.push([startidx, startidx_endidx]);
+            }
+
+            // Want to end 
+            const endidx = startidx + HOURS_PER_DAY * 2;
+            const endidx_startidx = startidx + endOffset;
+            if (endidx_startidx - endidx > 0) {
+                start_end_times.push([startidx, startidx_endidx]);
+            }
+            start_end_times.push([endidx_startidx, endidx]);
+        }
+
+        const sc: SlotConstraint = { start_end_times: start_end_times, who_id: who_id, who_id_string: name }
+        console.log("Slotconstraints for timeconstraint")
+        console.log(sc);
+        return sc;
+    }
+
 
     /**
      * Converts hour and minute + day of week into an integer representing a half-hour slot in the z3 timetable:w
@@ -134,6 +200,28 @@ export class TimetableSmtlib2Converter {
             // hour_index * 2 (since we count half-hours)
             // + half_hour_addon since we offset by 1 unit if it's a half hour
             // + number of hours in a day * 2 to get number of half-hours
+            const idx = (
+                (hour_index * 2)
+                + half_hour_addon
+                + day_index * ((this.end_hour - this.start_hour) * 2)
+            )
+            return idx;
+        }
+    }
+
+    /**
+     * Converts a HHMM string into an integer representing a half-hour slot in the z3 timetable
+     * Assumes that day is monday to get the integer offset in that day
+     * */
+    hhmm_to_offset(hhmm: string): number {
+        const hour = parseInt(hhmm.substring(0, 2))
+        const half_hour_addon = parseInt(hhmm.substring(2, 4)) == 30 ? 1 : 0;
+        // We assume lessons within start to end hour each day
+        if (hour < this.start_hour || hour > this.end_hour) {
+            throw new Error(`Lesson either starts before start_hour ${hour} < ${this.start_hour} or ends after end_hour ${hour} > ${this.end_hour}`);
+        } else {
+            const hour_index = hour - this.start_hour
+            const day_index = 0
             const idx = (
                 (hour_index * 2)
                 + half_hour_addon
@@ -174,7 +262,7 @@ export class TimetableSmtlib2Converter {
     z3_output_to_timetable(z3_output: string): TimetableOutput {
         const parse = require("sexpr-plus").parse;
         const parsed_expr = parse(z3_output)
-        console.log(parsed_expr)
+        // console.log(parsed_expr)
         const is_sat = parsed_expr[0].content === "sat"; // parsed_expr[0] === {type: "atom", content: "sat", location: {…}}
         if (!is_sat) return { is_sat: false, tt: [] }; // Nothing to do here
 
@@ -195,7 +283,7 @@ export class TimetableSmtlib2Converter {
             const var_value_expr: any = expr.content[4].content
             let var_value: number = -2;
             // Var_value could be an integer or an expression where the second element is the value of a negative number
-            console.log(var_value_expr)
+            // console.log(var_value_expr)
             if (typeof var_value_expr === "string") {
                 var_value = parseInt(var_value_expr)
             } else {

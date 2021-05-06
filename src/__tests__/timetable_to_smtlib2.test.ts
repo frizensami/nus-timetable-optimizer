@@ -1,5 +1,6 @@
 import { LessonWeek, Lesson, Module, GenericTimetable } from '../core/generic_timetable'
 import { TimetableSmtlib2Converter } from '../core/timetable_to_smtlib2'
+import { GlobalConstraintsList, defaultConstraints } from '../core/generic_timetable'
 
 test("Creates smtlib2 tables correctly", () => {
     const start_d = new Date(2018, 11, 12, 10, 30);
@@ -8,7 +9,7 @@ test("Creates smtlib2 tables correctly", () => {
     let lesson2 = new Lesson("1", "Tutorial", [[start_d, end_d]], ["Tuesday"], LessonWeek.ALL);
     let mod = new Module("CS3203", 5, [lesson, lesson2], true);
     let mod2 = new Module("CS3210", 5, [lesson, lesson2], true);
-    let gt = new GenericTimetable([mod, mod2], 5, 10);
+    let gt = new GenericTimetable([mod, mod2], defaultConstraints);
 
     const converter = new TimetableSmtlib2Converter(gt, 100, 8, 16);
     const who_id_table = {
@@ -36,25 +37,25 @@ test("Creates smtlib2 string correctly for one module with one tutorial clashing
     // Tutorial from 1030 to 1130 (shouldn't work when we solve it)
     let lesson3 = new Lesson("2", "Tutorial", [[new Date(2018, 11, 12, 10, 30), new Date(2018, 11, 12, 11, 30)]], ["Monday"], LessonWeek.ALL);
     let mod = new Module("CS3203", 5, [lesson, lesson2, lesson3], true);
-    let gt = new GenericTimetable([mod], 5, 10);
+    let gt = new GenericTimetable([mod], defaultConstraints);
 
     // Timetable of only 5 hours, starting at 8 am and ending at 10 pm on a Monday (monday since we restrict # of half hour slots)
     const converter = new TimetableSmtlib2Converter(gt, 10, 8, 22);
     const smtlib2str = converter.generateSmtLib2String(false);
-    const smtlib2str_expected = `(declare-fun SL_0 () Int)
+    const smtlib2str_expected = `(declare-fun SL_CS3203__Lecture__1 () Int)
 (declare-fun t5_monday_1030 () Int)
 (declare-fun t6_monday_1100 () Int)
-(declare-fun SL_1024_1025 () Int)
+(declare-fun SL_CS3203__Tutorial__1_CS3203__Tutorial__2 () Int)
 (declare-fun t3_monday_0930 () Int)
 (declare-fun t4_monday_1000 () Int)
-(assert (= SL_0 0))
-(assert (= (= SL_0 0) (= t5_monday_1030 0)))
-(assert (= (= SL_0 0) (= t6_monday_1100 0)))
-(assert (or (= SL_1024_1025 1024) (= SL_1024_1025 1025)))
-(assert (= (= SL_1024_1025 1024) (= t3_monday_0930 1024)))
-(assert (= (= SL_1024_1025 1024) (= t4_monday_1000 1024)))
-(assert (= (= SL_1024_1025 1025) (= t5_monday_1030 1025)))
-(assert (= (= SL_1024_1025 1025) (= t6_monday_1100 1025)))
+(assert (= SL_CS3203__Lecture__1 0))
+(assert (= (= SL_CS3203__Lecture__1 0) (= t5_monday_1030 0)))
+(assert (= (= SL_CS3203__Lecture__1 0) (= t6_monday_1100 0)))
+(assert (or (= SL_CS3203__Tutorial__1_CS3203__Tutorial__2 1024) (= SL_CS3203__Tutorial__1_CS3203__Tutorial__2 1025)))
+(assert (= (= SL_CS3203__Tutorial__1_CS3203__Tutorial__2 1024) (= t3_monday_0930 1024)))
+(assert (= (= SL_CS3203__Tutorial__1_CS3203__Tutorial__2 1024) (= t4_monday_1000 1024)))
+(assert (= (= SL_CS3203__Tutorial__1_CS3203__Tutorial__2 1025) (= t5_monday_1030 1025)))
+(assert (= (= SL_CS3203__Tutorial__1_CS3203__Tutorial__2 1025) (= t6_monday_1100 1025)))
 (assert (or (= t5_monday_1030 0) (= t5_monday_1030 -1) (= t5_monday_1030 1025)))
 (assert (or (= t6_monday_1100 0) (= t6_monday_1100 -1) (= t6_monday_1100 1025)))
 (assert (or (= t3_monday_0930 1024) (= t3_monday_0930 -1)))
@@ -65,6 +66,7 @@ test("Creates smtlib2 string correctly for one module with one tutorial clashing
 (get-model)
 (get-objectives)
 (exit)`
+
     expect(smtlib2str).toEqual(smtlib2str_expected)
 
 

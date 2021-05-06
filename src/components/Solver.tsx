@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react'
 
 import { TimetableOutput } from '../core/timetable_to_smtlib2'
 import { Segment, Button, Container, Divider, Grid, Loader, Dimmer } from 'semantic-ui-react'
-import { GenericTimetable } from '../core/generic_timetable'
+import { GenericTimetable, GlobalConstraintsList, defaultConstraints  } from '../core/generic_timetable'
 import { Z3Manager, Z3Callbacks } from '../core/z3_manager'
 import { NUSModsFrontend, ModuleToAdd } from '../frontends/nusmods_frontend'
 import { CodeDisplay } from './CodeDisplay'
 import { ModuleConstraints, ConstraintModule } from './ModuleConstraints'
-import { GlobalConstraints, GlobalConstraintsList, defaultConstraints } from './GlobalConstraints'
+import { GlobalConstraints } from './GlobalConstraints'
 import './Solver.css'
 
 enum Z3State {
@@ -67,7 +67,7 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
 
         nusmods_fe.add_modules(modules).then(() => {
             console.log(nusmods_fe);
-            const gt: GenericTimetable = nusmods_fe.create_timetable(constraints.minWorkload, constraints.maxWorkload, constraints.freeDayActive);
+            const gt: GenericTimetable = nusmods_fe.create_timetable(constraints);
             Z3Manager.loadTimetable(gt);
             setZ3State(Z3State.SOLVING);
             Z3Manager.solve()

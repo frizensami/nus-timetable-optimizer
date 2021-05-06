@@ -6,6 +6,26 @@ export enum LessonWeek {
     ODD = "ODD",
 }
 
+export interface GlobalConstraintsList {
+    workloadActive: boolean,
+    minWorkload: number,
+    maxWorkload: number
+    freeDayActive: boolean,
+    startTime: string,
+    endTime: string
+    timeConstraintActive: boolean
+}
+
+export const defaultConstraints: GlobalConstraintsList = {
+    workloadActive: false,
+    minWorkload: 16,
+    maxWorkload: 30,
+    freeDayActive: false,
+    startTime: "0800",
+    endTime: "2200",
+    timeConstraintActive: false,
+};
+
 /**
  *  Specification for each Lesson:
  * - For each UNIQUE lesson_type, the timetable must contain one lesson ID of this type
@@ -110,14 +130,11 @@ export class Module {
  * */
 export class GenericTimetable {
     modules: Array<Module>;
-    min_workload: number;
-    max_workload: number;
-    want_free_day: boolean;
+    constraints: GlobalConstraintsList
 
-    constructor(modules: Array<Module>, min_workload: number, max_workload: number, want_free_day: boolean = false) {
+
+    constructor(modules: Array<Module>, constraints: GlobalConstraintsList) {
         this.modules = modules
-        this.min_workload = min_workload
-        this.max_workload = max_workload
-        this.want_free_day = want_free_day
+        this.constraints = constraints
     }
 }
