@@ -98,36 +98,36 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                     <Form.Field
                         id='form-input-min-workload'
                         control={Input}
-                        label='Minimum Workload (MCs)'
+                        label='Minimum Credits'
                         type="number"
                         defaultValue={defaultConstraints.minWorkload}
                         min="0"
                         step="1"
                         onChange={(e: any) => updateMinWorkload(e.target.value)}
-                        width={6}
+                        width={5}
                         fluid
                     />
                     <Form.Field
                         id='form-input-max-workload'
                         control={Input}
-                        label='Maximum Workload (MCs)'
+                        label='Maximum Credits'
                         type="number"
                         defaultValue={defaultConstraints.maxWorkload}
                         min="0"
                         step="1"
                         onChange={(e: any) => updateMaxWorkload(e.target.value)}
                         fluid
-                        width={6}
+                        width={5}
                     />
                     <Form.Field
                         control={Button}
-                        label='&nbsp;'
+                        label='Activate Constraint?'
                         toggle
                         active={constraints.workloadActive}
                         onClick={toggleWorkloadActive}
-                        content={constraints.workloadActive ? "Active" : "Inactive"}
+                        content={constraints.workloadActive ? "Yes" : "No"}
                         fluid
-                        width={4}
+                        width={6}
                     />
                 </Form.Group>
 
@@ -142,7 +142,7 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                         options={timeSelections}
                         defaultValue={timeSelections[0].key}
                         label='Earliest Lesson Start Time'
-                        width={6}
+                        width={5}
                         fluid
                         search
                         onChange={(_: any, { value }: any) => setStartTime(value)}
@@ -154,19 +154,19 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                         defaultValue={timeSelections[timeSelections.length - 1].key}
                         label='Latest Lesson End Time'
                         fluid
-                        width={6}
+                        width={5}
                         search
                         onChange={(_: any, { value }: any) => setEndTime(value)}
                     />
                     <Form.Field
                         control={Button}
-                        label='&nbsp;'
+                        label='Activate Constraint?'
                         toggle
                         active={constraints.timeConstraintActive}
                         onClick={toggleTimeConstraintActive}
-                        content={constraints.timeConstraintActive ? "Active" : "Inactive"}
+                        content={constraints.timeConstraintActive ? "Yes" : "No"}
                         fluid
-                        width={4}
+                        width={6}
                     />
                 </Form.Group>
 
@@ -176,7 +176,7 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                 <Form.Group widths="equal">
                     <Form.Field
                         control={Button}
-                        label='Force solver to find at least 1 free day (Mon - Fri)?'
+                        label='Force solver to find at least 1 free day (Mon - Fri): Activate Constraint?'
                         toggle
                         active={constraints.freeDayActive}
                         onClick={toggleFreeDayActive}
