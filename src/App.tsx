@@ -17,7 +17,7 @@ function App() {
         return (
                 <div className="App">
                         <div className="ui basic segment">
-                                <h1 className="ui center aligned header"> NUSMods Timetable Arranger </h1>
+                                <h1 className="ui center aligned header"> NUSMods Timetable Optimizer </h1>
                                 <Timetable start_hour={8} end_hour={22} timetable={tt} />
                                 <Divider />
                                 <Solver onNewTimetable={onNewTimetable}/>

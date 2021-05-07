@@ -1,4 +1,4 @@
-# NUSMods Timetable Arranger - Web Version
+# NUSMods Timetable Optimizer - Web Version
 
 ## Objectives
 - Allow users to arrange their NUS timetable based on their specified constraints, e.g.,

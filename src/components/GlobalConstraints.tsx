@@ -141,7 +141,7 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                         control={Select}
                         options={timeSelections}
                         defaultValue={timeSelections[0].key}
-                        label='Earliest Lesson Start Time'
+                        label='Earliest Lesson Start'
                         width={5}
                         fluid
                         search
@@ -152,7 +152,7 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                         control={Select}
                         options={timeSelections}
                         defaultValue={timeSelections[timeSelections.length - 1].key}
-                        label='Latest Lesson End Time'
+                        label='Latest Lesson End'
                         fluid
                         width={5}
                         search
