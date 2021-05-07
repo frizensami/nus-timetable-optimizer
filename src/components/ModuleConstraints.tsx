@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import './Solver.css'
-import { Segment, Button, Container, Divider, Dropdown, Grid, List, Menu, Input, Form, Select, Header, Message, Card, Checkbox, Item, Transition } from 'semantic-ui-react'
+import { Segment, Button, Container, Divider, Dropdown, Grid, Icon, List, Menu, Input, Form, Select, Header, Message, Card, Checkbox, Item, Transition } from 'semantic-ui-react'
 import { NUSModsFrontend } from '../frontends/nusmods_frontend'
+import { getRandomColorFromString } from '../util/utils'
 
 interface ModuleConstraintsProps {
     onModulesChange(mods: Array<ConstraintModule>): any
@@ -202,18 +203,17 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
                 { /* Display each module as a card within the grid */}
                 <Transition.Group
                     duration={1000}
-                    size='huge'
-                    verticalAlign='middle'
                 >
                     {
                         modules.map((mod: ConstraintModule, idx: number) => {
+                            let color = getRandomColorFromString(mod.module_code);
                             return (
 
                                 <Grid.Row centered key={idx} columns="equal">
                                     <Grid.Column textAlign="center" width={16}>
                                         <Card centered fluid>
                                             <Card.Content>
-                                                <Card.Header> {mod.module_code + " " + mod.json["title"]} </Card.Header>
+                                                <Card.Header> <Icon name='square outline' size='tiny' style={{"background-color": color}}/> {mod.module_code + " " + mod.json["title"]} </Card.Header>
                                                 <Card.Meta> {"AY " + mod.acad_year + " | Semester " + mod.semester + " | Workload: " + mod.json['moduleCredit'] + " MC"} </Card.Meta>
                                             </Card.Content>
                                             <Card.Content extra>

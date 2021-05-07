@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Segment, Table, Header, Dimmer } from 'semantic-ui-react'
+import { getRandomColorFromString } from '../util/utils'
+
 
 interface TimetableProps {
     start_hour: number,
@@ -57,6 +59,11 @@ function Timetable({ start_hour, end_hour, timetable }: TimetableProps) {
                                                     const cellStr = timetable.tt[i1][i2];
                                                     if (cellStr.startsWith("TOO") || cellStr.startsWith("FREE")) {
                                                         return <Table.Cell active key={(2 ** (i1 + 1)) * (3 ** (i2 + 1))} textAlign='center'>{""}</Table.Cell>;
+                                                    } else if (timetable.tt[i1][i2] !== ""){
+                                                        let modname = timetable.tt[i1][i2].split("\n")[0]
+                                                        let modcolor = getRandomColorFromString(modname)
+                                                        console.log(`Modcolor: ${modcolor}`)
+                                                        return <Table.Cell key={(2 ** (i1 + 1)) * (3 ** (i2 + 1))} textAlign='center' style={{"background-color": modcolor}}>{timetable.tt[i1][i2]}</Table.Cell>;
                                                     } else {
                                                         return <Table.Cell key={(2 ** (i1 + 1)) * (3 ** (i2 + 1))} textAlign='center'>{timetable.tt[i1][i2]}</Table.Cell>;
                                                     }
