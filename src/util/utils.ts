@@ -48,7 +48,6 @@ export function getRandomColorFromString(str: string) {
       luminosity: 'light',
     }
   );
-  console.log(`Generating random seed for str ${str} with hashcode ${hashNum}, color generated: ${color}`)
   return color
 }
 

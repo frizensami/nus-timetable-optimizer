@@ -213,7 +213,7 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
                                     <Grid.Column textAlign="center" width={16}>
                                         <Card centered fluid>
                                             <Card.Content>
-                                                <Card.Header> <Icon name='square outline' size='tiny' style={{"background-color": color}}/> {mod.module_code + " " + mod.json["title"]} </Card.Header>
+                                                <Card.Header> <Icon name='square outline' size='tiny' style={{"backgroundColor": color}}/> {mod.module_code + " " + mod.json["title"]} </Card.Header>
                                                 <Card.Meta> {"AY " + mod.acad_year + " | Semester " + mod.semester + " | Workload: " + mod.json['moduleCredit'] + " MC"} </Card.Meta>
                                             </Card.Content>
                                             <Card.Content extra>

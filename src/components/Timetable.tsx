@@ -62,8 +62,7 @@ function Timetable({ start_hour, end_hour, timetable }: TimetableProps) {
                                                     } else if (timetable.tt[i1][i2] !== ""){
                                                         let modname = timetable.tt[i1][i2].split("\n")[0]
                                                         let modcolor = getRandomColorFromString(modname)
-                                                        console.log(`Modcolor: ${modcolor}`)
-                                                        return <Table.Cell key={(2 ** (i1 + 1)) * (3 ** (i2 + 1))} textAlign='center' style={{"background-color": modcolor}}>{timetable.tt[i1][i2]}</Table.Cell>;
+                                                        return <Table.Cell key={(2 ** (i1 + 1)) * (3 ** (i2 + 1))} textAlign='center' style={{"backgroundColor": modcolor}}>{timetable.tt[i1][i2]}</Table.Cell>;
                                                     } else {
                                                         return <Table.Cell key={(2 ** (i1 + 1)) * (3 ** (i2 + 1))} textAlign='center'>{timetable.tt[i1][i2]}</Table.Cell>;
                                                     }
