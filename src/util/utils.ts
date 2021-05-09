@@ -72,3 +72,70 @@ const hashCode = function hashCode(s: string): number {
 
     return h;
 }
+
+/**
+ * Check for array equality. I can't believe this isn't a builtin.
+ * */
+export function arrayEquals(a: any, b: any) {
+  return Array.isArray(a) &&
+    Array.isArray(b) &&
+    a.length === b.length &&
+    a.every((val, index) => val === b[index]);
+}
+
+
+/** *
+ * Usage:
+ * const ids = new StringIdGenerator();
+
+ids.next(); // 'a'
+ids.next(); // 'b'
+ids.next(); // 'c'
+
+// ...
+ids.next(); // 'z'
+ids.next(); // 'A'
+ids.next(); // 'B'
+
+// ...
+ids.next(); // 'Z'
+ids.next(); // 'aa'
+ids.next(); // 'ab'
+ids.next(); // 'ac'
+ *
+ * */
+export class StringIdGenerator {
+  _chars: any
+  _nextId: any
+  constructor(chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+    this._chars = chars;
+    this._nextId = [0];
+  }
+
+  next() {
+    const r = [];
+    for (const char of this._nextId) {
+      r.unshift(this._chars[char]);
+    }
+    this._increment();
+    return r.join('');
+  }
+
+  _increment() {
+    for (let i = 0; i < this._nextId.length; i++) {
+      const val = ++this._nextId[i];
+      if (val >= this._chars.length) {
+        this._nextId[i] = 0;
+      } else {
+        return;
+      }
+    }
+    this._nextId.push(0);
+  }
+
+  *[Symbol.iterator]() {
+    while (true) {
+      yield this.next();
+    }
+  }
+}

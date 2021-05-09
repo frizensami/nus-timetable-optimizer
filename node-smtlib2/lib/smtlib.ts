@@ -68,6 +68,11 @@ function And(...args: SNode[]): SNode {
         return args[0];
     return new SExpr('and', ...args);
 }
+function BVAnd(...args: SNode[]): SNode {
+    if (args.length === 1)
+        return args[0];
+    return new SExpr('bvand', ...args);
+}
 function Or(...args: SNode[]): SNode {
     if (args.length === 1)
         return args[0];
@@ -131,6 +136,7 @@ export {
     Predicate,
     Implies,
     And,
+    BVAnd,
     Or,
     If,
     Not,

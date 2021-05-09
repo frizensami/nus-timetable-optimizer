@@ -1,10 +1,15 @@
 import { groupBy } from '../util/utils'
 
-export enum LessonWeek {
-    ALL = "ALL",
-    EVEN = "EVEN",
-    ODD = "ODD",
-}
+// export enum LessonWeek {
+//     ALL = "ALL",
+//     EVEN = "EVEN",
+//     ODD = "ODD",
+// }
+
+// We can either specify that we lesson is on all / even (2,4,6,8,10) / odd weeks (1,3,5,7,9) OR we specify the weeks individually
+// Since a single lesson can permit multiple timeslots, which might be spread across weeks, we need to specify this as an array
+// For e.g., imagine classType 1 lesson 01 ==> lab on tuesday 10am even weeks and lab on thursday 10am odd weeks
+// export type LessonWeeks = Array<LessonWeek | Array<number>>;
 
 export interface GlobalConstraintsList {
     workloadActive: boolean,
@@ -39,9 +44,9 @@ export class Lesson {
     lesson_type: string;
     start_end_times: Array<[Date, Date]>;
     days: Array<string>;
-    weeks: LessonWeek;
+    weeks: Array<Array<number>>; // list of weeks where lesson is active
 
-    constructor(lesson_id: string, lesson_type: string, start_end_times: Array<[Date, Date]>, days: Array<string>, weeks: LessonWeek) {
+    constructor(lesson_id: string, lesson_type: string, start_end_times: Array<[Date, Date]>, days: Array<string>, weeks: Array<Array<number>>) {
         this.lesson_id = lesson_id.replace(/\s/g, '')
         this.lesson_type = lesson_type.replace(/\s/g, '')
         this.start_end_times = start_end_times
@@ -59,7 +64,7 @@ export class Lesson {
 export class Module {
     module_id: string;
     workload: number;
-    lessons: Record<string, Array<Lesson>>;
+    lessons: Record<string, Array<Lesson>>; // mapping from lessonType ==> all lessons of that type
     is_compulsory: boolean;
 
     constructor(module_id: string, workload: number, in_lessons: Array<Lesson>, is_compulsory: boolean) {
@@ -103,16 +108,18 @@ export class Module {
     merge_lessons_same_id(lessons: Array<Lesson>): Lesson {
         let start_ends = []
         let days = []
+        let weeks = []
         for (const lesson of lessons) {
             start_ends.push(...lesson.start_end_times)
             days.push(...lesson.days)
+            weeks.push(...lesson.weeks)
         }
         const l = new Lesson(
             lessons[0].lesson_id,
             lessons[0].lesson_type,
             start_ends,
             days,
-            lessons[0].weeks,
+            weeks,
         )
         return l
     }

@@ -1,5 +1,6 @@
-import { LessonWeek, Lesson, Module, GenericTimetable, GlobalConstraintsList } from '../core/generic_timetable'
-import { groupBy } from '../util/utils'
+import { Lesson, Module, GenericTimetable, GlobalConstraintsList } from '../core/generic_timetable'
+import { groupBy, arrayEquals } from '../util/utils'
+import { ALL_WEEKS } from '../core/constants'
 // @ts-ignore
 import ExpiredStorage from 'expired-storage'
 
@@ -149,12 +150,26 @@ export class NUSModsFrontend {
      * Convert a lesson from NUSMods JSON into our generic lesson format
      * */
     lesson_to_genericlesson(lesson: any) {
+        const weeks_arr = lesson["weeks"];
+        if (!(Array.isArray(weeks_arr))) throw new Error(`Can't process lesson, does not follow array-of-weeks format, not implemented.`);
+
+        // // So weeks_arr is now an array
+        // if (arrayEquals(weeks_arr, ALL_WEEKS)) {
+        //    weeks_final = [LessonWeek.ALL];
+        // } else {
+        //     weeks_final = weeks_arr;
+        // }
+        
+
+        // console.log(lesson)
+        // console.log(`Base lesson weeks: lesson: ${lesson.weeks}, ${weeks_arr} vs ${weeks_final}`)
+        
         const l = new Lesson(
             lesson["classNo"],
             lesson["lessonType"],
             [this.lesson_to_start_end_times(lesson)],
             [lesson["day"]],
-            LessonWeek.ALL,  // TODO actually process this
+            [weeks_arr], 
         )
         return l
     }

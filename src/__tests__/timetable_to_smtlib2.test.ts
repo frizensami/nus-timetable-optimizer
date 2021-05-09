@@ -1,12 +1,13 @@
-import { LessonWeek, Lesson, Module, GenericTimetable } from '../core/generic_timetable'
+import { Lesson, Module, GenericTimetable } from '../core/generic_timetable'
 import { TimetableSmtlib2Converter } from '../core/timetable_to_smtlib2'
 import { GlobalConstraintsList, defaultConstraints } from '../core/generic_timetable'
+import { ALL_WEEKS } from '../core/constants'
 
 test("Creates smtlib2 tables correctly", () => {
     const start_d = new Date(2018, 11, 12, 10, 30);
     const end_d = new Date(2018, 11, 12, 12, 30);
-    let lesson = new Lesson("1", "Lecture", [[start_d, end_d]], ["Monday"], LessonWeek.ALL);
-    let lesson2 = new Lesson("1", "Tutorial", [[start_d, end_d]], ["Tuesday"], LessonWeek.ALL);
+    let lesson = new Lesson("1", "Lecture", [[start_d, end_d]], ["Monday"], ALL_WEEKS);
+    let lesson2 = new Lesson("1", "Tutorial", [[start_d, end_d]], ["Tuesday"], ALL_WEEKS);
     let mod = new Module("CS3203", 5, [lesson, lesson2], true);
     let mod2 = new Module("CS3210", 5, [lesson, lesson2], true);
     let gt = new GenericTimetable([mod, mod2], defaultConstraints);
@@ -31,17 +32,17 @@ test("Creates smtlib2 tables correctly", () => {
 
 test("Creates smtlib2 string correctly for one module with one tutorial clashing with lecture (made-up scenario)", () => {
     // Lecture from 1030 to 1130 
-    let lesson = new Lesson("1", "Lecture", [[new Date(2018, 11, 12, 10, 30), new Date(2018, 11, 12, 11, 30)]], ["Monday"], LessonWeek.ALL);
+    let lesson = new Lesson("1", "Lecture", [[new Date(2018, 11, 12, 10, 30), new Date(2018, 11, 12, 11, 30)]], ["Monday"], ALL_WEEKS);
     // Tutorial from 0930 to 1030
-    let lesson2 = new Lesson("1", "Tutorial", [[new Date(2018, 11, 12, 9, 30), new Date(2018, 11, 12, 10, 30)]], ["Monday"], LessonWeek.ALL);
+    let lesson2 = new Lesson("1", "Tutorial", [[new Date(2018, 11, 12, 9, 30), new Date(2018, 11, 12, 10, 30)]], ["Monday"], ALL_WEEKS);
     // Tutorial from 1030 to 1130 (shouldn't work when we solve it)
-    let lesson3 = new Lesson("2", "Tutorial", [[new Date(2018, 11, 12, 10, 30), new Date(2018, 11, 12, 11, 30)]], ["Monday"], LessonWeek.ALL);
+    let lesson3 = new Lesson("2", "Tutorial", [[new Date(2018, 11, 12, 10, 30), new Date(2018, 11, 12, 11, 30)]], ["Monday"], ALL_WEEKS);
     let mod = new Module("CS3203", 5, [lesson, lesson2, lesson3], true);
     let gt = new GenericTimetable([mod], defaultConstraints);
 
     // Timetable of only 5 hours, starting at 8 am and ending at 10 pm on a Monday (monday since we restrict # of half hour slots)
     const converter = new TimetableSmtlib2Converter(gt, 10, 8, 22);
-    const smtlib2str = converter.generateSmtLib2String(false);
+    const smtlib2str = converter.generateTimetableSolveSmtLib2String(false);
     const smtlib2str_expected = `(declare-fun SL_CS3203__Lecture__1 () Int)
 (declare-fun t5_monday_1030 () Int)
 (declare-fun t6_monday_1100 () Int)

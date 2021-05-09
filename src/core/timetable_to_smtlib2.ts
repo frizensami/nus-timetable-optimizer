@@ -1,8 +1,9 @@
-import { LessonWeek, Lesson, Module, GenericTimetable } from './generic_timetable'
+import { Lesson, Module, GenericTimetable } from './generic_timetable'
+import { Z3WeekSolver } from './z3_weeksolver'
 
-import { flipRecord } from '../util/utils'
+import { flipRecord, StringIdGenerator } from '../util/utils'
 import { Z3Timetable, SlotConstraint, UNASSIGNED, FREE, TOOEARLY_LATE } from './z3_timetable'
-import { DAYS, DAY_IDXS, HOURS_PER_DAY, IDX_DAYS } from './constants'
+import { DAYS, DAY_IDXS, HOURS_PER_DAY, IDX_DAYS, HOURS_PER_WEEK, WEEKS_AFTER_WEEK0 } from './constants'
 
 /**
  * Convert a generic timetable to a string representing smtlib2 code
@@ -15,6 +16,7 @@ export class TimetableSmtlib2Converter {
     who_id_table: Record<string, number> // string in both cases is {module id}__{lesson type}__{lesson id}
     reverse_who_id_table: Record<number, string>
     z3tt: Z3Timetable
+    weeks_to_simulate: Array<number> // Each number in here is one week to simulate
 
     constructor(timetable: GenericTimetable, total_half_hour_slots: number, day_start_hour: number, day_end_hour: number) {
         this.gt = timetable;
@@ -25,17 +27,27 @@ export class TimetableSmtlib2Converter {
         this.populate_who_id_tables()
 
         let time_str_vals: Array<string> = Array.from(new Array(total_half_hour_slots), (_: number, i: number) => {
-            const [offset, day] = this.z3_time_to_generic_time(i);
+            const [offset, day, week] = this.z3_time_to_generic_time(i);
             const dayOfWeek = this.idx_to_day_str(day);
             const hour: number = Math.floor(offset / 2) + this.start_hour;
             const hourStr: string = hour < 10 ? "0" + hour.toString() : hour.toString();
             const minuteStr: string = offset % 2 === 0 ? "00" : "30"
-            return dayOfWeek + "_" + hourStr + minuteStr
+            if (week == 0) {
+                return dayOfWeek + "_" + hourStr + minuteStr
+            } else {
+                return dayOfWeek + "_" + hourStr + minuteStr + "_wk" + week.toString();
+            }
         });
 
         this.z3tt = new Z3Timetable(total_half_hour_slots, time_str_vals)
+        this.weeks_to_simulate = []
     }
 
+    /**
+     * Every lesson slot (unique combination of module - lessontype - lessonid) needs to have an integer representation to
+     * let the solver use integer constraints. Create the tables to transform between string and integer representations.
+     *
+     * */
     populate_who_id_tables() {
         this.gt.modules.forEach((mod: Module, moduleidx: number, _) => {
             Object.keys(mod.lessons).forEach((lessonType: string, lessontypeidx: number, _) => {
@@ -51,7 +63,58 @@ export class TimetableSmtlib2Converter {
         // console.log(this.reverse_who_id_table);
     }
 
-    generateSmtLib2String(randomize: boolean = true): string {
+    /**
+     * Generate first-stage solver string for which weeks to simulate
+     * */
+    generateWeekSolveSmtLib2String(): string {
+        const weekSolver: Z3WeekSolver = new Z3WeekSolver(WEEKS_AFTER_WEEK0);
+        let uniqueWeeks: Set<string> = new Set();
+
+        // Go through every lessons and generate all possible unique combinations of lesson weeks
+        this.gt.modules.forEach((mod: Module) => {
+            Object.keys(mod.lessons).forEach((lessonType: string) => {
+                const lessons_of_lessontype: Array<Lesson> = mod.lessons[lessonType];
+                lessons_of_lessontype.forEach((lesson: Lesson) => {
+                    // const key = [mod.module_id, lessonType, lesson.lesson_id].join("__");
+                    lesson.weeks.forEach((week: Array<number>) => {
+                        const weeksJson = JSON.stringify(week)
+                        uniqueWeeks.add(weeksJson);
+                        console.log(weeksJson)
+                    });
+
+                });
+            });
+        })
+
+        // Add each unique week list to solver to generate solve string
+        const ids = new StringIdGenerator();
+        uniqueWeeks.forEach((uniqueWeek: string) => {
+            const uniqueWeekArr = JSON.parse(uniqueWeek)
+            weekSolver.add_weeks(uniqueWeekArr, ids.next());
+        })
+
+        return weekSolver.generateSmtlib2String();
+
+    }
+
+    update_z3_weeksolve_output(buffer: string) {
+        // General structure
+        // sat\n((weeks_to_simulate #b1000000000001))\n"
+        const lines = buffer.split("\n");
+        if (lines[0] !== "sat") throw new Error("Not SAT for week-solve before timetable solve - unexpected error, please report")
+
+        // Extract binary string
+        const line2 = lines[1];
+        // Take part after first space, and part before first ) after that
+        const binstring = line2.split(" ")[1].split(")")[0]
+        // Ignore "#b" in string
+        const binary = binstring.substring(2)
+        // Create list of weeks that we should simulate
+        binary.split('').forEach((c: any, idx: number) => { if (c === '1') this.weeks_to_simulate.push(idx + 1); });
+        console.log("WEEKS TO SIMULATE " + this.weeks_to_simulate.toString())
+    }
+
+    generateTimetableSolveSmtLib2String(randomize: boolean = true): string {
         // Add all the time constraints from each module
         this.gt.modules.forEach((mod: Module) => {
             Object.keys(mod.lessons).forEach((lessonType: string) => {
@@ -101,6 +164,9 @@ export class TimetableSmtlib2Converter {
         const smtlib2Str = this.z3tt.generateSmtlib2String(randomize);
         return smtlib2Str;
     }
+
+
+
 
     /**
      * Takes all lessons of a particular type from the module and converts it into a set of slot constraints,
@@ -204,9 +270,10 @@ export class TimetableSmtlib2Converter {
 
 
     /**
-     * Converts hour and minute + day of week into an integer representing a half-hour slot in the z3 timetable:w
+     * Converts hour and minute + day of week into an integer representing a half-hour slot in the z3 timetable
+     * If the lesson is on a particular week, offset the time by (week * number of hours per week)
      * */
-    generic_time_to_z3_time(timeval: Date, day: string): number {
+    generic_time_to_z3_time(timeval: Date, day: string, week: number = 0): number {
         const hour = timeval.getHours();
         const half_hour_addon = timeval.getMinutes() === 30 ? 1 : 0;
         // We assume lessons within start to end hour each day
@@ -218,10 +285,12 @@ export class TimetableSmtlib2Converter {
             // hour_index * 2 (since we count half-hours)
             // + half_hour_addon since we offset by 1 unit if it's a half hour
             // + number of hours in a day * 2 to get number of half-hours
+            // + number of weeks offset from the "base week" 
             const idx = (
                 (hour_index * 2)
                 + half_hour_addon
-                + day_index * ((this.end_hour - this.start_hour) * 2)
+                + day_index * (HOURS_PER_DAY * 2)
+                + week * (HOURS_PER_WEEK * 2)
             )
             return idx;
         }
@@ -231,7 +300,7 @@ export class TimetableSmtlib2Converter {
      * Converts a HHMM string into an integer representing a half-hour slot in the z3 timetable
      * Assumes that day is monday to get the integer offset in that day
      * */
-    hhmm_to_offset(hhmm: string): number {
+    hhmm_to_offset(hhmm: string, week: number = 0): number {
         const hour = parseInt(hhmm.substring(0, 2))
         const half_hour_addon = parseInt(hhmm.substring(2, 4)) == 30 ? 1 : 0;
         // We assume lessons within start to end hour each day
@@ -243,7 +312,8 @@ export class TimetableSmtlib2Converter {
             const idx = (
                 (hour_index * 2)
                 + half_hour_addon
-                + day_index * ((this.end_hour - this.start_hour) * 2)
+                + day_index * (HOURS_PER_DAY * 2)
+                + week * (HOURS_PER_WEEK * 2)
             )
             return idx;
         }
@@ -252,11 +322,15 @@ export class TimetableSmtlib2Converter {
     /*
       Conversion from times like 0 --> (1, 0) (1st slot of the day 0-indexed, Monday)
     */
-    z3_time_to_generic_time(z3_time: number): [number, number] {
+    z3_time_to_generic_time(z3_time: number): [number, number, number] {
         // Day is easy: each day has(self.end_hour - self.start_hour) * 2) slots
-        const day = Math.floor(z3_time / ((this.end_hour - this.start_hour) * 2))
-        const offset = z3_time % ((this.end_hour - this.start_hour) * 2)
-        return [offset, day]
+
+        // If there are 60 slots per week, and we are at slot 70, we're 10 slots into the current week
+        const week = Math.floor(z3_time / (HOURS_PER_WEEK * 2))
+        let z3_time_week = z3_time % (HOURS_PER_WEEK * 2)
+        const day = Math.floor(z3_time_week / (HOURS_PER_DAY * 2))
+        const offset = z3_time_week % (HOURS_PER_DAY * 2)
+        return [offset, day, week]
     }
 
     /**
@@ -325,7 +399,7 @@ export class TimetableSmtlib2Converter {
             if (key.startsWith('t')) {
                 const key_split = key.split("_")[0];
                 const halfhouridx = parseInt(key_split.substr(1));
-                const [offset, day] = this.z3_time_to_generic_time(halfhouridx)
+                const [offset, day, week] = this.z3_time_to_generic_time(halfhouridx)
                 const val = variable_assignments[key];
                 if (val === UNASSIGNED) return; // Un-assigned slot
                 const assignment: string = this.reverse_who_id_table[val]
