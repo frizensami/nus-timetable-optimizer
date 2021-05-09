@@ -56,16 +56,29 @@ function Timetable({ start_hour, end_hour, timetable }: TimetableProps) {
                                                     // Empty timetable
                                                     return <Table.Cell key={(2 ** (i1 + 1)) * (3 ** (i2 + 1))} textAlign='center'>{""}</Table.Cell>;
                                                 } else {
-                                                    const cellStr = timetable.tt[i1][i2];
-                                                    if (cellStr.startsWith("TOO") || cellStr.startsWith("FREE")) {
+                                                    const cellMods = timetable.tt[i1][i2];
+                                                    if (cellMods === [] || cellMods.length === 0 || cellMods === undefined) {
+                                                        return <Table.Cell key={(2 ** (i1 + 1)) * (3 ** (i2 + 1))} textAlign='center'>{""}</Table.Cell>;
+                                                    } else if (cellMods.length === 1 && (cellMods[0].startsWith("TOO") || cellMods[0].startsWith("FREE"))) {
                                                         return <Table.Cell active key={(2 ** (i1 + 1)) * (3 ** (i2 + 1))} textAlign='center'>{""}</Table.Cell>;
-                                                    } else if (timetable.tt[i1][i2] !== ""){
-                                                        let modname = timetable.tt[i1][i2].split("\n")[0]
-                                                        let modcolor = getRandomColorFromString(modname)
-                                                        return <Table.Cell key={(2 ** (i1 + 1)) * (3 ** (i2 + 1))} textAlign='center' style={{"backgroundColor": modcolor}}>{timetable.tt[i1][i2]}</Table.Cell>;
-                                                    } else {
-                                                        return <Table.Cell key={(2 ** (i1 + 1)) * (3 ** (i2 + 1))} textAlign='center'>{timetable.tt[i1][i2]}</Table.Cell>;
-                                                    }
+                                                    } else if (cellMods.length >= 1) {
+                                                        return (
+                                                            <Table.Cell key={(2 ** (i1 + 1)) * (3 ** (i2 + 1))}>
+                                                                <Table>
+                                                                    { cellMods.map((mod: any) => {
+                                                                        let modname = mod.split("\n")[0]
+                                                                        let modcolor = getRandomColorFromString(modname)
+                                                                        return (
+                                                                            <Table.Row>
+                                                                                <Table.Cell key={(2 ** (i1 + 1)) * (3 ** (i2 + 1))} textAlign='center' style={{"backgroundColor": modcolor}}>{mod}</Table.Cell>
+                                                                            </Table.Row>
+                                                                        );
+                                                                    }) }
+                                                                </Table>
+                                                            </Table.Cell>
+                                    )
+                                    // return <Table.Cell key={(2 ** (i1 + 1)) * (3 ** (i2 + 1))} textAlign='center'>{timetable.tt[i1][i2]}</Table.Cell>;
+                                }
                                                 }
                                             })}
                                         </Table.Row>
@@ -75,13 +88,13 @@ function Timetable({ start_hour, end_hour, timetable }: TimetableProps) {
                         </Table.Body>
                     </Table>
                 </Segment>
-                <Dimmer active={!timetable.is_sat}>
-                    <Header as='h2' inverted color='red'>
-                        No valid timetable found: run the solver or adjust your constraints.
+            <Dimmer active={!timetable.is_sat}>
+                <Header as='h2' inverted color='red'>
+                    No valid timetable found: run the solver or adjust your constraints.
                     </Header>
-                </Dimmer>
+            </Dimmer>
             </Dimmer.Dimmable>
-        </div>
+        </div >
     );
 }
 

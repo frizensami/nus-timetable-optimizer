@@ -1,7 +1,7 @@
 import { TimetableOutput, TimetableSmtlib2Converter } from './timetable_to_smtlib2'
 import { GenericTimetable } from './generic_timetable'
 import { Z3Message, MessageKind } from "./z3_protocol"
-import { DAYS, HOURS_PER_DAY, DAY_START_HOUR, DAY_END_HOUR } from './constants'
+import { DAYS, HOURS_PER_DAY, DAY_START_HOUR, DAY_END_HOUR, NUM_WEEKS, HOURS_PER_WEEK } from './constants'
 
 
 /* eslint-disable import/no-webpack-loader-syntax */
@@ -47,7 +47,7 @@ export class Z3Manager {
         console.log(gt)
         Z3Manager.gt = gt;
         Z3Manager.conv = new TimetableSmtlib2Converter(Z3Manager.gt,
-            DAYS * HOURS_PER_DAY * 2, // Number of "half-hour" slots
+            NUM_WEEKS * HOURS_PER_WEEK * 2, // Number of "half-hour" slots
             DAY_START_HOUR, // Start at 8am
             DAY_END_HOUR) // End at 2200 (10 pm)
 

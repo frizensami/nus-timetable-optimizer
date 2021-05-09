@@ -3,7 +3,7 @@ import { Z3WeekSolver } from './z3_weeksolver'
 
 import { flipRecord, StringIdGenerator } from '../util/utils'
 import { Z3Timetable, SlotConstraint, UNASSIGNED, FREE, TOOEARLY_LATE } from './z3_timetable'
-import { DAYS, DAY_IDXS, HOURS_PER_DAY, IDX_DAYS, HOURS_PER_WEEK, WEEKS_AFTER_WEEK0 } from './constants'
+import { DAYS, DAY_IDXS, HOURS_PER_DAY, IDX_DAYS, HOURS_PER_WEEK, NUM_WEEKS } from './constants'
 
 /**
  * Convert a generic timetable to a string representing smtlib2 code
@@ -16,7 +16,7 @@ export class TimetableSmtlib2Converter {
     who_id_table: Record<string, number> // string in both cases is {module id}__{lesson type}__{lesson id}
     reverse_who_id_table: Record<number, string>
     z3tt: Z3Timetable
-    weeks_to_simulate: Array<number> // Each number in here is one week to simulate
+    weeks_to_simulate: Set<number> // Each number in here is one week to simulate
 
     constructor(timetable: GenericTimetable, total_half_hour_slots: number, day_start_hour: number, day_end_hour: number) {
         this.gt = timetable;
@@ -32,15 +32,11 @@ export class TimetableSmtlib2Converter {
             const hour: number = Math.floor(offset / 2) + this.start_hour;
             const hourStr: string = hour < 10 ? "0" + hour.toString() : hour.toString();
             const minuteStr: string = offset % 2 === 0 ? "00" : "30"
-            if (week == 0) {
-                return dayOfWeek + "_" + hourStr + minuteStr
-            } else {
-                return dayOfWeek + "_" + hourStr + minuteStr + "_wk" + week.toString();
-            }
+            return dayOfWeek + "_" + hourStr + minuteStr + "_wk" + week.toString();
         });
 
         this.z3tt = new Z3Timetable(total_half_hour_slots, time_str_vals)
-        this.weeks_to_simulate = []
+        this.weeks_to_simulate = new Set() // 1-indexed weeks to simulate for the timetable
     }
 
     /**
@@ -67,7 +63,7 @@ export class TimetableSmtlib2Converter {
      * Generate first-stage solver string for which weeks to simulate
      * */
     generateWeekSolveSmtLib2String(): string {
-        const weekSolver: Z3WeekSolver = new Z3WeekSolver(WEEKS_AFTER_WEEK0);
+        const weekSolver: Z3WeekSolver = new Z3WeekSolver(NUM_WEEKS);
         let uniqueWeeks: Set<string> = new Set();
 
         // Go through every lessons and generate all possible unique combinations of lesson weeks
@@ -110,8 +106,8 @@ export class TimetableSmtlib2Converter {
         // Ignore "#b" in string
         const binary = binstring.substring(2)
         // Create list of weeks that we should simulate
-        binary.split('').forEach((c: any, idx: number) => { if (c === '1') this.weeks_to_simulate.push(idx + 1); });
-        console.log("WEEKS TO SIMULATE " + this.weeks_to_simulate.toString())
+        binary.split('').forEach((c: any, idx: number) => { if (c === '1') this.weeks_to_simulate.add(idx + 1); });
+        console.log("WEEKS TO SIMULATE " + Array.from(this.weeks_to_simulate).join(','))
     }
 
     generateTimetableSolveSmtLib2String(randomize: boolean = true): string {
@@ -131,7 +127,7 @@ export class TimetableSmtlib2Converter {
 
         })
 
-        // TODO add module workload
+        // Workload constraints
         if (this.gt.constraints.workloadActive) {
             // Non-compulsory modules make up the if-then-else
             const optional_workloads: Array<[string, number]> = this.gt.modules
@@ -155,6 +151,7 @@ export class TimetableSmtlib2Converter {
             this.z3tt.add_constraints_fulfil_only_one(slot_constraints);
         }
 
+        // Start / end too late in the day constraint
         if (this.gt.constraints.timeConstraintActive) {
             const slot_constraint: SlotConstraint | undefined = this.generate_timeconstraint_slotconstraint();
             if (slot_constraint !== undefined) {
@@ -179,14 +176,30 @@ export class TimetableSmtlib2Converter {
             const key = [mod.module_id, lesson.lesson_type, lesson.lesson_id].join("__");
             const who_id = this.who_id_table[key]
             let start_end_times: Array<[number, number]> = []
+            // A lesson can have multiple start_end_times (e.g., lecture classNo 01 on Monday and Friday)
             lesson.start_end_times.forEach(([g_start_time, g_end_time], idx) => {
-                const start_time = this.generic_time_to_z3_time(g_start_time, lesson.days[idx]);
-                const end_time = this.generic_time_to_z3_time(g_end_time, lesson.days[idx]);
-                start_end_times.push([start_time, end_time]);
+                // If no week calculation, run everything as every week
+                if (this.weeks_to_simulate.size === 0) {
+                    const start_time = this.generic_time_to_z3_time(g_start_time, lesson.days[idx]);
+                    const end_time = this.generic_time_to_z3_time(g_end_time, lesson.days[idx]);
+                    start_end_times.push([start_time, end_time]);
+                } else {
+                    // Add all start and end times for each lesson based on the weeks of this lesson that need to be simulated
+                    const weeks_for_lesson = lesson.weeks[idx]
+                    const weeks_to_sim = weeks_for_lesson.filter((week: number) => this.weeks_to_simulate.has(week));
+                    for (let week of weeks_to_sim) {
+                        console.log("Simulating week " + week)
+                        const start_time = this.generic_time_to_z3_time(g_start_time, lesson.days[idx], week - 1);
+                        const end_time = this.generic_time_to_z3_time(g_end_time, lesson.days[idx], week - 1);
+                        start_end_times.push([start_time, end_time]);
+                    }
+                }
+
             })
             const sc: SlotConstraint = { start_end_times: start_end_times, who_id: who_id, who_id_string: key };
             scs.push(sc)
         })
+        console.log(scs)
         return scs;
     }
 
@@ -216,10 +229,15 @@ export class TimetableSmtlib2Converter {
                 console.log(`Start offset: ${startOffset}, endOffset: ${endOffset}`)
             }
 
-            // Generate the slot constraints for each day
-            const startidx = day * (HOURS_PER_DAY * 2) + startOffset;
-            const endidx = startidx + (endOffset - startOffset);
-            const sc: SlotConstraint = { start_end_times: [[startidx, endidx]], who_id: who_id, who_id_string: name }
+            let start_end_idxs: Array<[number, number]> = []
+            for (let week of Array.from(this.weeks_to_simulate)) {
+                // Generate the slot constraints for each day
+                const startidx = ((week - 1) * (HOURS_PER_WEEK * 2)) + (day * (HOURS_PER_DAY * 2)) + startOffset;
+                const endidx = startidx + (endOffset - startOffset);
+                start_end_idxs.push([startidx, endidx])
+            }
+
+            const sc: SlotConstraint = { start_end_times: start_end_idxs, who_id: who_id, who_id_string: name }
             scs.push(sc)
         }
         return scs;
@@ -243,23 +261,23 @@ export class TimetableSmtlib2Converter {
 
         // For each day of the week, add a slot constraint blocking out hours before and after our ideal timings
         for (let day = 0; day < DAYS; day++) {
-
             // Compute the two time windows necessary to block off start and end of day
-
             // Start-of-day time starts at the initial index of the day, up until the offset
-            const startidx = day * (HOURS_PER_DAY * 2);
-            const startidx_endidx = startidx + startOffset;
-            if (startidx_endidx - startidx > 0) {
-                start_end_times.push([startidx, startidx_endidx]);
-            }
+            // Do this for every week that we have to simulate
+            for (let week of Array.from(this.weeks_to_simulate)) {
+                const startidx = ((week - 1) * (HOURS_PER_WEEK * 2)) + (day * (HOURS_PER_DAY * 2));
+                const startidx_endidx = startidx + startOffset;
+                if (startidx_endidx - startidx > 0) {
+                    start_end_times.push([startidx, startidx_endidx]);
+                }
 
-            // Want to end 
-            const endidx = startidx + HOURS_PER_DAY * 2;
-            const endidx_startidx = startidx + endOffset;
-            if (endidx_startidx - endidx > 0) {
-                start_end_times.push([startidx, startidx_endidx]);
+                const endidx = startidx + HOURS_PER_DAY * 2;
+                const endidx_startidx = startidx + endOffset;
+                if (endidx_startidx - endidx > 0) {
+                    start_end_times.push([startidx, startidx_endidx]);
+                }
+                start_end_times.push([endidx_startidx, endidx]);
             }
-            start_end_times.push([endidx_startidx, endidx]);
         }
 
         const sc: SlotConstraint = { start_end_times: start_end_times, who_id: who_id, who_id_string: name }
@@ -387,10 +405,13 @@ export class TimetableSmtlib2Converter {
         console.log(variable_assignments);
 
 
-        // 2D array of days (assuming that doesn't change...) x half-hours per day
+        // 3D array of days x hours per day x mods in that hour
         let tt = new Array(DAYS);
         for (let i = 0; i < tt.length; i++) {
-            tt[i] = Array((this.end_hour - this.start_hour) * 2).fill("");
+            tt[i] = new Array(HOURS_PER_DAY * 2);
+            for (let j = 0; j < tt[i].length; j++) {
+                tt[i][j] = [];
+            }
         }
 
         // Create the final output timetable based on hour assignments
@@ -407,7 +428,12 @@ export class TimetableSmtlib2Converter {
                     return;
                     // throw new Error(`Undefined assignment for variable_assignments[${key}] = ${variable_assignments[key]}`)
                 }
-                tt[day][offset] = assignment.split("__").join("\n");
+                console.log(`For z3 t${halfhouridx}, offset: ${offset}, day: ${day}, week: ${week}`)
+                const modname = assignment.split("__").join("\n")
+                if (!tt[day][offset].includes(modname)) {
+                    tt[day][offset].push(modname);
+                }
+
             }
         })
 

@@ -5,7 +5,7 @@ export const DAY_START_HOUR = 8
 export const DAY_END_HOUR = 22
 export const HOURS_PER_DAY = DAY_END_HOUR - DAY_START_HOUR  // 14 8 am --> 10 pm
 export const HOURS_PER_WEEK = HOURS_PER_DAY * DAYS;
-export const WEEKS_AFTER_WEEK0 = 13
+export const NUM_WEEKS = 13
 
 export const DAY_IDXS: Record<string, number> = {
     "monday": 0,
