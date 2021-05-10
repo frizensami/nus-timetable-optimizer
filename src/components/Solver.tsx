@@ -96,16 +96,16 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
 
                         {
                             0: <Segment raised>
-                                <Button disabled attached="top">Solver Loading</Button>,
+                                <Button disabled attached="top">Optimizer Loading</Button>,
                                 <Dimmer active>
-                                    <Loader content='Solver Initializing... (this can take one or two minutes)' />
+                                    <Loader content='Optimizer Initializing... (this can take one or two minutes)' />
                                 </Dimmer>
                             </Segment>,
-                            1: <Button onClick={onSubmit} disabled={modules.length === 0} primary size="big" attached="top"> {modules.length === 0 ? "Add at least one module before running solver" : "Run Solver"}</Button>,
+                            1: <Button onClick={onSubmit} disabled={modules.length === 0} primary size="big" attached="top"> {modules.length === 0 ? "Add at least one module before running optimizer" : "Run Optimizer"}</Button>,
                             2: <Segment raised>
-                                <Button disabled attached="top">Solver Running</Button>,
+                                <Button disabled attached="top">Optimizer Running</Button>,
                                 <Dimmer active>
-                                    <Loader content='Solver Running...' />
+                                    <Loader content='Optimizer Running...' />
                                 </Dimmer>
                             </Segment>,
                         }[z3State]

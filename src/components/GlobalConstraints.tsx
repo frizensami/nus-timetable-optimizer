@@ -176,7 +176,7 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                 <Form.Group widths="equal">
                     <Form.Field
                         control={Button}
-                        label='Force solver to find at least 1 free day (Mon - Fri): Activate Constraint?'
+                        label='Force optimizer to find at least 1 free day (Mon - Fri): Activate Constraint?'
                         toggle
                         active={constraints.freeDayActive}
                         onClick={toggleFreeDayActive}
