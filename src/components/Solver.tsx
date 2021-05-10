@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
 import { TimetableOutput } from '../core/timetable_to_smtlib2'
-import { Segment, Button, Container, Divider, Grid, Loader, Dimmer } from 'semantic-ui-react'
+import { Segment, Button, Message, Container, Divider, Grid, Loader, Dimmer } from 'semantic-ui-react'
 import { GenericTimetable, GlobalConstraintsList, defaultConstraints  } from '../core/generic_timetable'
 import { Z3Manager, Z3Callbacks } from '../core/z3_manager'
 import { NUSModsFrontend, ModuleToAdd } from '../frontends/nusmods_frontend'
