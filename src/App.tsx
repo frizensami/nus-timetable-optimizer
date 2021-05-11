@@ -6,7 +6,9 @@ import { SolverApp } from './components/SolverApp'
 import { HowToUse } from './components/HowToUse'
 import { About } from './components/About'
 // import './App.css';             
-import 'semantic-ui-less/semantic.less'
+// import 'semantic-ui-less/semantic.less'
+import 'semantic-ui-css/semantic.min.css'
+
 
 import Timetable from './components/Timetable'
 import { Solver } from './components/Solver'

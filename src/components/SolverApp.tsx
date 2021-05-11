@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import logo from './logo.svg';
 // import './App.css';             
-import 'semantic-ui-less/semantic.less'
+// import 'semantic-ui-less/semantic.less'
 
 import Timetable from './Timetable'
 import { Solver } from './Solver'

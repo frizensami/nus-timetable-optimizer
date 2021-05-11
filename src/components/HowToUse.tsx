@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Segment, Button, Container, Divider, Grid, Loader, Dimmer, Header } from 'semantic-ui-react'
 import logo from './logo.svg';
 // import './App.css';             
-import 'semantic-ui-less/semantic.less'
+// import 'semantic-ui-less/semantic.less'
 
 
 export const HowToUse: React.FC = () => {
