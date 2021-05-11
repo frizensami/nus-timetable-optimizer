@@ -84,6 +84,12 @@ function Not(expr: SNode): SExpr {
 function Eq(lhs: SNode, rhs: SNode): SExpr {
     return new SExpr('=', lhs, rhs);
 }
+
+//  ((_ pbeq N 1 1) SL_somename SL_somename2) ==> select N out of equally weighted SL_somename and SL_somename2
+function PbEq(clauses: SNode[], weights: number[], N: number): SExpr {
+    const strWeights = weights.map(x => x.toString());
+    return new SExpr(new SExpr("_", "pbeq", N.toString(), ...strWeights), ...clauses);
+}
 function NEq(lhs: SNode, rhs: SNode): SExpr {
     return Not(Eq(lhs, rhs));
 }
@@ -141,6 +147,7 @@ export {
     If,
     Not,
     Eq,
+    PbEq,
     NEq,
     LEq,
     GEq,

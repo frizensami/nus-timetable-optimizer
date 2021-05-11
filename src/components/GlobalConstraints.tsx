@@ -17,6 +17,8 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
 
     let [constraints, setConstraints] = useState<GlobalConstraintsList>(defaultConstraints);
 
+    const freeDaySelections: Array<any> = [1, 2, 3, 4].map((n: number) => ({ key: n, text: n, value: n }))
+
     const generateTimeSelections = () => {
         const times: Array<any> = []
         for (let hour = Constants.DAY_START_HOUR; hour < Constants.DAY_END_HOUR; hour++) {
@@ -32,8 +34,9 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
         times.push({ key: hour * 2, text: `${hourStr}:00 ${am_pm}`, value: hour * 2, })
 
         return times
-
     }
+
+
     const timeSelections = generateTimeSelections();
 
     function _setConstraints(newState: GlobalConstraintsList) {
@@ -84,6 +87,11 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
         const min = v % 2 == 0 ? "00" : "30";
         const timeStr = `${hourStr}${min}`
         const newState = { ...constraints, endTime: timeStr }
+        _setConstraints(newState)
+    }
+
+    function setNumFreeDays(v: any) {
+        const newState = { ...constraints, numRequiredFreeDays: v }
         _setConstraints(newState)
     }
 
@@ -175,13 +183,23 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
 
                 <Form.Group widths="equal">
                     <Form.Field
+                        id='form-input-num-free-days'
+                        control={Select}
+                        options={freeDaySelections}
+                        defaultValue={freeDaySelections[0].key}
+                        label='Number of free days wanted'
+                        width={10}
+                        fluid
+                        onChange={(_: any, { value }: any) => setNumFreeDays(value)} />
+                    <Form.Field
                         control={Button}
-                        label='Force optimizer to find at least 1 free day (Mon - Fri): Activate Constraint?'
+                        label='Activate Constraint?'
                         toggle
                         active={constraints.freeDayActive}
                         onClick={toggleFreeDayActive}
                         content={constraints.freeDayActive ? "Yes" : "No"}
                         fluid
+                        width={6}
                     />
                 </Form.Group>
 

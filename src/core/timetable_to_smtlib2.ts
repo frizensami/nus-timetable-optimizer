@@ -146,15 +146,17 @@ export class TimetableSmtlib2Converter {
 
         // Add requirements for free day: this ensures that we won't get SAT unless an entire day is free
         if (this.gt.constraints.freeDayActive) {
-            // Model this as a "fulfil only one" constraint, but all the slots are assigned to WHO_ID == UNASSIGND
+            // Model this as a "fulfil only one" constraint, we require there to be exactly 1 free day
             const slot_constraints: Array<SlotConstraint> = this.generate_free_day_slotconstraints();
-            this.z3tt.add_constraints_fulfil_only_one(slot_constraints);
+            // this.z3tt.add_constraints_fulfil_only_one(slot_constraints);
+            this.z3tt.add_constraints_fulfil_exactly_N(slot_constraints, this.gt.constraints.numRequiredFreeDays);
         }
 
         // Start / end too late in the day constraint
         if (this.gt.constraints.timeConstraintActive) {
             const slot_constraint: SlotConstraint | undefined = this.generate_timeconstraint_slotconstraint();
             if (slot_constraint !== undefined) {
+                // MUST fulfil the single slot constraint generated for the start too early / end too late
                 this.z3tt.add_constraints_fulfil_only_one([slot_constraint]);
             }
         }
