@@ -18,6 +18,13 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
     let [constraints, setConstraints] = useState<GlobalConstraintsList>(defaultConstraints);
 
     const freeDaySelections: Array<any> = [1, 2, 3, 4].map((n: number) => ({ key: n, text: n, value: n }))
+    const freeDayofWeekSelection = [
+        { key: 'Monday', text: 'Monday', value: 'Monday' },
+        { key: 'Tuesday', text: 'Tuesday', value: 'Tuesday' },
+        { key: 'Wednesday', text: 'Wednesday', value: 'Wednesday' },
+        { key: 'Thursday', text: 'Thursday', value: 'Thursday' },
+        { key: 'Friday', text: 'Friday', value: 'Friday' },
+    ]
 
     const generateTimeSelections = () => {
         const times: Array<any> = []
@@ -64,6 +71,11 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
         _setConstraints(newState)
     }
 
+    function toggleSpecificFreeDaysActive() {
+        const newState = { ...constraints, specificFreeDaysActive: !constraints.specificFreeDaysActive }
+        _setConstraints(newState)
+    }
+
     function toggleTimeConstraintActive() {
         const newState = { ...constraints, timeConstraintActive: !constraints.timeConstraintActive }
         _setConstraints(newState)
@@ -92,6 +104,12 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
 
     function setNumFreeDays(v: any) {
         const newState = { ...constraints, numRequiredFreeDays: v }
+        _setConstraints(newState)
+    }
+
+    function setSpecificFreeDays(v: any) {
+        // ["Monday", "Wednesday"] e.g.,
+        const newState = { ...constraints, specificFreeDays: v }
         _setConstraints(newState)
     }
 
@@ -203,9 +221,28 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                     />
                 </Form.Group>
 
+                <Divider />
 
-
-
+                <Form.Group widths="equal">
+                    <Form.Field
+                        id='form-input-which-fre-days'
+                        control={Select}
+                        options={freeDayofWeekSelection}
+                        fluid multiple selection
+                        label='Specific free days wanted'
+                        width={10}
+                        onChange={(_: any, { value }: any) => setSpecificFreeDays(value)} />
+                    <Form.Field
+                        control={Button}
+                        label='Activate Constraint?'
+                        toggle
+                        active={constraints.specificFreeDaysActive}
+                        onClick={toggleSpecificFreeDaysActive}
+                        content={constraints.specificFreeDaysActive ? "Yes" : "No"}
+                        fluid
+                        width={6}
+                    />
+                </Form.Group>
 
                 <Divider />
 

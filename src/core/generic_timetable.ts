@@ -17,6 +17,8 @@ export interface GlobalConstraintsList {
     maxWorkload: number
     freeDayActive: boolean,
     numRequiredFreeDays: number,
+    specificFreeDaysActive: boolean,
+    specificFreeDays: Array<string>,
     startTime: string,
     endTime: string
     timeConstraintActive: boolean
@@ -28,6 +30,8 @@ export const defaultConstraints: GlobalConstraintsList = {
     maxWorkload: 30,
     freeDayActive: false,
     numRequiredFreeDays: 1,
+    specificFreeDaysActive: false,
+    specificFreeDays: [],
     startTime: "0800",
     endTime: "2200",
     timeConstraintActive: false,

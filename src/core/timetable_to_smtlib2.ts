@@ -145,11 +145,23 @@ export class TimetableSmtlib2Converter {
 
 
         // Add requirements for free day: this ensures that we won't get SAT unless an entire day is free
-        if (this.gt.constraints.freeDayActive) {
-            // Model this as a "fulfil only one" constraint, we require there to be exactly 1 free day
+        if (this.gt.constraints.freeDayActive || this.gt.constraints.specificFreeDaysActive) {
             const slot_constraints: Array<SlotConstraint> = this.generate_free_day_slotconstraints();
-            // this.z3tt.add_constraints_fulfil_only_one(slot_constraints);
-            this.z3tt.add_constraints_fulfil_exactly_N(slot_constraints, this.gt.constraints.numRequiredFreeDays);
+            if (this.gt.constraints.freeDayActive) {
+                // We fulfil K out of N possible free days based on user selection
+                // this.z3tt.add_constraints_fulfil_only_one(slot_constraints);
+                this.z3tt.add_constraints_fulfil_exactly_N(slot_constraints, this.gt.constraints.numRequiredFreeDays);
+            }
+            if (this.gt.constraints.specificFreeDaysActive) {
+                // We ensure that the days specified are free
+                // Assume that the free day slot constraints are in order of day-of-week
+                this.gt.constraints.specificFreeDays.forEach((freeday: string) => {
+                    const day_idx = this.day_str_to_idx(freeday);
+                    const day_freeday_constraints = slot_constraints[day_idx];
+                    this.z3tt.add_constraints_fulfil_only_one([day_freeday_constraints]);
+                })
+                
+            }
         }
 
         // Start / end too late in the day constraint
