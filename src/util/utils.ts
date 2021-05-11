@@ -39,7 +39,7 @@ export function flipRecord(obj: any): any {
  * */
 let randomColor = require('randomcolor'); // import the script
 export function getRandomColorFromString(str: string) {
-  const hashNum = hashCode(str);
+  const hashNum = hashCodeMurmur(str);
   const color = randomColor(
     {
       seed: hashNum,
@@ -50,6 +50,16 @@ export function getRandomColorFromString(str: string) {
   );
   return color
 }
+
+const MurmurHash3 = require('imurmurhash');
+const hashState = new MurmurHash3("", 42);
+
+const hashCodeMurmur = function(s: string): number {
+  const res = hashState.hash(s).result();
+  hashState.reset();
+  return res;
+}
+
 
 /**
  * Returns a hash code for a string.

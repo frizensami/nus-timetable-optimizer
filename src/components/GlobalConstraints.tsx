@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import './Solver.css'
-import { Segment, Button, Container, Divider, Dropdown, Grid, Menu, Input, Form, Select, Header, Message, Card, Checkbox, Item, Transition } from 'semantic-ui-react'
+import { Segment, Button, Container, Divider, Dropdown, Grid, Menu, Input, Form, Select, Header, Message, Card, Checkbox, Item, Transition, Popup } from 'semantic-ui-react'
 import * as Constants from '../core/constants'
 import { GlobalConstraintsList, defaultConstraints } from '../core/generic_timetable'
 
@@ -129,7 +129,6 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                     <Form.Field
                         id='form-input-min-workload'
                         control={Input}
-                        label='Minimum Credits'
                         type="number"
                         defaultValue={defaultConstraints.minWorkload}
                         min="0"
@@ -137,7 +136,9 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                         onChange={(e: any) => updateMinWorkload(e.target.value)}
                         width={5}
                         fluid
-                    />
+                    >
+                    <label>Minimum credits</label>
+                    </Form.Field>
                     <Form.Field
                         id='form-input-max-workload'
                         control={Input}
@@ -184,6 +185,43 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                         options={timeSelections}
                         defaultValue={timeSelections[timeSelections.length - 1].key}
                         label='Latest Lesson End'
+                        fluid
+                        width={5}
+                        search
+                        onChange={(_: any, { value }: any) => setEndTime(value)}
+                    />
+                    <Form.Field
+                        control={Button}
+                        label='Constraint Activated?'
+                        toggle
+                        active={constraints.timeConstraintActive}
+                        onClick={toggleTimeConstraintActive}
+                        content={constraints.timeConstraintActive ? "Yes" : "No"}
+                        fluid
+                        width={6}
+                    />
+                </Form.Group>
+
+                <Divider />
+
+                <Form.Group>
+                    <Form.Field
+                        id='form-input-lunch-start'
+                        control={Select}
+                        options={timeSelections}
+                        defaultValue={timeSelections[0].key}
+                        label='Lunch Period'
+                        width={5}
+                        fluid
+                        search
+                        onChange={(_: any, { value }: any) => setStartTime(value)}
+                    />
+                    <Form.Field
+                        id='form-input-lunch-end'
+                        control={Select}
+                        options={timeSelections}
+                        defaultValue={timeSelections[timeSelections.length - 1].key}
+                        label='Lunch Period End'
                         fluid
                         width={5}
                         search

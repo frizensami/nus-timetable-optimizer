@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import './Solver.css'
-import { Segment, Button, Container, Divider, Dropdown, Grid, Icon, List, Menu, Input, Form, Select, Header, Message, Card, Checkbox, Item, Transition } from 'semantic-ui-react'
+import { Segment, Button, Container, Divider, Dropdown, Grid, Icon, Modal, List, Menu, Input, Form, Select, Header, Message, Card, Checkbox, Item, Transition } from 'semantic-ui-react'
 import { NUSModsFrontend } from '../frontends/nusmods_frontend'
 import { getRandomColorFromString } from '../util/utils'
 
@@ -34,6 +34,7 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
     let [showModuleAddSuccess, setShowModuleAddSuccess] = useState(false);
     let [activeErrorCancelTimeout, setActiveErrorCancelTimeout] = useState<any>(undefined)
     let [activeSuccessCancelTimeout, setActiveSuccessCancelTimeout] = useState<any>(undefined)
+    let [open, setOpen] = useState(false)
 
     /*
      * Try to add a module to the current list of modules
@@ -62,6 +63,7 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
                 cancelErrorAfterInterval();
             } else {
                 mod.json = moduleJson
+                setOpen(true);
                 console.log("Successfully added module!")
                 setShowModuleAddSuccess(true);
                 setShowModuleAddError(false);
@@ -213,7 +215,7 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
                                     <Grid.Column textAlign="center" width={16}>
                                         <Card centered fluid>
                                             <Card.Content>
-                                                <Card.Header> <Icon name='square outline' size='tiny' style={{"backgroundColor": color}}/> {mod.module_code + " " + mod.json["title"]} </Card.Header>
+                                                <Card.Header> <Icon name='square outline' size='tiny' style={{ "backgroundColor": color }} /> {mod.module_code + " " + mod.json["title"]} </Card.Header>
                                                 <Card.Meta> {"AY " + mod.acad_year + " | Semester " + mod.semester + " | Workload: " + mod.json['moduleCredit'] + " MC"} </Card.Meta>
                                             </Card.Content>
                                             <Card.Content extra>
@@ -245,6 +247,36 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
                     }
                 </Transition.Group>
             </Grid>
+
+            <Modal
+                onClose={() => setOpen(false)}
+                onOpen={() => setOpen(true)}
+                open={open}>
+                <Modal.Header>The module you are adding does not follow the traditional NUS academic semester.</Modal.Header>
+                <Modal.Content>
+                    <Modal.Description>
+                        <p>Would you like to <strong>skip</strong> adding this module, or just <strong>assume that the module takes place every week?</strong></p>
+                    </Modal.Description>
+                </Modal.Content>
+                <Modal.Actions>
+
+                    <Grid columns="equal">
+                        <Grid.Column>
+                            <Button fluid negative onClick={() => setOpen(false)}>
+                                Skip
+                            </Button>
+                        </Grid.Column>
+                        <Grid.Column>
+                            <Button
+                                content="Assume weekly"
+                                fluid
+                                onClick={() => setOpen(false)}
+                                positive
+                            />
+                        </Grid.Column>
+                    </Grid>
+                </Modal.Actions>
+            </Modal>
         </div>
     )
 }

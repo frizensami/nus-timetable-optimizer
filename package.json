@@ -13,6 +13,7 @@
     "@types/react-router": "^5.1.14",
     "ace-builds": "^1.4.12",
     "expired-storage": "^1.0.2",
+    "imurmurhash": "^0.1.4",
     "preact": "^10.5.13",
     "preact-compat": "^3.19.0",
     "randomcolor": "^0.6.2",
