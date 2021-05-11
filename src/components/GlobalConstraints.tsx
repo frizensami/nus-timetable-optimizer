@@ -255,7 +255,7 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                 <Form.Group widths="equal">
                     <Form.Field
                         control={Button}
-                        label='Make timetable as compact as possible?'
+                        label='Make timetable as compact as possible? Warning: optimizer might become very slow!'
                         toggle
                         active={constraints.preferCompactTimetable}
                         onClick={toggleCompactTimetable}
