@@ -19,13 +19,12 @@ export const About: React.FC = () => {
                     I don't need to optimize my own timetables anymore, but this could still be useful to other people!  </p>
 
                 <Header as="h3" textAlign="left"> Is this project affiliated with NUSMods? </Header>
-                <p> No. However, NUSMods have a wonderful public-facing API at
-                    <a href="https://api.nusmods.com/v2/">{"https://api.nusmods.com/v2/"}</a> that this optimizer uses, and that I am very grateful for.
+                <p> No. However, NUSMods have a wonderful public-facing API at <a href="https://api.nusmods.com/v2/">{"https://api.nusmods.com/v2/"}</a> that this optimizer uses, and that I am very grateful for.
                     All API requests for module information are cached locally for a while to avoid hitting the API too much. </p>
 
                 <Header as="h3" textAlign="left"> Is this a new idea? </Header>
                 <p> Yes and no. There have been a number of attempts (including my own previous one in 2015) to address this issue.
-                This work is most closesly inspired by <a href="https://modsplanner.tk">{"https://modsplanner.tk/"}</a>, which appears to be defunct.
+                This work is most closely inspired by <a href="https://modsplanner.tk">{"https://modsplanner.tk/"}</a>, which appears to be defunct.
             I would urge anyone interested to see the modsplanner {"team's"} technical report and work on <a href="https://github.com/raynoldng/nusmods-planner">their GitHub page</a>.
             </p>
 
@@ -37,7 +36,7 @@ export const About: React.FC = () => {
             </p>
 
                 <p>
-                    <strong> This work allows the optimizer to run on browsers at speeds that are very close to running it natively on a computer </strong>.
+                    <strong> This work allows the optimizer to run on browsers at speeds that are very close to running it natively on a computer</strong>.
                 This is mainly due to the amazing effort by <a href="http://pit-claudel.fr/clement/">Clément Pit-Claudel</a> at MIT to enable the
                 <a href="https://github.com/Z3Prover/z3"><strong> Microsoft Z3 solver</strong></a> to be run as a <a href="https://webassembly.org/">WebAssembly</a> module.
             </p>
