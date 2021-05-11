@@ -12,10 +12,11 @@ export const BOOLVAR_ASSIGNED_WEIGHT: number = 100000;
  * */
 export class Z3Timetable {
     timevars: Array<string> // ["t0", "t1", ....]
-    assigned_intvars_possiblevalues: Record<string, Set<number>> // What allowed values can each time val
+    assigned_intvars_possiblevalues: Record<string, Set<number>> // What allowed values can each time val have
     bool_selectors_set: Set<string> // Basically module names e.g, CS3203, to select or de-select a module
     variables_solver: any // Just for variables assignment - hack to get the variables assignment ABOVE the constraints
     solver: any // For the actual constraints
+    constrain_compactness: boolean // whether we want all classes to be right after each other as much as possible
 
     constructor(total_time_units: number, time_unit_names?: Array<string>) {
         // Create time variable names based on just the raw time unit, or pass in a list of strings to be appended to the raw time hours
@@ -32,6 +33,7 @@ export class Z3Timetable {
         this.bool_selectors_set = new Set();
         this.variables_solver = new smt.BaseSolver('QF_ALL_SUPPORTED');
         this.solver = new smt.BaseSolver('QF_ALL_SUPPORTED');
+        this.constrain_compactness = false;
     }
 
     /**
@@ -177,18 +179,22 @@ export class Z3Timetable {
             });
             return slot_requirements;
         }).flat(); // Flatten in case we return multiple constraints per slot
-        
+
         // Ensures we declare the selector later
         selector_var_list.forEach((selector: string) => this.bool_selectors_set.add(selector));
 
         // Assert all the constraints that relate the selector variable to the selected constrains
         constraints.forEach((constraint: any) => this.solver.assert(constraint));
-        
+
         // Assert a K-out-of-N constraint for the selector variables
         const k_of_n = smt.PbEq(selector_var_list, new Array(selector_var_list.length).fill(1), n)
         this.solver.assert(k_of_n);
     }
 
+
+    /**
+     * This sets the "workload" costs of choosing an optional module, modelled as a cost on the boolean selectors
+     * */
     set_boolean_selector_costs(workloads: Array<[string, number]>, base_workload: number, minWorkload: number, maxWorkload: number) {
         // Create a variable for the cost of the boolean selectors, add it to declarations list
         const workload_sum_name = "workloadsum"
@@ -203,6 +209,16 @@ export class Z3Timetable {
         // Assert that the workload should be >= than the minimum workload and <= the maximum workload
         this.solver.assert(smt.GEq(workload_sum_name, minWorkload))
         this.solver.assert(smt.LEq(workload_sum_name, maxWorkload))
+    }
+
+    /**
+     * Bit hacky since it requires knowing our WHO_ID constraint format, but basically:
+     *  If a slot is assigned to a who_id > 0 (meaning not UNASSIGNED / FREE / etc)
+     *      Then: (assert-soft) that the NEXT slot is also assigned > 0
+     *  Here, we just set a flag, since this must be done at the end after all variables are assigned
+     * */
+    add_compactness_constraint() {
+        this.constrain_compactness = true;
     }
 
     /**
@@ -249,6 +265,41 @@ export class Z3Timetable {
             }
             // this.variables_solver.add.smt.AssertSoft(smt.Eq(timevar, UNASSIGNED), VAR_UNASSIGNED_WEIGHT, 'defaultval'));
         })
+
+        if (this.constrain_compactness) {
+            // Now that all variables are declared, add the constraint-compactness soft asserts
+            Object.keys(this.assigned_intvars_possiblevalues).forEach((varname: string) => {
+                // For each variable that is assigned to a mod (who_id > 0), find the next variable that could possibly be assigned, 
+                // and assert-soft that it IS assigned
+
+                // We only care about time slot vars
+                if (!varname.startsWith('t')) return;
+
+                // Get the timeslot ID (e.g., 2044)
+                let var_id = parseInt(varname.split("_")[0].substring(1))
+
+                // Find the next variable after this one. If it doesn't exist, return
+                if (var_id + 1 >= this.timevars.length) return;
+                var_id++;
+                const next_var_name = this.timevars[var_id];
+                if (!(next_var_name in this.assigned_intvars_possiblevalues)) return
+                if (next_var_name === undefined || next_var_name === "") return;
+
+                // If the current var is assigned to a mod, we assert-soft that
+                //  the next one is either the same mod (continuation of slot), or a different mod immediately
+                const assert_soft_nextvar_assigned = smt.AssertSoft(
+                    smt.Eq(
+                        smt.GEq(varname, 0),
+                        smt.Or(
+                            smt.Eq(next_var_name, varname),
+                            smt.And(
+                                smt.NEq(next_var_name, varname),
+                                smt.GEq(next_var_name, 0)))),
+                    1, "nextvar");
+                this.solver.add(assert_soft_nextvar_assigned)
+            });
+        }
+
 
 
         // Declare that we want as many modules to be selected as possible for now

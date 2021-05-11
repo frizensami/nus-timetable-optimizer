@@ -163,6 +163,11 @@ export class TimetableSmtlib2Converter {
                 
             }
         }
+        
+        // Keep all mods close together
+        if (this.gt.constraints.preferCompactTimetable) {
+            this.z3tt.add_compactness_constraint();
+        }
 
         // Start / end too late in the day constraint
         if (this.gt.constraints.timeConstraintActive) {
@@ -208,7 +213,6 @@ export class TimetableSmtlib2Converter {
                         start_end_times.push([start_time, end_time]);
                     }
                 }
-
             })
             const sc: SlotConstraint = { start_end_times: start_end_times, who_id: who_id, who_id_string: key };
             scs.push(sc)

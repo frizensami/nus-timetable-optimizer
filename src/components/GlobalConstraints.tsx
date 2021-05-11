@@ -81,6 +81,11 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
         _setConstraints(newState)
     }
 
+    function toggleCompactTimetable() {
+        const newState = { ...constraints, preferCompactTimetable: !constraints.preferCompactTimetable }
+        _setConstraints(newState)
+    }
+
     function setStartTime(v: any) {
         console.log(v);
         const hour = Math.floor(v / 2)
@@ -241,6 +246,21 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                         content={constraints.specificFreeDaysActive ? "Yes" : "No"}
                         fluid
                         width={6}
+                    />
+                </Form.Group>
+
+
+                <Divider />
+
+                <Form.Group widths="equal">
+                    <Form.Field
+                        control={Button}
+                        label='Make timetable as compact as possible?'
+                        toggle
+                        active={constraints.preferCompactTimetable}
+                        onClick={toggleCompactTimetable}
+                        content={constraints.preferCompactTimetable ? "Yes" : "No"}
+                        fluid
                     />
                 </Form.Group>
 

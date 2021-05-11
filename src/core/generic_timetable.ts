@@ -20,8 +20,10 @@ export interface GlobalConstraintsList {
     specificFreeDaysActive: boolean,
     specificFreeDays: Array<string>,
     startTime: string,
-    endTime: string
-    timeConstraintActive: boolean
+    endTime: string,
+    timeConstraintActive: boolean,
+    preferCompactTimetable: boolean
+    
 }
 
 export const defaultConstraints: GlobalConstraintsList = {
@@ -35,6 +37,7 @@ export const defaultConstraints: GlobalConstraintsList = {
     startTime: "0800",
     endTime: "2200",
     timeConstraintActive: false,
+    preferCompactTimetable: false,
 };
 
 /**
