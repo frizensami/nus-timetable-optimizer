@@ -152,7 +152,7 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                     />
                     <Form.Field
                         control={Button}
-                        label='Activate Constraint?'
+                        label='Constraint Activated?'
                         toggle
                         active={constraints.workloadActive}
                         onClick={toggleWorkloadActive}
@@ -191,7 +191,7 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                     />
                     <Form.Field
                         control={Button}
-                        label='Activate Constraint?'
+                        label='Constraint Activated?'
                         toggle
                         active={constraints.timeConstraintActive}
                         onClick={toggleTimeConstraintActive}
@@ -216,7 +216,7 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                         onChange={(_: any, { value }: any) => setNumFreeDays(value)} />
                     <Form.Field
                         control={Button}
-                        label='Activate Constraint?'
+                        label='Constraint Activated?'
                         toggle
                         active={constraints.freeDayActive}
                         onClick={toggleFreeDayActive}
@@ -239,7 +239,7 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                         onChange={(_: any, { value }: any) => setSpecificFreeDays(value)} />
                     <Form.Field
                         control={Button}
-                        label='Activate Constraint?'
+                        label='Constraint Activated?'
                         toggle
                         active={constraints.specificFreeDaysActive}
                         onClick={toggleSpecificFreeDaysActive}
