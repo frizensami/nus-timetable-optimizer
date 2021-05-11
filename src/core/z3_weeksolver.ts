@@ -38,7 +38,7 @@ export class Z3WeekSolver {
         let constraintStr = ""
         this.solver.forEachStatement((stmt: string) => constraintStr += stmt + "\n");
         constraintStr = constraintStr.substring(constraintStr.indexOf("\n") + 1);
-        const minimizeStr = `(minimize ${SIM_VARNAME})\n`
+        const minimizeStr = `(minimize (popCount13 ${SIM_VARNAME}))\n`
         // The string that executes the solver and retrives the final model and objectives
         let solveStr = `(check-sat)\n(get-value (${SIM_VARNAME}))\n(exit)`
         // Overall SMTLIB2 string to return
@@ -85,7 +85,9 @@ export class Z3WeekSolver {
     }
 
     _generate_one() {
-        return this._generate_bitvec(new Array(this.num_weeks).fill(1))
+        let arr = new Array(this.num_weeks).fill(0);
+        arr[arr.length - 1] = 1;
+        return this._generate_bitvec(arr)
     }
 
 

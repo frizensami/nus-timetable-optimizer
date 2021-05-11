@@ -129,16 +129,15 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
                     <Form.Field
                         id='form-input-min-workload'
                         control={Input}
+                        label='Minimum Credits'
                         type="number"
                         defaultValue={defaultConstraints.minWorkload}
-                        min="0"
-                        step="1"
+                        min={0}
+                        step={1}
                         onChange={(e: any) => updateMinWorkload(e.target.value)}
                         width={5}
                         fluid
-                    >
-                    <label>Minimum credits</label>
-                    </Form.Field>
+                    />
                     <Form.Field
                         id='form-input-max-workload'
                         control={Input}

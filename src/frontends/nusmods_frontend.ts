@@ -150,8 +150,12 @@ export class NUSModsFrontend {
      * Convert a lesson from NUSMods JSON into our generic lesson format
      * */
     lesson_to_genericlesson(lesson: any) {
-        const weeks_arr = lesson["weeks"];
-        if (!(Array.isArray(weeks_arr))) throw new Error(`Can't process lesson, does not follow array-of-weeks format, not implemented.`);
+        let weeks_arr = lesson["weeks"];
+        if (!(Array.isArray(weeks_arr))) {
+            // Assume it takes places on all weeks if the weeks format doesn't work for us
+            // User should have received a popup to confirm this earlier
+            weeks_arr = ALL_WEEKS[0]; // take out one layer
+        }
 
         // // So weeks_arr is now an array
         // if (arrayEquals(weeks_arr, ALL_WEEKS)) {

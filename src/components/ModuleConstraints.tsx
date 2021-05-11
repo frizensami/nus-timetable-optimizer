@@ -63,16 +63,34 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
                 cancelErrorAfterInterval();
             } else {
                 mod.json = moduleJson
-                setOpen(true);
-                console.log("Successfully added module!")
-                setShowModuleAddSuccess(true);
-                setShowModuleAddError(false);
-                cancelSucessAfterInterval();
-                let mods = modules.concat(mod);
-                setModules(mods);
-                onModulesChange(mods);
+                const data = mod.json
+                const semdata = data["semesterData"].find((v: any) => v.semester === mod.semester);
+                const timetable = semdata["timetable"]
+                // If any lesson doesn't have a weeks array, show the modal 
+                if (timetable.some((lesson: any) => !Array.isArray(lesson.weeks))) {
+                    setOpen(true);
+                    let mods = modules.concat(mod);
+                    setModules(mods);
+                    onModulesChange(mods);
+                } else {
+                    console.log("Successfully added module!")
+                    setShowModuleAddSuccess(true);
+                    setShowModuleAddError(false);
+                    cancelSucessAfterInterval();
+                    let mods = modules.concat(mod);
+                    setModules(mods);
+                    onModulesChange(mods);
+                }
+
             }
         })
+    }
+
+    function removeLatestModuleAndClose() {
+        let mods = modules.slice(0, -1);
+        setModules(mods);
+        onModulesChange(mods);
+        setOpen(false);
     }
 
     function cancelErrorAfterInterval() {
@@ -252,17 +270,17 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
                 onClose={() => setOpen(false)}
                 onOpen={() => setOpen(true)}
                 open={open}>
-                <Modal.Header>The module you are adding does not follow the traditional NUS academic semester.</Modal.Header>
+                <Modal.Header>The module you are adding does not follow the traditional NUS Academic Semester Calendar.</Modal.Header>
                 <Modal.Content>
                     <Modal.Description>
-                        <p>Would you like to <strong>skip</strong> adding this module, or just <strong>assume that the module takes place every week?</strong></p>
+                        <p>Would you like to <strong>skip</strong> adding this module, or just <strong>assume that the module takes place every week this semester?</strong></p>
                     </Modal.Description>
                 </Modal.Content>
                 <Modal.Actions>
 
                     <Grid columns="equal">
                         <Grid.Column>
-                            <Button fluid negative onClick={() => setOpen(false)}>
+                            <Button fluid negative onClick={() => removeLatestModuleAndClose()}>
                                 Skip
                             </Button>
                         </Grid.Column>
