@@ -35,6 +35,7 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
     let [activeErrorCancelTimeout, setActiveErrorCancelTimeout] = useState<any>(undefined)
     let [activeSuccessCancelTimeout, setActiveSuccessCancelTimeout] = useState<any>(undefined)
     let [open, setOpen] = useState(false)
+    let [open2, setOpen2] = useState(false)
 
     /*
      * Try to add a module to the current list of modules
@@ -72,6 +73,13 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
                     let mods = modules.concat(mod);
                     setModules(mods);
                     onModulesChange(mods);
+                } else if (modules.length > 0 && mod.semester !== modules[0].semester) {
+                    console.log("Diff sem")
+                    // Our new module is from a different semester than the rest
+                    setOpen2(true);
+                    let mods = modules.concat(mod);
+                    setModules(mods);
+                    onModulesChange(mods);
                 } else {
                     console.log("Successfully added module!")
                     setShowModuleAddSuccess(true);
@@ -91,6 +99,7 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
         setModules(mods);
         onModulesChange(mods);
         setOpen(false);
+        setOpen2(false);
     }
 
     function cancelErrorAfterInterval() {
@@ -289,6 +298,36 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
                                 content="Assume weekly"
                                 fluid
                                 onClick={() => setOpen(false)}
+                                positive
+                            />
+                        </Grid.Column>
+                    </Grid>
+                </Modal.Actions>
+            </Modal>
+
+            <Modal
+                onClose={() => setOpen2(false)}
+                onOpen={() => setOpen2(true)}
+                open={open2}>
+                <Modal.Header>The module you are adding is from a different semester than the rest of the modules.</Modal.Header>
+                <Modal.Content>
+                    <Modal.Description>
+                        <p>Would you like to <strong>skip</strong> adding this module, or <strong>add it anyway?</strong></p>
+                    </Modal.Description>
+                </Modal.Content>
+                <Modal.Actions>
+
+                    <Grid columns="equal">
+                        <Grid.Column>
+                            <Button fluid negative onClick={() => removeLatestModuleAndClose()}>
+                                Skip
+                            </Button>
+                        </Grid.Column>
+                        <Grid.Column>
+                            <Button
+                                content="Add anyway"
+                                fluid
+                                onClick={() => setOpen2(false)}
                                 positive
                             />
                         </Grid.Column>
