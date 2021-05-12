@@ -90,6 +90,16 @@ function PbEq(clauses: SNode[], weights: number[], N: number): SExpr {
     const strWeights = weights.map(x => x.toString());
     return new SExpr(new SExpr("_", "pbeq", N.toString(), ...strWeights), ...clauses);
 }
+//  ((_ pbge N 1 1) SL_somename SL_somename2) ==> select at least N out of equally weighted SL_somename and SL_somename2
+function PbGe(clauses: SNode[], weights: number[], N: number): SExpr {
+    const strWeights = weights.map(x => x.toString());
+    return new SExpr(new SExpr("_", "pbge", N.toString(), ...strWeights), ...clauses);
+}
+//  ((_ pble N 1 1) SL_somename SL_somename2) ==> select at most N out of equally weighted SL_somename and SL_somename2
+function PbLe(clauses: SNode[], weights: number[], N: number): SExpr {
+    const strWeights = weights.map(x => x.toString());
+    return new SExpr(new SExpr("_", "pble", N.toString(), ...strWeights), ...clauses);
+}
 function NEq(lhs: SNode, rhs: SNode): SExpr {
     return Not(Eq(lhs, rhs));
 }
@@ -148,6 +158,8 @@ export {
     Not,
     Eq,
     PbEq,
+    PbGe,
+    PbLe,
     NEq,
     LEq,
     GEq,

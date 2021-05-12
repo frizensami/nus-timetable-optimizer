@@ -169,6 +169,14 @@ export class TimetableSmtlib2Converter {
             this.z3tt.add_compactness_constraint();
         }
 
+        // Allow lunch hours
+        if (this.gt.constraints.lunchBreakActive) {
+            const slot_constraints: Array<SlotConstraint> = this.generate_lunch_break_slotconstraints();
+            slot_constraints.forEach((sc: SlotConstraint) => {
+                this.z3tt.add_negativevalue_constraint_to_N_consecutive(sc, this.gt.constraints.lunchHalfHours);
+            })
+        }
+
         // Start / end too late in the day constraint
         if (this.gt.constraints.timeConstraintActive) {
             const slot_constraint: SlotConstraint | undefined = this.generate_timeconstraint_slotconstraint();
@@ -303,6 +311,36 @@ export class TimetableSmtlib2Converter {
         console.log(sc);
         return sc;
     }
+
+    /**
+     * Generates a single slot constraint representing time blocked off for too-early / too-late in the day for classes.
+     * */
+    generate_lunch_break_slotconstraints(): Array<SlotConstraint>{
+
+        let scs: Array<SlotConstraint> = [];
+
+        // Calculate offsets within the day
+        const startOffset = this.hhmm_to_offset(this.gt.constraints.lunchStart);
+        const endOffset = this.hhmm_to_offset(this.gt.constraints.lunchEnd);
+        if (startOffset >= endOffset) return [];
+
+        // For each day of the week, add a slot constraint blocking out hours before and after our ideal timings
+        for (let day = 0; day < DAYS; day++) {
+            // Compute the lunch break window for each day and week
+            for (let week of Array.from(this.weeks_to_simulate)) {
+                const baseidx = ((week - 1) * (HOURS_PER_WEEK * 2)) + (day * (HOURS_PER_DAY * 2));
+                const startidx = baseidx + startOffset;
+                const endidx = baseidx + endOffset;
+                const sc: SlotConstraint = { start_end_times: [[startidx, endidx]], who_id: UNASSIGNED, who_id_string: "UNASSIGNED" }
+                scs.push(sc)
+            }
+        }
+
+        console.log("Slotconstraints for lunchbreak")
+        console.log(scs);
+        return scs;
+    }
+
 
 
     /**

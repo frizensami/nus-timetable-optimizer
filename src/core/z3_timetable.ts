@@ -222,6 +222,35 @@ export class Z3Timetable {
     }
 
     /**
+     * Asserts that N CONSECUTIVE time values in the slot constraint are assigned to a NEGATIVE number
+     * */
+    add_negativevalue_constraint_to_N_consecutive(slot: SlotConstraint, n: number) {
+        // Holds all the constraints, assuming this slotconstraint is selected
+        let slot_requirements: Array<any> = [];
+        // We only care about first slotconstraint slot, multiple slots are meaningless here
+        let [start_time, end_time] = slot.start_end_times[0]; 
+        // Take the start_time --> end_time range as windows of size n
+        for (let start_t = start_time; start_t < end_time - n + 1; start_t++) {
+            // For each window, we need to assert that ALL of the hours are unassigned
+            // Then we OR across all windows
+            let window_requirements: Array<any> = [];
+            for (let i = 0; i < n; i++) {
+                const timevar = this.timevars[start_t + i];
+                // Make sure we declare this timevar since we use it, at least allow it to be unassigned (negative)
+                this.add_possible_values_to_variable(timevar, [UNASSIGNED]);
+                // Assert that the slot is < 0 (either UNASSIGNED / FREE / etc)
+                window_requirements.push(smt.LEq(timevar, -1));
+            }
+            slot_requirements.push(smt.And(...window_requirements))
+        }
+        const final_requirements = smt.Or(...slot_requirements);
+        this.solver.assert(final_requirements)
+        // Assert a K-out-of-N constraint for the selector variables
+        // const k_of_n = smt.PbGe(slot_requirements, new Array(slot_requirements.length).fill(1), n)
+        // this.solver.assert(k_of_n);
+    }
+
+    /**
      * Creates a list of variables to declare as Ints later.
      * They can be constrained to have a certain set of values.
      * If not constrained, the set will be empty

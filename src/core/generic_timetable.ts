@@ -21,6 +21,10 @@ export interface GlobalConstraintsList {
     specificFreeDays: Array<string>,
     startTime: string,
     endTime: string,
+    lunchStart: string,
+    lunchEnd: string,
+    lunchHalfHours: number,
+    lunchBreakActive: boolean,
     timeConstraintActive: boolean,
     preferCompactTimetable: boolean
     
@@ -36,6 +40,10 @@ export const defaultConstraints: GlobalConstraintsList = {
     specificFreeDays: [],
     startTime: "0800",
     endTime: "2200",
+    lunchStart: "1100",
+    lunchEnd: "1500",
+    lunchHalfHours: 2,
+    lunchBreakActive: false,
     timeConstraintActive: false,
     preferCompactTimetable: false,
 };
