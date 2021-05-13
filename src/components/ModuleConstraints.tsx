@@ -20,7 +20,7 @@ export interface ConstraintModule {
  * Responsible for setting constraints individually for all selected modules.
  * Also contains a selector (combined here to keep state contained) for the modules
  * */
-export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }) => {
+const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }) => {
     let ay_xs: Array<any> = [{ key: 1, text: "2020-2021", value: 1 }]
     let sem_xs: Array<any> = [{ key: 1, text: "1", value: 1 }, { key: 2, text: "2", value: 2 }]
     const defaultAyValue = 1
@@ -337,3 +337,5 @@ export const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesC
         </div>
     )
 }
+
+export default ModuleConstraints;

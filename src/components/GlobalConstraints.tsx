@@ -10,11 +10,10 @@ export interface GlobalConstraintsProps {
 }
 
 
-
 /**
  * Responsible for setting constraints globally for all modules
  * */
-export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateConstraints, numberOfModules }) => {
+const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateConstraints, numberOfModules }) => {
 
     let [constraints, setConstraints] = useState<GlobalConstraintsList>(defaultConstraints);
     /**
@@ -405,3 +404,5 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
         </div>
     );
 }
+
+export default GlobalConstraints

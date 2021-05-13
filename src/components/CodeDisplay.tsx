@@ -7,7 +7,7 @@ import "ace-builds/src-noconflict/mode-python";
 import "ace-builds/src-noconflict/theme-monokai";
 import "ace-builds/src-noconflict/theme-tomorrow";
 
-export const CodeDisplay: React.FC<{ code: string, theme: string, headerText: string }> = ({ code, theme, headerText }) => {
+const CodeDisplay: React.FC<{ code: string, theme: string, headerText: string }> = ({ code, theme, headerText }) => {
 
     // <Segment raised inverted color={color as any} style={{ overflow: 'auto', maxHeight: 200 }}>
     //     <div className="display-linebreak">
@@ -34,3 +34,5 @@ export const CodeDisplay: React.FC<{ code: string, theme: string, headerText: st
         </Segment>
     )
 }
+
+export default CodeDisplay;

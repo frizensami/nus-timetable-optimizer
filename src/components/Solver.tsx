@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from 'react'
-
+import React, { Suspense, useState, useEffect } from 'react'
 import { TimetableOutput } from '../core/timetable_to_smtlib2'
 import { Segment, Button, Accordion, Message, Container, Divider, Grid, Loader, Dimmer } from 'semantic-ui-react'
 import { GenericTimetable, GlobalConstraintsList, defaultConstraints } from '../core/generic_timetable'
 import { Z3Manager, Z3Callbacks } from '../core/z3_manager'
 import { NUSModsFrontend, ModuleToAdd } from '../frontends/nusmods_frontend'
-import { CodeDisplay } from './CodeDisplay'
-import { ModuleConstraints, ConstraintModule } from './ModuleConstraints'
-import { GlobalConstraints } from './GlobalConstraints'
+import { ConstraintModule } from './ModuleConstraints'
 import './Solver.css'
+//@ts-ignore
+const CodeDisplay = React.lazy(() => import('./CodeDisplay'));
+const GlobalConstraints = React.lazy(() => import('./GlobalConstraints'));
+const ModuleConstraints = React.lazy(() => import('./ModuleConstraints'));
 
 enum Z3State {
     PRE_INIT = 0,
@@ -117,10 +118,15 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
                     <Grid columns="equal" stackable celled>
                         <Grid.Row>
                             <Grid.Column textAlign="center">
-                                <ModuleConstraints onModulesChange={onModulesChange} />
+                                <Suspense fallback={<div><strong>Loading Module Selector...</strong></div>}>
+                                    <ModuleConstraints onModulesChange={onModulesChange} />
+                                </Suspense>
                             </Grid.Column>
                             <Grid.Column textAlign="center">
-                                <GlobalConstraints onUpdateConstraints={setConstraints} numberOfModules={modules.length} />
+
+                                <Suspense fallback={<div><strong>Loading Constraints...</strong></div>}>
+                                    <GlobalConstraints onUpdateConstraints={setConstraints} numberOfModules={modules.length} />
+                                </Suspense>
                             </Grid.Column>
                         </Grid.Row>
                     </Grid>
@@ -142,13 +148,18 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
                 </Accordion.Title>
                 <Accordion.Content active={debugOpen}>
                     <Container>
-                        <CodeDisplay code={smtlibInput} theme="dark" headerText="Optimizer SMTLIB2 Input (Debug)" />
+                        <Suspense fallback={<div>Loading...</div>}>
+                            <CodeDisplay code={smtlibInput} theme="dark" headerText="Optimizer SMTLIB2 Input (Debug)" />
+                        </Suspense>
                     </Container>
 
                     <Divider />
 
                     <Container>
-                        <CodeDisplay code={smtlibOutput} theme="light" headerText="Optimizer SMTLIB2 Output (Debug)" />
+
+                        <Suspense fallback={<div>Loading...</div>}>
+                            <CodeDisplay code={smtlibOutput} theme="light" headerText="Optimizer SMTLIB2 Output (Debug)" />
+                        </Suspense>
                     </Container>
                 </Accordion.Content>
             </Accordion>
