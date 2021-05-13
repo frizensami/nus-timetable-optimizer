@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 
 import { TimetableOutput } from '../core/timetable_to_smtlib2'
-import { Segment, Button, Message, Container, Divider, Grid, Loader, Dimmer } from 'semantic-ui-react'
-import { GenericTimetable, GlobalConstraintsList, defaultConstraints  } from '../core/generic_timetable'
+import { Segment, Button, Accordion, Message, Container, Divider, Grid, Loader, Dimmer } from 'semantic-ui-react'
+import { GenericTimetable, GlobalConstraintsList, defaultConstraints } from '../core/generic_timetable'
 import { Z3Manager, Z3Callbacks } from '../core/z3_manager'
 import { NUSModsFrontend, ModuleToAdd } from '../frontends/nusmods_frontend'
 import { CodeDisplay } from './CodeDisplay'
@@ -24,6 +24,7 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
     let [modules, setModules] = useState<Array<ModuleToAdd>>([]);
     let [z3State, setZ3State] = useState<Z3State>(Z3State.PRE_INIT);
     let [constraints, setConstraints] = useState<GlobalConstraintsList>(defaultConstraints);
+    let [debugOpen, setDebugOpen] = useState<boolean>(false);
 
 
 
@@ -129,15 +130,28 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
 
             <Divider />
 
-            <Container>
-                <CodeDisplay code={smtlibInput} theme="dark" headerText="Solver SMTLIB2 Input (Debug)" />
+            <Container textAlign="center">
+                <Button primary={!debugOpen} negative={debugOpen} onClick={() => setDebugOpen(!debugOpen)}>{debugOpen ? "Hide Behind-The-Scenes Optimizer Info" : "Show Behind-The-Scenes Optimizer Info"}</Button>
             </Container>
 
-            <Divider />
+            <Accordion>
+                <Accordion.Title
+                    active={debugOpen}
+                    index={0}>
+                    &nbsp;
+                </Accordion.Title>
+                <Accordion.Content active={debugOpen}>
+                    <Container>
+                        <CodeDisplay code={smtlibInput} theme="dark" headerText="Optimizer SMTLIB2 Input (Debug)" />
+                    </Container>
 
-            <Container>
-                <CodeDisplay code={smtlibOutput} theme="light" headerText="Solver SMTLIB2 Output (Debug)" />
-            </Container>
-        </div>
+                    <Divider />
+
+                    <Container>
+                        <CodeDisplay code={smtlibOutput} theme="light" headerText="Optimizer SMTLIB2 Output (Debug)" />
+                    </Container>
+                </Accordion.Content>
+            </Accordion>
+        </div >
     );
 }
