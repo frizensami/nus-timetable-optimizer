@@ -119,7 +119,7 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
                                 <ModuleConstraints onModulesChange={onModulesChange} />
                             </Grid.Column>
                             <Grid.Column textAlign="center">
-                                <GlobalConstraints onUpdateConstraints={setConstraints} />
+                                <GlobalConstraints onUpdateConstraints={setConstraints} numberOfModules={modules.length} />
                             </Grid.Column>
                         </Grid.Row>
                     </Grid>

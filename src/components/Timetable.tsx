@@ -88,9 +88,15 @@ function Timetable({ start_hour, end_hour, timetable }: TimetableProps) {
                         </Table.Body>
                     </Table>
                 </Segment>
-            <Dimmer active={!timetable.is_sat}>
+            <Dimmer active={Object.keys(timetable).length > 0 && !timetable.is_sat}>
                 <Header as='h2' inverted color='red'>
-                    No valid timetable found: run the optimizer or adjust your constraints.
+                    There is no timetable that meets these constraints. <br/> <br/>
+                    Please change your constraints or module list.
+                    </Header>
+            </Dimmer>
+            <Dimmer active={Object.keys(timetable).length === 0}>
+                <Header as='h2' inverted>
+                    Add at least one module and some constraints and run the optimizer.
                     </Header>
             </Dimmer>
             </Dimmer.Dimmable>

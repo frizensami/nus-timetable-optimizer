@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import './Solver.css'
-import { Segment, Button, Container, Divider, Dropdown, Grid, Menu, Input, Form, Select, Header, Message, Card, Checkbox, Item, Transition, Popup } from 'semantic-ui-react'
+import { Segment, Button, Container, Divider, Dropdown, Dimmer, Grid, Menu, Input, Form, Select, Header, Message, Card, Checkbox, Item, Transition, Popup } from 'semantic-ui-react'
 import * as Constants from '../core/constants'
 import { GlobalConstraintsList, defaultConstraints } from '../core/generic_timetable'
 
 export interface GlobalConstraintsProps {
-    onUpdateConstraints(newState: GlobalConstraintsList): any
+    onUpdateConstraints(newState: GlobalConstraintsList): any,
+    numberOfModules: number
 }
 
 
@@ -13,10 +14,9 @@ export interface GlobalConstraintsProps {
 /**
  * Responsible for setting constraints globally for all modules
  * */
-export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateConstraints }) => {
+export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateConstraints, numberOfModules }) => {
 
     let [constraints, setConstraints] = useState<GlobalConstraintsList>(defaultConstraints);
-
     /**
      * GENERATORS
      * */
@@ -183,7 +183,7 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
     // Need to process a bit to set initial dropdown value
     function getLunchStartEndSelectionFromDefaults() {
         const start = defaultConstraints.lunchStart // eg 1100
-        const end = defaultConstraints.lunchEnd //  eg 1500
+        const end = defaultConstraints.lunchEnd // eg 1500
         return [getTimeKeyFromStr(start), getTimeKeyFromStr(end)]
     }
 
@@ -194,204 +194,214 @@ export const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({ onUpdateCo
 
             <Divider />
 
+            <div>
+                <Dimmer.Dimmable dimmed={numberOfModules === 0}>
             <Form>
-                <Form.Group>
-                    <Form.Field
-                        id='form-input-min-workload'
-                        control={Input}
-                        label='Minimum Credits'
-                        type="number"
-                        defaultValue={defaultConstraints.minWorkload}
-                        min={0}
-                        step={1}
-                        onChange={(e: any) => updateMinWorkload(e.target.value)}
-                        width={5}
-                        fluid
-                    />
-                    <Form.Field
-                        id='form-input-max-workload'
-                        control={Input}
-                        label='Maximum Credits'
-                        type="number"
-                        defaultValue={defaultConstraints.maxWorkload}
-                        min="0"
-                        step="1"
-                        onChange={(e: any) => updateMaxWorkload(e.target.value)}
-                        fluid
-                        width={5}
-                    />
-                    <Form.Field
-                        control={Button}
-                        label='Constraint Activated?'
-                        toggle
-                        active={constraints.workloadActive}
-                        onClick={toggleWorkloadActive}
-                        content={constraints.workloadActive ? "Yes" : "No"}
-                        fluid
-                        width={6}
-                    />
-                </Form.Group>
+                    <Form.Group>
+                        <Form.Field
+                            id='form-input-min-workload'
+                            control={Input}
+                            label='Minimum Credits'
+                            type="number"
+                            defaultValue={defaultConstraints.minWorkload}
+                            min={0}
+                            step={1}
+                            onChange={(e: any) => updateMinWorkload(e.target.value)}
+                            width={5}
+                            fluid
+                        />
+                        <Form.Field
+                            id='form-input-max-workload'
+                            control={Input}
+                            label='Maximum Credits'
+                            type="number"
+                            defaultValue={defaultConstraints.maxWorkload}
+                            min="0"
+                            step="1"
+                            onChange={(e: any) => updateMaxWorkload(e.target.value)}
+                            fluid
+                            width={5}
+                        />
+                        <Form.Field
+                            control={Button}
+                            label='Constraint Activated?'
+                            toggle
+                            active={constraints.workloadActive}
+                            onClick={toggleWorkloadActive}
+                            content={constraints.workloadActive ? "Yes" : "No"}
+                            fluid
+                            width={6}
+                        />
+                    </Form.Group>
 
 
-                <Divider />
+                    <Divider />
 
 
-                <Form.Group>
-                    <Form.Field
-                        id='form-input-earliest-start'
-                        control={Select}
-                        options={timeSelections}
-                        defaultValue={timeSelections[0].value}
-                        label='Earliest Lesson Start'
-                        width={5}
-                        fluid
-                        search
-                        onChange={(_: any, { value }: any) => setStartTime(value)}
-                    />
-                    <Form.Field
-                        id='form-input-latest-end'
-                        control={Select}
-                        options={timeSelections}
-                        defaultValue={timeSelections[timeSelections.length - 1].value}
-                        label='Latest Lesson End'
-                        fluid
-                        width={5}
-                        search
-                        onChange={(_: any, { value }: any) => setEndTime(value)}
-                    />
-                    <Form.Field
-                        control={Button}
-                        label='Constraint Activated?'
-                        toggle
-                        active={constraints.timeConstraintActive}
-                        onClick={toggleTimeConstraintActive}
-                        content={constraints.timeConstraintActive ? "Yes" : "No"}
-                        fluid
-                        width={6}
-                    />
-                </Form.Group>
+                    <Form.Group>
+                        <Form.Field
+                            id='form-input-earliest-start'
+                            control={Select}
+                            options={timeSelections}
+                            defaultValue={timeSelections[0].value}
+                            label='Earliest Lesson Start'
+                            width={5}
+                            fluid
+                            search
+                            onChange={(_: any, { value }: any) => setStartTime(value)}
+                        />
+                        <Form.Field
+                            id='form-input-latest-end'
+                            control={Select}
+                            options={timeSelections}
+                            defaultValue={timeSelections[timeSelections.length - 1].value}
+                            label='Latest Lesson End'
+                            fluid
+                            width={5}
+                            search
+                            onChange={(_: any, { value }: any) => setEndTime(value)}
+                        />
+                        <Form.Field
+                            control={Button}
+                            label='Constraint Activated?'
+                            toggle
+                            active={constraints.timeConstraintActive}
+                            onClick={toggleTimeConstraintActive}
+                            content={constraints.timeConstraintActive ? "Yes" : "No"}
+                            fluid
+                            width={6}
+                        />
+                    </Form.Group>
 
-                <Divider />
-
-
+                    <Divider />
 
 
-                <Form.Group widths="equal">
-                    <Form.Field
-                        id='form-input-num-free-days'
-                        control={Select}
-                        options={freeDaySelections}
-                        defaultValue={freeDaySelections[0].key}
-                        label='Number of Free Days Wanted'
-                        width={10}
-                        fluid
-                        onChange={(_: any, { value }: any) => setNumFreeDays(value)} />
-                    <Form.Field
-                        control={Button}
-                        label='Constraint Activated?'
-                        toggle
-                        active={constraints.freeDayActive}
-                        onClick={toggleFreeDayActive}
-                        content={constraints.freeDayActive ? "Yes" : "No"}
-                        fluid
-                        width={6}
-                    />
-                </Form.Group>
-
-                <Divider />
-
-                <Form.Group widths="equal">
-                    <Form.Field
-                        id='form-input-which-fre-days'
-                        control={Select}
-                        options={freeDayofWeekSelection}
-                        fluid multiple selection
-                        label='Specific Free Days Wanted'
-                        width={10}
-                        onChange={(_: any, { value }: any) => setSpecificFreeDays(value)} />
-                    <Form.Field
-                        control={Button}
-                        label='Constraint Activated?'
-                        toggle
-                        active={constraints.specificFreeDaysActive}
-                        onClick={toggleSpecificFreeDaysActive}
-                        content={constraints.specificFreeDaysActive ? "Yes" : "No"}
-                        fluid
-                        width={6}
-                    />
-                </Form.Group>
 
 
-                <Divider />
+                    <Form.Group widths="equal">
+                        <Form.Field
+                            id='form-input-num-free-days'
+                            control={Select}
+                            options={freeDaySelections}
+                            defaultValue={freeDaySelections[0].key}
+                            label='Number of Free Days Wanted'
+                            width={10}
+                            fluid
+                            onChange={(_: any, { value }: any) => setNumFreeDays(value)} />
+                        <Form.Field
+                            control={Button}
+                            label='Constraint Activated?'
+                            toggle
+                            active={constraints.freeDayActive}
+                            onClick={toggleFreeDayActive}
+                            content={constraints.freeDayActive ? "Yes" : "No"}
+                            fluid
+                            width={6}
+                        />
+                    </Form.Group>
 
-                <Form.Group>
-                    <Form.Field
-                        id='form-input-lunch-start'
-                        control={Select}
-                        options={timeSelections}
-                        defaultValue={getLunchStartEndSelectionFromDefaults()[0]}
-                        label='Lunch Period Start'
-                        width={8}
-                        fluid
-                        search
-                        onChange={(_: any, { value }: any) => updateLunchStart(value)}
-                    />
-                    <Form.Field
-                        id='form-input-lunch-end'
-                        control={Select}
-                        options={timeSelections}
-                        defaultValue={getLunchStartEndSelectionFromDefaults()[1]}
-                        label='Lunch Period End'
-                        fluid
-                        width={8}
-                        search
-                        onChange={(_: any, { value }: any) => updateLunchEnd(value)}
-                    />
+                    <Divider />
 
-                </Form.Group>
+                    <Form.Group widths="equal">
+                        <Form.Field
+                            id='form-input-which-fre-days'
+                            control={Select}
+                            options={freeDayofWeekSelection}
+                            fluid multiple selection
+                            label='Specific Free Days Wanted'
+                            width={10}
+                            onChange={(_: any, { value }: any) => setSpecificFreeDays(value)} />
+                        <Form.Field
+                            control={Button}
+                            label='Constraint Activated?'
+                            toggle
+                            active={constraints.specificFreeDaysActive}
+                            onClick={toggleSpecificFreeDaysActive}
+                            content={constraints.specificFreeDaysActive ? "Yes" : "No"}
+                            fluid
+                            width={6}
+                        />
+                    </Form.Group>
 
-                <Form.Group>
-                    <Form.Field
-                        id='form-input-num-lunch-hours'
-                        control={Select}
-                        label='Minimum Lunch Duration within Lunch Period'
-                        options={allLunchLengthSelections}
-                        defaultValue={defaultConstraints.lunchHalfHours}
-                        onChange={(_: any, { value }: any) => updateLunchLength(value)}
-                        fluid
-                        width={10}
-                    />
 
-                    <Form.Field
-                        control={Button}
-                        label='Constraint Activated?'
-                        toggle
-                        active={constraints.lunchBreakActive}
-                        onClick={toggleLunchBreakActive}
-                        content={constraints.lunchBreakActive ? "Yes" : "No"}
-                        fluid
-                        width={6}
-                    />
+                    <Divider />
 
-                </Form.Group>
+                    <Form.Group>
+                        <Form.Field
+                            id='form-input-lunch-start'
+                            control={Select}
+                            options={timeSelections}
+                            defaultValue={getLunchStartEndSelectionFromDefaults()[0]}
+                            label='Lunch Period Start'
+                            width={8}
+                            fluid
+                            search
+                            onChange={(_: any, { value }: any) => updateLunchStart(value)}
+                        />
+                        <Form.Field
+                            id='form-input-lunch-end'
+                            control={Select}
+                            options={timeSelections}
+                            defaultValue={getLunchStartEndSelectionFromDefaults()[1]}
+                            label='Lunch Period End'
+                            fluid
+                            width={8}
+                            search
+                            onChange={(_: any, { value }: any) => updateLunchEnd(value)}
+                        />
 
-                <Divider />
+                    </Form.Group>
 
-                <Form.Group widths="equal">
-                    <Form.Field
-                        control={Button}
-                        label='Make timetable as compact as possible? Warning: optimizer might become very slow!'
-                        toggle
-                        active={constraints.preferCompactTimetable}
-                        onClick={toggleCompactTimetable}
-                        content={constraints.preferCompactTimetable ? "Yes" : "No"}
-                        fluid
-                    />
-                </Form.Group>
+                    <Form.Group>
+                        <Form.Field
+                            id='form-input-num-lunch-hours'
+                            control={Select}
+                            label='Minimum Lunch Duration within Lunch Period'
+                            options={allLunchLengthSelections}
+                            defaultValue={defaultConstraints.lunchHalfHours}
+                            onChange={(_: any, { value }: any) => updateLunchLength(value)}
+                            fluid
+                            width={10}
+                        />
 
-                <Divider />
+                        <Form.Field
+                            control={Button}
+                            label='Constraint Activated?'
+                            toggle
+                            active={constraints.lunchBreakActive}
+                            onClick={toggleLunchBreakActive}
+                            content={constraints.lunchBreakActive ? "Yes" : "No"}
+                            fluid
+                            width={6}
+                        />
 
+                    </Form.Group>
+
+                    <Divider />
+
+                    <Form.Group widths="equal">
+                        <Form.Field
+                            control={Button}
+                            label='Make timetable as compact as possible? Warning: optimizer might become very slow!'
+                            toggle
+                            active={constraints.preferCompactTimetable}
+                            onClick={toggleCompactTimetable}
+                            content={constraints.preferCompactTimetable ? "Yes" : "No"}
+                            fluid
+                        />
+                    </Form.Group>
+
+                    <Divider />
+
+                    <Dimmer active={numberOfModules === 0}>
+                        <Header as='h3' inverted>
+                            Add at least one module before changing constraints.
+                        </Header>
+                    </Dimmer>
             </Form>
+
+                </Dimmer.Dimmable>
+            </div>
         </div>
     );
 }
