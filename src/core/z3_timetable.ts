@@ -200,9 +200,13 @@ export class Z3Timetable {
         const workload_sum_name = "workloadsum"
         this.assigned_intvars_possiblevalues[workload_sum_name] = new Set();
 
-        // Assert that the workload sum is the sum of the if-then-else of the boolean selectors involved
         let terms = [base_workload]
-        workloads.forEach(([varname, workload]) => terms.push(smt.If("OPT_" + varname, workload, 0)));
+        workloads.forEach(([varname, workload]) => {
+            // Make sure varname is declared
+            const fullvarname = "OPT_" + varname
+            this.bool_selectors_set.add(fullvarname); 
+            terms.push(smt.If(fullvarname, workload, 0));
+        });
         let sumOfTerms = smt.Sum(...terms);
         this.solver.assert(smt.Eq(workload_sum_name, sumOfTerms));
 
@@ -228,7 +232,7 @@ export class Z3Timetable {
         // Holds all the constraints, assuming this slotconstraint is selected
         let slot_requirements: Array<any> = [];
         // We only care about first slotconstraint slot, multiple slots are meaningless here
-        let [start_time, end_time] = slot.start_end_times[0]; 
+        let [start_time, end_time] = slot.start_end_times[0];
         // Take the start_time --> end_time range as windows of size n
         for (let start_t = start_time; start_t < end_time - n + 1; start_t++) {
             // For each window, we need to assert that ALL of the hours are unassigned
