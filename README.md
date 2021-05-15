@@ -34,7 +34,8 @@ For production builds, run `npm run build`, which builds all assets into the `bu
 
 ## Temporary Disclaimers
 - The code style / linting / other tools for this project are still being set up. 
-- The code style itself is inconsistent for now.
+- The code style itself is incredibly inconsistent for now.
+- Not many best practices are in place at the moment, but that will improve over time.
 - There are a few tests, but not with significant coverage.
 
 ## Contributing
