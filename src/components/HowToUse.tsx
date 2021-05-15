@@ -9,7 +9,7 @@ export const HowToUse: React.FC = () => {
     return (
         <Container text textAlign='justified'>
             <Segment raised>
-                <Header as="h2" textAlign="center"> Using the NUS Modules Timetable Optimizer </Header>
+                <Header as="h2" textAlign="center"> Using the NUS Timetable Optimizer </Header>
 
                 <Header as="h3" textAlign="left"> Purpose </Header>
 

@@ -18,7 +18,7 @@ export const SolverApp: React.FC = () => {
         <div>
             <Message error>
                 <Message.Header as="p" style={{ "textAlign": "center" }}>
-                    The NUS Modules Timetable Optimizer is in <em> Beta Testing Mode</em>. Please report any errors to <a href="mailto:sriramsami@nus.edu.sg?subject=NUS Modules Optimizer Error">sriramsami@nus.edu.sg</a>.
+                    The NUS Timetable Optimizer is in <em> Beta Testing Mode</em>. Please report any errors or feedback to <a href="mailto:sriramsami@nus.edu.sg?subject=NUS Timetable Optimizer Feedback">sriramsami@nus.edu.sg</a>.
             </Message.Header>
 
             </Message>

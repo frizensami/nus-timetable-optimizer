@@ -1,6 +1,6 @@
 {
-  "short_name": "NUS Modules Timetable Optimizer",
-  "name": "NUS Modules Timetable Optimizer",
+  "short_name": "NUS Timetable Optimizer",
+  "name": "NUS Timetable Optimizer",
   "icons": [
     {
       "src": "favicon.ico",

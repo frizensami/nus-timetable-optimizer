@@ -1,46 +1,42 @@
-# NUSMods Timetable Optimizer - Web Version
+# NUS Timetable Optimizer
 
-## Objectives
-- Allow users to arrange their NUS timetable based on their specified constraints, e.g.,
-      - Keep lunch hours free
-      - No classes before 9 am, etc
-      - Try to get a free day
-- This system should run primarily on the user's own infrastructure (i.e., in their browser) 
-      - Purpose: keep server load low. Necessary due to SMT solving being CPU-heavy.
+Codebase for <a href="https://optimize.sriramsami.com" target="_blank">the NUS Timetable Optimizer</a>, a tool to help students at the National University of Singapore to optimize their timetables to their liking.
 
-## Architecture
-- **React frontend** that should call little to no APIs on the backend that serves it (i.e., backend should primarily exist just to serve the app as-is)
-- Frontend should take in user timetable and constraints (keep it to an MVP-level frontend for now) and **convert those into SMTLIB2 code**
-- Frontend should then **call the z3 wasm binary** that will execute the SMTLIB2 code and read + format the results
+![Example Timetable Optimization](timetable_example.png)
 
+## Features
+- Allows users to optimize their NUS timetable based on their specified constraints, for example:
+      - Allocate one or more free days 
+      - Reserve time every day for lunch
+      - Avoid classes that start too early or end too late
+      - Allow certain modules to only be taken ("Optional Modules") if they meet the above constraints
+      - Select a combination of modules that meets these constraints but maintain a minimum and maximum workload
+- Uses the NUSMods API to keep up-to-date.
+- Tries to prevent all students balloting for the same timetable by randomizing the final timetable output.
+- Runs completely on the client browser, which keeps the optimizer responsive regardless of the number of people using the system.
 
 ## Building and Running
-- `src/z3` was downloaded from the initial release [here](https://github.com/cpitclaudel/z3.wasm/releases), since building it was error-prone
+1. Clone this repository
+1. Run `npm install`
+1. Run `update_smtlib2.sh` if on Linux, otherwise just run `npm link node-smtlib2/` to link the project's internal modifications of the `node-smtlib2` library into `node_modules`
+1. Run `npm start` to start the server
 
-## Working with the z3.wasm project
-- `z3.wasm` [here](https://github.com/cpitclaudel/z3.wasm) doesn't have a lot of documentation. We need to figure out how to call it from the examples
-- `z3.wasm` basically is the command line version of z3, which takes in command line options and a file with smt2 code
-- Seems like we need to pass `args`, should  be just "-smt2"
-- We can extract the critical lines (spread across functions):
+For production builds, run `npm run build`, which builds all assets into the `build/` folder
 
-```javascript
-/* Initializes the Z3 solver - here it assumes 
-- it's running in a web worker
-- it will call the runtime initialization function when ready 
-- it will call the print functions specified
-*/
-solver = Z3({ ENVIRONMENT: "WORKER",
-                      onRuntimeInitialized: onRuntimeInitialized,
-                      print: function(message) { postOutput(responses.STDOUT, message); },
-                      printErr: function(message) { postOutput(responses.STDERR, message); } });
-// This creates an overall args array as ["-smtlib2", "input.smt2"]
-args.push(INPUT_FNAME);
-// This writes the required smtlib2 code to the emscripten virtual filesystem
-solver.FS.writeFile(INPUT_FNAME, input, { encoding: "utf8" });
-// Finally, runs the solver. The print / printErr function will be called as required
-solver.callMain(args);
-```
+## How does this work?
+- The front-end is written in React, and the app is served from Netlify.
+- Module information is populated from the NUSMods API, which is cached for at least 24 hours.
+- When a "Run Optimizer" call is initiated, a WebWorker is called to execute a WebAssembly version of the Microsoft Z3 SMT Solver.
+- There is a two-phase solving process, one to decide which weeks to simulate in the academic calendar based on the modules selected, and one to actually solve for the final timetable.
+- The timetable and constraints specified by the user translated into SMTLIB2 code, which is passed to the WebWorker, and eventually the solver.
+- The results are passed back to the display components, which populate the timetable.
+- A separate document will be written to explain the technical details of how this problem was encoded into the Z3 SMT (SMTLIB2) format. Some ideas for the encoding were taking from <a href="https://github.com/raynoldng/orbital-splashdown/blob/master/Splashdown_Technical_Report.pdf" target="_blank">this technical report</a> by another attempt to solve this problem.
 
-- Ok, when I try this and set ENVIRONMENT to WEB (after disabling eslint for the file), get this error `in the web, we need the wasm binary to be preloaded and set on Module['wasmBinary']. emcc.py will do that for you when generating HTML (but not JS)`
-- If I use ENVIRONMENT as WORKER... 
-- **WORKING**: Need to use a web worker (with `worker-loader`). Have to put the z3w.js and z3w.wasm files inside "public" folder, then modify the z3w.js file to link to http://localhost:3000/z3w.wasm instead of the original string of `z3w.wasm`.
+## Temporary Disclaimers
+- The code style / linting / other tools for this project are still being set up. 
+- The code style itself is inconsistent for now.
+- There are a few tests, but not with significant coverage.
+
+## Contributing
+- Please do open a new Issue if you encounter a bug, or would like a particular feature added.
+- Feel free to send a pull request to add features as well.

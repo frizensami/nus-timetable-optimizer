@@ -13,7 +13,7 @@ export const Navbar: React.FC = () => {
 
     return (
         <Menu stackable size="massive">
-            <Menu.Item header>  <Icon name='calendar alternate outline'/> <p> NUS Modules Timetable Optimizer </p> </Menu.Item>
+            <Menu.Item header>  <Icon name='calendar alternate outline'/> <p> NUS Timetable Optimizer </p> </Menu.Item>
             <Menu.Item
                 position='right'
                 as={NavLink} to="/"
