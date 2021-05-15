@@ -22,17 +22,24 @@ export const About: React.FC = () => {
                     About{' '}
                 </Header>
 
-                <Header as="h3" textAlign="left">
-                    {' '}
-                    Who are you?{' '}
-                </Header>
                 <p>
                     {' '}
                     {"I'm"} Sriram, a PhD student at the NUS School of Computing. You can find me at{' '}
                     <a href="https://sriramsami.com" target="_blank" rel="noreferrer">
-                        sriramsami.com
+                        sriramsami.com.
                     </a>
-                    .
+                </p>
+                <p>
+                    {' '}
+                    The code for this project is available{' '}
+                    <a
+                        href="https://github.com/frizensami/nus-timetable-optimizer"
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        {' '}
+                        on GitHub.
+                    </a>
                 </p>
 
                 <Header as="h3" textAlign="left">
@@ -42,8 +49,7 @@ export const About: React.FC = () => {
                 <p>
                     {' '}
                     {"I've"} always wondered if I've extracted the maximum laziness out of my
-                    timetables. I don't need to optimize my own timetables anymore, but this could
-                    still be useful to other people!{' '}
+                    timetables :)
                 </p>
 
                 <Header as="h3" textAlign="left">
