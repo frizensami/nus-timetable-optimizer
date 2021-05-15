@@ -167,6 +167,10 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }
         onModulesChange(mods);
     }
 
+                // { /* Display error messages */}
+                // <Grid.Row>
+
+                // </Grid.Row>
 
     return (
         <div>
@@ -219,10 +223,6 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }
 
             </Form>
 
-            <Grid stackable centered textAlign="center">
-
-                { /* Display error messages */}
-                <Grid.Row>
                     <Transition visible={showModuleAddError} animation='fade' duration={1000}>
                         <Message negative>
                             <Message.Header>{"The module you specified doesn't exist or is already added."}</Message.Header>
@@ -236,12 +236,18 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }
                             <Message.Header>{"Module added!"}</Message.Header>
                         </Message>
                     </Transition>
-                    <Divider />
-                </Grid.Row>
+
+
+            <Grid stackable centered textAlign="center">
+
 
                 { /* Conditional display of header */}
                 {modules.length > 0 &&
-                    <Header as='h3' textAlign='center'> Selected Modules </Header>
+                    <Grid.Row>
+                    <Divider />
+                        <Header as='h3' textAlign='center'> Selected Modules </Header>
+                    <Divider />
+                    </Grid.Row>
                 }
 
 
