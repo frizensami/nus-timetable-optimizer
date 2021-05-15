@@ -22,7 +22,7 @@ export const HowToUse: React.FC = () => {
                 <ul>
                     <li> The Optimizer will download itself and begin the initialization process. </li>
                     <li> During and after this process, you can use the <strong>Module Selector</strong> to add the modules you would like to eventually create an optimized timetable for. </li>
-                    <li> The Optimizer is not a module planner, so you can use something like <a href="https://nusmods.com" target="_blank">NUSMods</a> to browse for your modules first. </li>
+                    <li> The Optimizer is not a module planner, so you can use something like <a href="https://nusmods.com" target="_blank" rel="noreferrer">NUSMods</a> to browse for your modules first. </li>
 
                     <li> Modules can be set as <strong> "Required" </strong> or <strong> "Optional" </strong>. A "Required" module must be present in the final timetable, whereas an "Optional" module may be dropped if other constraints are violated. </li>
                 </ul>

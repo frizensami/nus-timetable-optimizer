@@ -94,7 +94,7 @@ const ModuleSlotSelector: React.FC<ModuleConstraintsProps> = ({ open, updateOpen
                     <p> The optimizer will <strong> only </strong> consider the slots you select here during its optimization procedure.
             This can help you coordinate classes with friends, work around any external commitments you have, etc. </p>
 
-                        <p> You can use <a href="https://nusmods.com" target="_blank">NUSMods</a> to decide the class numbers that you want to consider. </p>
+                        <p> You can use <a href="https://nusmods.com" target="_blank" rel="noreferrer">NUSMods</a> to decide the class numbers that you want to consider. </p>
 
 
                         <Form>
