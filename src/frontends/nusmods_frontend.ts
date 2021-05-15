@@ -44,10 +44,6 @@ export class NUSModsFrontend {
             const lessons_for_lessontype = value
             lessons_for_lessontype.forEach((lesson: any) => {
                 // We only include a lesson if there are no lesson constraints, or the lesson number is part of the constraint list from the user
-                console.log("Frontend lessonconstraints & lessonNo")
-                console.log(lessonConstraints)
-                console.log(lesson)
-                console.log(lesson['lessonNo'])
                 if (lessonConstraints === undefined || lessonConstraints[key] === undefined || lessonConstraints[key].includes(lesson['classNo'])) {
                     const generic_lesson = this.lesson_to_genericlesson(lesson);
                     generic_lessons.push(generic_lesson);

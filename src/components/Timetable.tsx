@@ -32,7 +32,7 @@ function Timetable({ start_hour, end_hour, timetable }: TimetableProps) {
             <Dimmer.Dimmable dimmed={!timetable.is_sat}>
                 <Segment raised style={{ overflow: 'auto', maxWidth: "100%" }}>
                     <Header as='h2' textAlign="center">Timetable Output</Header>
-                    <Table unstackable celled definition striped>
+                    <Table unstackable celled definition striped columns={16} compact>
                         <Table.Header>
                             <Table.Row textAlign='center'>
                                 <Table.HeaderCell />
