@@ -1,37 +1,37 @@
 /**
-* @description
-* Takes an Array<V>, and a grouping function,
-* and returns a Map of the array grouped by the grouping function.
-*
-* @param list An array of type V.
-* @param keyGetter A Function that takes the the Array type V as an input, and returns a value of type K.
-*                  K is generally intended to be a property key of V.
-*
-* @returns Map of the array grouped by the grouping function.
-*/
+ * @description
+ * Takes an Array<V>, and a grouping function,
+ * and returns a Map of the array grouped by the grouping function.
+ *
+ * @param list An array of type V.
+ * @param keyGetter A Function that takes the the Array type V as an input, and returns a value of type K.
+ *                  K is generally intended to be a property key of V.
+ *
+ * @returns Map of the array grouped by the grouping function.
+ */
 export function groupBy(list: Array<any>, keyGetter: Function) {
-  const map = new Map();
-  list.forEach((item) => {
-    const key = keyGetter(item);
-    const collection = map.get(key);
-    if (!collection) {
-      map.set(key, [item]);
-    } else {
-      collection.push(item);
-    }
-  });
-  return map;
+    const map = new Map();
+    list.forEach(item => {
+        const key = keyGetter(item);
+        const collection = map.get(key);
+        if (!collection) {
+            map.set(key, [item]);
+        } else {
+            collection.push(item);
+        }
+    });
+    return map;
 }
 
 /**
  * Swaps the keys and values of an object
  * */
 export function flipRecord(obj: any): any {
-  const ret: any = {};
-  Object.keys(obj).forEach(key => {
-    ret[obj[key]] = key;
-  });
-  return ret;
+    const ret: any = {};
+    Object.keys(obj).forEach(key => {
+        ret[obj[key]] = key;
+    });
+    return ret;
 }
 
 /**
@@ -39,27 +39,24 @@ export function flipRecord(obj: any): any {
  * */
 let randomColor = require('randomcolor'); // import the script
 export function getRandomColorFromString(str: string) {
-  const hashNum = hashCodeMurmur(str);
-  const color = randomColor(
-    {
-      seed: hashNum,
-      alpha: 0.6,
-      format: 'rgba',
-      luminosity: 'light',
-    }
-  );
-  return color
+    const hashNum = hashCodeMurmur(str);
+    const color = randomColor({
+        seed: hashNum,
+        alpha: 0.6,
+        format: 'rgba',
+        luminosity: 'light',
+    });
+    return color;
 }
 
 const MurmurHash3 = require('imurmurhash');
-const hashState = new MurmurHash3("", 42);
+const hashState = new MurmurHash3('', 42);
 
 const hashCodeMurmur = function(s: string): number {
-  const res = hashState.hash(s).result();
-  hashState.reset();
-  return res;
-}
-
+    const res = hashState.hash(s).result();
+    hashState.reset();
+    return res;
+};
 
 /**
  * Returns a hash code for a string.
@@ -77,22 +74,22 @@ const hashCodeMurmur = function(s: string): number {
  */
 const hashCode = function hashCode(s: string): number {
     let h = 0;
-    for(let i = 0; i < s.length; i++) 
-          h = Math.imul(31, h) + s.charCodeAt(i) | 0;
+    for (let i = 0; i < s.length; i++) h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
 
     return h;
-}
+};
 
 /**
  * Check for array equality. I can't believe this isn't a builtin.
  * */
 export function arrayEquals(a: any, b: any) {
-  return Array.isArray(a) &&
-    Array.isArray(b) &&
-    a.length === b.length &&
-    a.every((val, index) => val === b[index]);
+    return (
+        Array.isArray(a) &&
+        Array.isArray(b) &&
+        a.length === b.length &&
+        a.every((val, index) => val === b[index])
+    );
 }
-
 
 /** *
  * Usage:
@@ -115,37 +112,37 @@ ids.next(); // 'ac'
  *
  * */
 export class StringIdGenerator {
-  _chars: any
-  _nextId: any
-  constructor(chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ') {
-    this._chars = chars;
-    this._nextId = [0];
-  }
-
-  next() {
-    const r = [];
-    for (const char of this._nextId) {
-      r.unshift(this._chars[char]);
+    _chars: any;
+    _nextId: any;
+    constructor(chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ') {
+        this._chars = chars;
+        this._nextId = [0];
     }
-    this._increment();
-    return r.join('');
-  }
 
-  _increment() {
-    for (let i = 0; i < this._nextId.length; i++) {
-      const val = ++this._nextId[i];
-      if (val >= this._chars.length) {
-        this._nextId[i] = 0;
-      } else {
-        return;
-      }
+    next() {
+        const r = [];
+        for (const char of this._nextId) {
+            r.unshift(this._chars[char]);
+        }
+        this._increment();
+        return r.join('');
     }
-    this._nextId.push(0);
-  }
 
-  *[Symbol.iterator]() {
-    while (true) {
-      yield this.next();
+    _increment() {
+        for (let i = 0; i < this._nextId.length; i++) {
+            const val = ++this._nextId[i];
+            if (val >= this._chars.length) {
+                this._nextId[i] = 0;
+            } else {
+                return;
+            }
+        }
+        this._nextId.push(0);
     }
-  }
+
+    *[Symbol.iterator]() {
+        while (true) {
+            yield this.next();
+        }
+    }
 }

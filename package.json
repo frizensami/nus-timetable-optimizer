@@ -14,7 +14,9 @@
     "ace-builds": "^1.4.12",
     "craco-preact": "^1.1.0",
     "expired-storage": "^1.0.2",
+    "husky": "^6.0.0",
     "imurmurhash": "^0.1.4",
+    "lint-staged": "^11.0.0",
     "preact": "^10.5.13",
     "preact-compat": "^3.19.0",
     "randomcolor": "^0.6.2",
@@ -62,8 +64,20 @@
     "@craco/craco": "^6.1.2",
     "@semantic-ui-react/craco-less": "^1.2.1",
     "@types/react-router-dom": "^5.1.7",
+    "eslint-plugin-unused-imports": "^1.1.1",
+    "prettier": "^1.19.1",
     "semantic-ui-less": "^2.4.1",
     "semantic-ui-react": "^2.0.3",
     "worker-loader": "^3.0.8"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "prettier --write"
+    ]
   }
 }

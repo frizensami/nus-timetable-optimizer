@@ -1,4 +1,4 @@
-import { groupBy } from '../util/utils'
+import { groupBy } from '../util/utils';
 
 // export enum LessonWeek {
 //     ALL = "ALL",
@@ -12,22 +12,21 @@ import { groupBy } from '../util/utils'
 // export type LessonWeeks = Array<LessonWeek | Array<number>>;
 
 export interface GlobalConstraintsList {
-    workloadActive: boolean,
-    minWorkload: number,
-    maxWorkload: number
-    freeDayActive: boolean,
-    numRequiredFreeDays: number,
-    specificFreeDaysActive: boolean,
-    specificFreeDays: Array<string>,
-    startTime: string,
-    endTime: string,
-    lunchStart: string,
-    lunchEnd: string,
-    lunchHalfHours: number,
-    lunchBreakActive: boolean,
-    timeConstraintActive: boolean,
-    preferCompactTimetable: boolean
-    
+    workloadActive: boolean;
+    minWorkload: number;
+    maxWorkload: number;
+    freeDayActive: boolean;
+    numRequiredFreeDays: number;
+    specificFreeDaysActive: boolean;
+    specificFreeDays: Array<string>;
+    startTime: string;
+    endTime: string;
+    lunchStart: string;
+    lunchEnd: string;
+    lunchHalfHours: number;
+    lunchBreakActive: boolean;
+    timeConstraintActive: boolean;
+    preferCompactTimetable: boolean;
 }
 
 export const defaultConstraints: GlobalConstraintsList = {
@@ -38,10 +37,10 @@ export const defaultConstraints: GlobalConstraintsList = {
     numRequiredFreeDays: 1,
     specificFreeDaysActive: false,
     specificFreeDays: [],
-    startTime: "0800",
-    endTime: "2200",
-    lunchStart: "1100",
-    lunchEnd: "1500",
+    startTime: '0800',
+    endTime: '2200',
+    lunchStart: '1100',
+    lunchEnd: '1500',
     lunchHalfHours: 2,
     lunchBreakActive: false,
     timeConstraintActive: false,
@@ -63,12 +62,18 @@ export class Lesson {
     days: Array<string>;
     weeks: Array<Array<number>>; // list of weeks where lesson is active
 
-    constructor(lesson_id: string, lesson_type: string, start_end_times: Array<[Date, Date]>, days: Array<string>, weeks: Array<Array<number>>) {
-        this.lesson_id = lesson_id.replace(/\s/g, '')
-        this.lesson_type = lesson_type.replace(/\s/g, '')
-        this.start_end_times = start_end_times
-        this.days = days
-        this.weeks = weeks
+    constructor(
+        lesson_id: string,
+        lesson_type: string,
+        start_end_times: Array<[Date, Date]>,
+        days: Array<string>,
+        weeks: Array<Array<number>>
+    ) {
+        this.lesson_id = lesson_id.replace(/\s/g, '');
+        this.lesson_type = lesson_type.replace(/\s/g, '');
+        this.start_end_times = start_end_times;
+        this.days = days;
+        this.weeks = weeks;
     }
 }
 
@@ -84,19 +89,23 @@ export class Module {
     lessons: Record<string, Array<Lesson>>; // mapping from lessonType ==> all lessons of that type
     is_compulsory: boolean;
 
-    constructor(module_id: string, workload: number, in_lessons: Array<Lesson>, is_compulsory: boolean) {
-        this.module_id = module_id.replace(/\s/g, '')
-        this.workload = workload
-        this.lessons = this.process_lessons(in_lessons)
-        this.is_compulsory = is_compulsory
+    constructor(
+        module_id: string,
+        workload: number,
+        in_lessons: Array<Lesson>,
+        is_compulsory: boolean
+    ) {
+        this.module_id = module_id.replace(/\s/g, '');
+        this.workload = workload;
+        this.lessons = this.process_lessons(in_lessons);
+        this.is_compulsory = is_compulsory;
     }
 
     /**
      * Split all lessons up into their individual lesson types.
-    *  If there is more than 1 lesson of a given type with the same number, merge them
+     *  If there is more than 1 lesson of a given type with the same number, merge them
      * */
-    process_lessons(in_lessons: Array<Lesson>): Record<string, Array<Lesson>>  {
-
+    process_lessons(in_lessons: Array<Lesson>): Record<string, Array<Lesson>> {
         // Split on lesson type
         // Each grouping contains lessons of  same lesson type
         let lessons_for_timetable: Record<string, Array<Lesson>> = {};
@@ -106,41 +115,34 @@ export class Module {
         grouped_lessontypes.forEach((lessons_for_lessontype, lessontype, _) => {
             lessons_for_timetable[lessontype] = [];
             // Iterate through each lesson number in that type
-            const grouped_lesson_nums = groupBy(lessons_for_lessontype, (v: Lesson) => v.lesson_id)
+            const grouped_lesson_nums = groupBy(lessons_for_lessontype, (v: Lesson) => v.lesson_id);
             grouped_lesson_nums.forEach((lessons_for_lessonnum: Array<Lesson>, _lessonNum, _) => {
                 if (lessons_for_lessonnum.length === 1) {
                     // If only one lesson number of this type, leave it alone
-                    lessons_for_timetable[lessontype].push(lessons_for_lessonnum[0])
+                    lessons_for_timetable[lessontype].push(lessons_for_lessonnum[0]);
                 } else {
                     // Otherwise, we have to merge lessons
                     const l = this.merge_lessons_same_id(lessons_for_lessonnum);
-                    lessons_for_timetable[lessontype].push(l)
+                    lessons_for_timetable[lessontype].push(l);
                 }
             });
         });
 
-        return lessons_for_timetable
+        return lessons_for_timetable;
     }
 
     merge_lessons_same_id(lessons: Array<Lesson>): Lesson {
-        let start_ends = []
-        let days = []
-        let weeks = []
+        let start_ends = [];
+        let days = [];
+        let weeks = [];
         for (const lesson of lessons) {
-            start_ends.push(...lesson.start_end_times)
-            days.push(...lesson.days)
-            weeks.push(...lesson.weeks)
+            start_ends.push(...lesson.start_end_times);
+            days.push(...lesson.days);
+            weeks.push(...lesson.weeks);
         }
-        const l = new Lesson(
-            lessons[0].lesson_id,
-            lessons[0].lesson_type,
-            start_ends,
-            days,
-            weeks,
-        )
-        return l
+        const l = new Lesson(lessons[0].lesson_id, lessons[0].lesson_type, start_ends, days, weeks);
+        return l;
     }
-
 }
 
 /**
@@ -150,15 +152,14 @@ export class Module {
  *   - Modules and their associated lessons and workload
  *   - An indication of which modules are required vs optional
  *   - Min and Max workload
- * 
+ *
  * */
 export class GenericTimetable {
     modules: Array<Module>;
-    constraints: GlobalConstraintsList
-
+    constraints: GlobalConstraintsList;
 
     constructor(modules: Array<Module>, constraints: GlobalConstraintsList) {
-        this.modules = modules
-        this.constraints = constraints
+        this.modules = modules;
+        this.constraints = constraints;
     }
 }

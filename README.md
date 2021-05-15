@@ -33,7 +33,7 @@ For production builds, run `npm run build`, which builds all assets into the `bu
 - A separate document will be written to explain the technical details of how this problem was encoded into the Z3 SMT (SMTLIB2) format. Some ideas for the encoding were taking from <a href="https://github.com/raynoldng/orbital-splashdown/blob/master/Splashdown_Technical_Report.pdf" target="_blank">this technical report</a> by another attempt to solve this problem.
 
 ## Temporary Disclaimers
-- The code style / linting / other tools for this project are still being set up. 
+- The code style / linting / other tools for this project are still being set up. Prettier will run to format code on every commit. 
 - The code style itself is incredibly inconsistent for now.
 - Not many best practices are in place at the moment, but that will improve over time.
 - There are a few tests, but not with significant coverage.

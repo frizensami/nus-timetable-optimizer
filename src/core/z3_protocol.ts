@@ -1,24 +1,24 @@
 export enum MessageKind {
     // Request to init
-    INIT = "INIT",
+    INIT = 'INIT',
     // Z3 initialized
-    INITIALIZED = "INITIALIZED",
+    INITIALIZED = 'INITIALIZED',
     // Run the optimizer
-    OPTIMIZE = "OPTIMIZE",
+    OPTIMIZE = 'OPTIMIZE',
     // Print output
-    PRINT = "PRINT",
+    PRINT = 'PRINT',
     // Error
-    ERR = "ERR",
+    ERR = 'ERR',
     // Z3 finished runnung
-    EXIT = "EXIT",
+    EXIT = 'EXIT',
     // Z3 aborted
-    ABORT = "ABORT",
+    ABORT = 'ABORT',
 }
 
 /**
  * Message to be sent back and forth between a Z3 worker and any controlling React components
  * */
 export interface Z3Message {
-    kind: MessageKind,
-    msg: string
+    kind: MessageKind;
+    msg: string;
 }

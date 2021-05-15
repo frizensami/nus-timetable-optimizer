@@ -1,12 +1,18 @@
-import { TimetableOutput, TimetableSmtlib2Converter } from './timetable_to_smtlib2'
-import { GenericTimetable } from './generic_timetable'
-import { Z3Message, MessageKind } from "./z3_protocol"
-import { DAYS, HOURS_PER_DAY, DAY_START_HOUR, DAY_END_HOUR, NUM_WEEKS, HOURS_PER_WEEK } from './constants'
-
+import { TimetableOutput, TimetableSmtlib2Converter } from './timetable_to_smtlib2';
+import { GenericTimetable } from './generic_timetable';
+import { Z3Message, MessageKind } from './z3_protocol';
+import {
+    DAYS,
+    HOURS_PER_DAY,
+    DAY_START_HOUR,
+    DAY_END_HOUR,
+    NUM_WEEKS,
+    HOURS_PER_WEEK,
+} from './constants';
 
 /* eslint-disable import/no-webpack-loader-syntax */
 // @ts-ignore
-import Z3Worker from "worker-loader!./z3_worker";
+import Z3Worker from 'worker-loader!./z3_worker';
 
 /**
  * The Z3 manager takes a generic timetable as input and manages the lifecycle of running the
@@ -16,15 +22,14 @@ import Z3Worker from "worker-loader!./z3_worker";
  * Only one Z3 Manager per application - allows stateless components to run manager methods
  * */
 export class Z3Manager {
-    static gt: GenericTimetable
-    static conv: TimetableSmtlib2Converter
-    static smtString: string
-    static callbacks: Z3Callbacks
-    static printBuffer: string
-    static errBuffer: string
+    static gt: GenericTimetable;
+    static conv: TimetableSmtlib2Converter;
+    static smtString: string;
+    static callbacks: Z3Callbacks;
+    static printBuffer: string;
+    static errBuffer: string;
     static worker?: Z3Worker = null;
-    static completedStage1Solve: boolean // Need to complete week-solving before timetable-solving
-
+    static completedStage1Solve: boolean; // Need to complete week-solving before timetable-solving
 
     static initZ3(callbacks: Z3Callbacks) {
         Z3Manager.callbacks = callbacks;
@@ -32,27 +37,26 @@ export class Z3Manager {
         Z3Manager.completedStage1Solve = false;
         // Set up worker if it's not set up
         if (!Z3Manager.worker) {
-            Z3Manager.worker = new Z3Worker()
+            Z3Manager.worker = new Z3Worker();
             Z3Manager.worker.onmessage = Z3Manager.receiveWorkerMessage;
         }
-        Z3Manager.managerPostMessage(MessageKind.INIT, "");
+        Z3Manager.managerPostMessage(MessageKind.INIT, '');
     }
 
-
-    /** 
+    /**
      * Register a generic timetable a set of callbacks to be called for different states in the Z3 solver lifecycle
      * */
     static loadTimetable(gt: GenericTimetable) {
-        console.log("Loaded timetable")
-        console.log(gt)
+        console.log('Loaded timetable');
+        console.log(gt);
         Z3Manager.gt = gt;
-        Z3Manager.conv = new TimetableSmtlib2Converter(Z3Manager.gt,
+        Z3Manager.conv = new TimetableSmtlib2Converter(
+            Z3Manager.gt,
             NUM_WEEKS * HOURS_PER_WEEK * 2, // Number of "half-hour" slots
             DAY_START_HOUR, // Start at 8am
-            DAY_END_HOUR) // End at 2200 (10 pm)
-
+            DAY_END_HOUR
+        ); // End at 2200 (10 pm)
     }
-
 
     static solve() {
         Z3Manager.resetBuffers();
@@ -60,9 +64,8 @@ export class Z3Manager {
         Z3Manager.managerPostMessage(MessageKind.OPTIMIZE, weekSolveStr);
     }
 
-
     static receiveWorkerMessage(e: any) {
-        const message: Z3Message = e.data
+        const message: Z3Message = e.data;
         // console.log("Kind: %s, Message: %s", message.kind, message.msg)
         switch (message.kind) {
             case MessageKind.INITIALIZED:
@@ -70,24 +73,24 @@ export class Z3Manager {
                 Z3Manager.callbacks.onZ3Initialized();
                 break;
             case MessageKind.PRINT:
-                Z3Manager.printBuffer += message.msg + "\n"
+                Z3Manager.printBuffer += message.msg + '\n';
                 break;
             case MessageKind.ERR:
-                Z3Manager.errBuffer += message.msg + "\n"
+                Z3Manager.errBuffer += message.msg + '\n';
                 break;
             case MessageKind.EXIT:
                 // Z3 Initialization exit
-                console.log("Z3 messages on exit: ")
-                if (Z3Manager.printBuffer === "" && Z3Manager.errBuffer === "") {
-                    console.log("Premature exit - Z3 was initializing (this is normal)")
+                console.log('Z3 messages on exit: ');
+                if (Z3Manager.printBuffer === '' && Z3Manager.errBuffer === '') {
+                    console.log('Premature exit - Z3 was initializing (this is normal)');
                     return; // Premature exit (probably initialization)
                 }
 
                 // Print buffers generically
-                if (Z3Manager.printBuffer !== "") {
+                if (Z3Manager.printBuffer !== '') {
                     console.log(Z3Manager.printBuffer);
                 }
-                if (Z3Manager.errBuffer !== "") {
+                if (Z3Manager.errBuffer !== '') {
                     console.error(Z3Manager.errBuffer);
                 }
 
@@ -100,7 +103,7 @@ export class Z3Manager {
                     // Generate the SMTLIB2 string based on the week-solve:w
                     Z3Manager.smtString = Z3Manager.conv.generateTimetableSolveSmtLib2String();
                     // Run callback to update the generated smtlib2 string
-                    Z3Manager.callbacks.onSmtlib2InputCreated(Z3Manager.smtString)
+                    Z3Manager.callbacks.onSmtlib2InputCreated(Z3Manager.smtString);
                     // Reset state for our next optimization run
                     Z3Manager.resetBuffers();
                     // Two stage solve: first solve for the week constraints, then solve for the actual timetable
@@ -110,12 +113,15 @@ export class Z3Manager {
                     Z3Manager.completedStage1Solve = false;
                     // Deal with real solve state
                     // Call the output callback
-                    Z3Manager.callbacks.onOutput(Z3Manager.printBuffer + "\n" + Z3Manager.errBuffer);
+                    Z3Manager.callbacks.onOutput(
+                        Z3Manager.printBuffer + '\n' + Z3Manager.errBuffer
+                    );
                     // Process the output text we just got from the Z3 solver
-                    const timetable: TimetableOutput = Z3Manager.conv.z3_output_to_timetable(Z3Manager.printBuffer);
+                    const timetable: TimetableOutput = Z3Manager.conv.z3_output_to_timetable(
+                        Z3Manager.printBuffer
+                    );
                     Z3Manager.callbacks.onTimetableOutput(timetable);
                 }
-
 
                 break;
             default:
@@ -132,15 +138,14 @@ export class Z3Manager {
     }
 
     static resetBuffers() {
-        Z3Manager.printBuffer = "";
-        Z3Manager.errBuffer = "";
+        Z3Manager.printBuffer = '';
+        Z3Manager.errBuffer = '';
     }
-
 }
 
 export interface Z3Callbacks {
-    onZ3Initialized: any
-    onSmtlib2InputCreated(s: string): any
-    onOutput(s: string): any
-    onTimetableOutput(timetable: TimetableOutput): any
+    onZ3Initialized: any;
+    onSmtlib2InputCreated(s: string): any;
+    onOutput(s: string): any;
+    onTimetableOutput(timetable: TimetableOutput): any;
 }
