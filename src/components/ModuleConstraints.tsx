@@ -278,7 +278,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }
 
                                                         <Grid.Column textAlign="center" width={8}>
                                                             <Button fluid toggle active={mod.required} onClick={() => toggleRequired(mod)}>
-                                                                {mod.required ? "Required Module" : "Optional Module"}
+                                                                {mod.required ? "Compulsory Module" : "Optional Module"}
                                                             </Button>
                                                         </Grid.Column>
 
