@@ -84,7 +84,8 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
                 module_code: mod.module_code,
                 acad_year: mod.acad_year,
                 semester: mod.semester,
-                is_compulsory: mod.required
+                is_compulsory: mod.required,
+                lessonConstraints: mod.lessonConstraints
             }
         }));
     }

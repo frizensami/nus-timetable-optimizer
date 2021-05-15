@@ -3,6 +3,7 @@ import './Solver.css'
 import { Segment, Button, Container, Divider, Dropdown, Grid, Icon, Modal, List, Menu, Input, Form, Select, Header, Message, Card, Checkbox, Item, Transition } from 'semantic-ui-react'
 import { NUSModsFrontend } from '../frontends/nusmods_frontend'
 import { getRandomColorFromString } from '../util/utils'
+import ModuleSlotSelector, { LessonTypeConstraints } from './ModuleSlotSelector'
 
 interface ModuleConstraintsProps {
     onModulesChange(mods: Array<ConstraintModule>): any
@@ -12,8 +13,9 @@ export interface ConstraintModule {
     module_code: string,
     acad_year: string,
     semester: number,
-    json?: any
-    required: boolean
+    json?: any,
+    required: boolean,
+    lessonConstraints?: LessonTypeConstraints // JSON after constraints have 
 }
 
 /**
@@ -36,6 +38,8 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }
     let [activeSuccessCancelTimeout, setActiveSuccessCancelTimeout] = useState<any>(undefined)
     let [open, setOpen] = useState(false)
     let [open2, setOpen2] = useState(false)
+    let [openSlotSelector, setOpenSlotSelector] = useState(false);
+    let [selectedMod, setSelectedMod] = useState<ConstraintModule | undefined>(undefined);
 
     /*
      * Try to add a module to the current list of modules
@@ -137,20 +141,32 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }
         onModulesChange(newmods);
     }
 
-    // function onKeyPress(event: any) {
-    //     if (event.key === 'Enter') {
-    //         handleClick();
-    //     }
-    // }
+    function manualSelect(mod: ConstraintModule) {
+        setSelectedMod(mod);
+        setOpenSlotSelector(true);
+    }
 
-    // <Grid.Row>
-    //     <Input stackable action type='text' onChange={(e) => setModuleText(e.target.value)} onKeyPress={onKeyPress} placeholder='Type module code'>
-    //         <input />
-    //         <Select compact options={ay_xs} defaultValue={defaultAyValue} onChange={(e, { value }) => setAyText(value as number)} />
-    //         <Select compact options={sem_xs} defaultValue={defaultSemValue} onChange={(e, { value }) => setSemText(value as number)} />
-    //         <Button type="submit" positive onClick={handleClick}>Add Module</Button>
-    //     </Input>
-    // </Grid.Row>
+    function updateOpenSlotSelector() {
+        setOpenSlotSelector(false);
+    }
+
+    function updateModuleSlotSelections(selections: LessonTypeConstraints) {
+        const mods = modules.map((m: ConstraintModule) => {
+            if (m !== selectedMod) {
+                return m;
+            } else {
+                if (selections === undefined || Object.keys(selections).length === 0) {
+                    m.lessonConstraints = undefined;
+                } else {
+                    m.lessonConstraints = selections;
+                }
+                return m;
+            }
+        });
+        setModules(mods);
+        onModulesChange(mods);
+    }
+
 
     return (
         <div>
@@ -242,23 +258,27 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }
                                     <Grid.Column textAlign="center" width={16}>
                                         <Card centered fluid>
                                             <Card.Content>
+                                                <Button size='mini' floated='right' negative icon onClick={() => removeModule(mod)}>
+                                                    <Icon name='close' />
+                                                </Button>
                                                 <Card.Header> <Icon name='square outline' size='tiny' style={{ "backgroundColor": color }} /> {mod.module_code + " " + mod.json["title"]} </Card.Header>
                                                 <Card.Meta> {"AY " + mod.acad_year + " | Semester " + mod.semester + " | Workload: " + mod.json['moduleCredit'] + " MC"} </Card.Meta>
+                                                <Message visible={mod.lessonConstraints !== undefined} hidden={mod.lessonConstraints === undefined} info>
+                                                    <p> You have restricted the possible slots for this module. </p>
+                                                </Message>
                                             </Card.Content>
                                             <Card.Content extra>
                                                 <Grid stackable textAlign="center">
                                                     <Grid.Row columns="equal">
-
-
-                                                        <Grid.Column width={8}>
-                                                            <Button basic color='red' onClick={() => removeModule(mod)}>
-                                                                Remove Module
-                                                    </Button>
+                                                        <Grid.Column textAlign="center" width={8}>
+                                                            <Button fluid primary onClick={() => manualSelect(mod)}>
+                                                                Restrict Slots
+                                                            </Button>
                                                         </Grid.Column>
 
                                                         <Grid.Column textAlign="center" width={8}>
-                                                            <Button toggle active={mod.required} onClick={() => toggleRequired(mod)}>
-                                                                {mod.required ? "Required" : "Optional"}
+                                                            <Button fluid toggle active={mod.required} onClick={() => toggleRequired(mod)}>
+                                                                {mod.required ? "Required Module" : "Optional Module"}
                                                             </Button>
                                                         </Grid.Column>
 
@@ -334,6 +354,14 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }
                     </Grid>
                 </Modal.Actions>
             </Modal>
+
+            <ModuleSlotSelector
+                open={openSlotSelector}
+                updateOpen={updateOpenSlotSelector}
+                mod={selectedMod}
+                updateModuleSlotSelections={updateModuleSlotSelections}
+                initialSlotSelections={selectedMod?.lessonConstraints}
+            />
         </div>
     )
 }

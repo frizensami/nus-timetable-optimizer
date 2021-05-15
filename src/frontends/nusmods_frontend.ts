@@ -1,18 +1,20 @@
 import { Lesson, Module, GenericTimetable, GlobalConstraintsList } from '../core/generic_timetable'
 import { groupBy, arrayEquals } from '../util/utils'
 import { ALL_WEEKS } from '../core/constants'
+import { LessonTypeConstraints } from '../components/ModuleSlotSelector'
 // @ts-ignore
 import ExpiredStorage from 'expired-storage'
 
 const EXPIRY_HOURS = 24;
 const EXPIRY_MINUTES = EXPIRY_HOURS * 60
-const EXPIRY_SECS = EXPIRY_MINUTES * 60 
+const EXPIRY_SECS = EXPIRY_MINUTES * 60
 
 export interface ModuleToAdd {
     module_code: string,
     acad_year: string,
     semester: number,
-    is_compulsory: boolean
+    is_compulsory: boolean,
+    lessonConstraints?: LessonTypeConstraints
 }
 
 export class NUSModsFrontend {
@@ -20,14 +22,14 @@ export class NUSModsFrontend {
 
     async add_modules(modules_to_add: Array<ModuleToAdd>) {
         for (let mod of modules_to_add) {
-            await this.add_module(mod) 
+            await this.add_module(mod)
         }
     }
 
     /**
      * Lookup a module JSON in our server and add it and its lessons to our list of modules
      * */
-    async add_module({module_code, acad_year, semester, is_compulsory}: ModuleToAdd): Promise<boolean> {
+    async add_module({ module_code, acad_year, semester, is_compulsory, lessonConstraints }: ModuleToAdd): Promise<boolean> {
         const data: any = await NUSModsFrontend.read_module_json(module_code, acad_year, semester)
         if (data === {}) return false; // No module to add - didn't fit our specifications
 
@@ -37,12 +39,19 @@ export class NUSModsFrontend {
         // Create generic lessons
         let generic_lessons: Array<any> = []
         const grouped_lessontypes = groupBy(timetable, (v: any) => v["lessonType"]);
-        grouped_lessontypes.forEach((value: Array<Lesson>, _key: string, _: any) => {
+        grouped_lessontypes.forEach((value: any, key: string, _: any) => {
             // console.log(`m[${key}] = ${JSON.stringify(value)}`);
             const lessons_for_lessontype = value
             lessons_for_lessontype.forEach((lesson: any) => {
-                const generic_lesson = this.lesson_to_genericlesson(lesson);
-                generic_lessons.push(generic_lesson);
+                // We only include a lesson if there are no lesson constraints, or the lesson number is part of the constraint list from the user
+                console.log("Frontend lessonconstraints & lessonNo")
+                console.log(lessonConstraints)
+                console.log(lesson)
+                console.log(lesson['lessonNo'])
+                if (lessonConstraints === undefined || lessonConstraints[key] === undefined || lessonConstraints[key].includes(lesson['classNo'])) {
+                    const generic_lesson = this.lesson_to_genericlesson(lesson);
+                    generic_lessons.push(generic_lesson);
+                }
             })
         });
 
@@ -81,7 +90,7 @@ export class NUSModsFrontend {
      * Read module data as public json files from our server
      * */
     static async read_module_server(module_code: string, acad_year: string, semester: number): Promise<object> {
-        const baseUrl = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
+        const baseUrl = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port : '');
         const finalUrl = `${baseUrl}/modules/${acad_year}/${module_code}.json`;
         // console.log(`Fetching ${finalUrl}`)
         try {
@@ -114,8 +123,8 @@ export class NUSModsFrontend {
         let expiredStorage = new ExpiredStorage();
         const key = `${module_code}__${acad_year}__${semester}`;
         expiredStorage.setJson(key, json, EXPIRY_SECS);
-        
-        
+
+
     }
 
     static async read_module_nusmods_api(module_code: string, acad_year: string, semester: number): Promise<object> {
@@ -163,17 +172,17 @@ export class NUSModsFrontend {
         // } else {
         //     weeks_final = weeks_arr;
         // }
-        
+
 
         // console.log(lesson)
         // console.log(`Base lesson weeks: lesson: ${lesson.weeks}, ${weeks_arr} vs ${weeks_final}`)
-        
+
         const l = new Lesson(
             lesson["classNo"],
             lesson["lessonType"],
             [this.lesson_to_start_end_times(lesson)],
             [lesson["day"]],
-            [weeks_arr], 
+            [weeks_arr],
         )
         return l
     }
@@ -192,7 +201,7 @@ export class NUSModsFrontend {
             const minutes = parseInt(hhmm.substr(2, 4));
             return new Date(1970, 1, 1, hour, minutes);
         }
-        
+
         start_time = hhmm_to_date(start_time)
         end_time = hhmm_to_date(end_time)
         return [start_time, end_time]
