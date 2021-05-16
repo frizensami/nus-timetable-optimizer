@@ -1,4 +1,7 @@
-# NUS Timetable Optimizer
+# NUS Timetable Optimizer [![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/Naereen/StrapDown.js/blob/master/LICENSE)
+
+
+
 
 Codebase for <a href="https://optimize.sriramsami.com" target="_blank">the NUS Timetable Optimizer</a>, a tool to help students at the National University of Singapore to optimize their timetables to their liking.
 
