@@ -66,8 +66,8 @@ export const HowToUse: React.FC = () => {
 
                     <li>
                         {' '}
-                        Modules can be set as <strong> "Required" </strong> or{' '}
-                        <strong> "Optional" </strong>. A "Required" module must be present in the
+                        Modules can be set as <strong> "Compulsory" </strong> or{' '}
+                        <strong> "Optional" </strong>. A "Compulsory" module must be present in the
                         final timetable, whereas an "Optional" module may be dropped if other
                         constraints are violated.{' '}
                     </li>
