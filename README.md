@@ -6,11 +6,12 @@ Codebase for <a href="https://optimize.sriramsami.com" target="_blank">the NUS T
 
 ## Features
 - Allows users to optimize their NUS timetable based on their specified constraints, for example:
-      - Allocate one or more free days 
-      - Reserve time every day for lunch
-      - Avoid classes that start too early or end too late
-      - Allow certain modules to only be taken ("Optional Modules") if they meet the above constraints
-      - Select a combination of modules that meets these constraints but maintain a minimum and maximum workload
+  - Allocate one or more free days 
+  - Reserve time every day for lunch
+  - Avoid classes that start too early or end too late
+  - Allow certain modules to only be taken ("Optional Modules") if they meet the above constraints
+  - Select a combination of modules that meets these constraints but maintain a minimum and maximum workload
+     
 - Uses the NUSMods API to keep up-to-date.
 - Tries to prevent all students balloting for the same timetable by randomizing the final timetable output.
 - Runs completely on the client browser, which keeps the optimizer responsive regardless of the number of people using the system.
