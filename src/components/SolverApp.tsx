@@ -22,6 +22,14 @@ export const SolverApp: React.FC = () => {
                     errors or feedback to{' '}
                     <a href="mailto:sriramsami@nus.edu.sg?subject=NUS Timetable Optimizer Feedback">
                         sriramsami@nus.edu.sg
+                    </a>{' '}
+                    or{' '}
+                    <a
+                        href="https://github.com/frizensami/nus-timetable-optimizer/issues"
+                        target="_blank"
+                        rel="noreferrer"
+                    >
+                        open an Issue on GitHub
                     </a>
                     .
                 </Message.Header>
