@@ -14,8 +14,6 @@ export const SolverApp: React.FC = () => {
         setTT(timetable);
     }
 
-    function blank_test_husky() {}
-
     return (
         <div>
             <Message error>
