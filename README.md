@@ -15,7 +15,7 @@ Codebase for <a href="https://optimize.sriramsami.com" target="_blank">the NUS T
   - Allow certain modules to only be taken ("Optional Modules") if they meet the above constraints
   - Select a combination of modules that meets these constraints but maintain a minimum and maximum workload
 - Works for modules that are on even/odd weeks and even for those held on arbitrary weeks on the academic calendar.
-  - Note: it doesn't work / will fallback to a "weekly" mode for modules outside the academic calendar  
+  - Note: it will fallback to a "weekly" mode for modules outside the academic calendar  
 - Allows users to restrict the slots for each module and lesson type that should be considered, to synchronize with friends or work around external commitments.  
 - Uses the NUSMods API to keep up-to-date.
 - Tries to prevent all students balloting for the same timetable by randomizing the final timetable output.
