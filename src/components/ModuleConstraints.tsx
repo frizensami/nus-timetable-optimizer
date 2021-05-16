@@ -1,25 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './Solver.css';
 import {
-    Segment,
     Button,
-    Container,
-    Divider,
-    Dropdown,
     Grid,
     Icon,
     Modal,
-    List,
-    Menu,
     Input,
     Form,
     Select,
     Header,
     Message,
-    Card,
-    Checkbox,
-    Item,
     Transition,
+    Table,
 } from 'semantic-ui-react';
 import { NUSModsFrontend } from '../frontends/nusmods_frontend';
 import { getRandomColorFromString } from '../util/utils';
@@ -56,9 +48,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }
     let [semValue, setSemText] = useState(defaultSemValue);
     let [modules, setModules] = useState<Array<ConstraintModule>>([]);
     let [showModuleAddError, setShowModuleAddError] = useState(false);
-    let [showModuleAddSuccess, setShowModuleAddSuccess] = useState(false);
     let [activeErrorCancelTimeout, setActiveErrorCancelTimeout] = useState<any>(undefined);
-    let [activeSuccessCancelTimeout, setActiveSuccessCancelTimeout] = useState<any>(undefined);
     let [open, setOpen] = useState(false);
     let [open2, setOpen2] = useState(false);
     let [openSlotSelector, setOpenSlotSelector] = useState(false);
@@ -83,7 +73,6 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }
         );
         if (containsModAlready) {
             console.log("Couldn't add module, exists already");
-            setShowModuleAddSuccess(false);
             setShowModuleAddError(true);
             cancelErrorAfterInterval();
             return;
@@ -94,7 +83,6 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }
                 console.log(moduleJson);
                 if (Object.keys(moduleJson).length === 0) {
                     console.log("Couldn't add module!");
-                    setShowModuleAddSuccess(false);
                     setShowModuleAddError(true);
                     cancelErrorAfterInterval();
                 } else {
@@ -119,9 +107,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }
                         onModulesChange(mods);
                     } else {
                         console.log('Successfully added module!');
-                        setShowModuleAddSuccess(true);
                         setShowModuleAddError(false);
-                        cancelSucessAfterInterval();
                         let mods = modules.concat(mod);
                         setModules(mods);
                         onModulesChange(mods);
@@ -145,14 +131,6 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }
             setShowModuleAddError(false);
         }, 3000);
         setActiveErrorCancelTimeout(t);
-    }
-
-    function cancelSucessAfterInterval() {
-        if (activeSuccessCancelTimeout !== undefined) clearTimeout(activeSuccessCancelTimeout);
-        let t = setTimeout(() => {
-            setShowModuleAddSuccess(false);
-        }, 3000);
-        setActiveSuccessCancelTimeout(t);
     }
 
     function toggleRequired(mod: ConstraintModule) {
@@ -212,8 +190,6 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }
                 Module Selector{' '}
             </Header>
 
-            <Divider />
-
             {/* Display module selector */}
             <Form>
                 <Form.Group>
@@ -268,111 +244,74 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }
                 </Message>
             </Transition>
 
-            <Transition visible={showModuleAddSuccess} animation="fade" duration={1000}>
-                <Message positive>
-                    <Message.Header>{'Module added!'}</Message.Header>
-                </Message>
-            </Transition>
+            {modules.length > 0 && (
+                <Table compact>
+                    <Table.Header>
+                        <Table.Row>
+                            <Table.HeaderCell>Module</Table.HeaderCell>
+                            <Table.HeaderCell width="5">Actions</Table.HeaderCell>
+                        </Table.Row>
+                    </Table.Header>
 
-            <Grid stackable centered textAlign="center">
-                {/* Conditional display of header */}
-                {modules.length > 0 && (
-                    <Grid.Row>
-                        <Divider />
-                        <Header as="h3" textAlign="center">
-                            {' '}
-                            Selected Modules{' '}
-                        </Header>
-                        <Divider />
-                    </Grid.Row>
-                )}
-
-                {/* Display each module as a card within the grid */}
-                <Transition.Group duration={1000}>
-                    {modules.map((mod: ConstraintModule, idx: number) => {
-                        let color = getRandomColorFromString(mod.module_code);
-                        return (
-                            <Grid.Row centered key={idx} columns="equal">
-                                <Grid.Column textAlign="center" width={16}>
-                                    <Card centered fluid>
-                                        <Card.Content>
-                                            <Button
-                                                size="mini"
-                                                floated="right"
-                                                negative
-                                                icon
-                                                onClick={() => removeModule(mod)}
-                                            >
-                                                <Icon name="close" />
-                                            </Button>
-                                            <Card.Header>
+                    <Table.Body>
+                        {/* <Transition.Group duration={1000}> */}
+                        {modules.map((mod: ConstraintModule, idx: number) => {
+                            let color = getRandomColorFromString(mod.module_code);
+                            return (
+                                <Table.Row>
+                                    <Table.Cell>
+                                        <span
+                                            style={{
+                                                display: 'inline-block',
+                                                backgroundColor: color,
+                                                height: '1em',
+                                                width: '1em',
+                                                borderRadius: '0.125rem',
+                                                marginRight: '0.5rem',
+                                            }}
+                                        />
+                                        {mod.module_code + ' ' + mod.json['title']}{' '}
+                                        <div style={{ fontSize: '0.875rem', color: 'grey' }}>
+                                            {' '}
+                                            {'AY ' +
+                                                mod.acad_year +
+                                                ' | Semester ' +
+                                                mod.semester +
+                                                ' | Workload: ' +
+                                                mod.json['moduleCredit'] +
+                                                ' MC ' +
+                                                (mod.required ? '' : '| Optional')}
+                                        </div>
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        <Button basic onClick={() => toggleRequired(mod)}>
+                                            Make {mod.required ? 'Optional' : 'Required'}
+                                        </Button>
+                                        <Button basic onClick={() => manualSelect(mod)}>
+                                            Restrict Slots
+                                        </Button>
+                                        <Button basic icon onClick={() => removeModule(mod)}>
+                                            <Icon name="delete" />
+                                        </Button>
+                                        <Message
+                                            visible={mod.lessonConstraints !== undefined}
+                                            hidden={mod.lessonConstraints === undefined}
+                                            info
+                                        >
+                                            <p>
                                                 {' '}
-                                                <Icon
-                                                    name="square outline"
-                                                    size="tiny"
-                                                    style={{
-                                                        backgroundColor: color,
-                                                    }}
-                                                />{' '}
-                                                {mod.module_code + ' ' + mod.json['title']}{' '}
-                                            </Card.Header>
-                                            <Card.Meta>
-                                                {' '}
-                                                {'AY ' +
-                                                    mod.acad_year +
-                                                    ' | Semester ' +
-                                                    mod.semester +
-                                                    ' | Workload: ' +
-                                                    mod.json['moduleCredit'] +
-                                                    ' MC'}{' '}
-                                            </Card.Meta>
-                                            <Message
-                                                visible={mod.lessonConstraints !== undefined}
-                                                hidden={mod.lessonConstraints === undefined}
-                                                info
-                                            >
-                                                <p>
-                                                    {' '}
-                                                    You have restricted the possible slots for this
-                                                    module.{' '}
-                                                </p>
-                                            </Message>
-                                        </Card.Content>
-                                        <Card.Content extra>
-                                            <Grid stackable textAlign="center">
-                                                <Grid.Row columns="equal">
-                                                    <Grid.Column textAlign="center" width={8}>
-                                                        <Button
-                                                            fluid
-                                                            primary
-                                                            onClick={() => manualSelect(mod)}
-                                                        >
-                                                            Restrict Slots
-                                                        </Button>
-                                                    </Grid.Column>
-
-                                                    <Grid.Column textAlign="center" width={8}>
-                                                        <Button
-                                                            fluid
-                                                            toggle
-                                                            active={mod.required}
-                                                            onClick={() => toggleRequired(mod)}
-                                                        >
-                                                            {mod.required
-                                                                ? 'Compulsory Module'
-                                                                : 'Optional Module'}
-                                                        </Button>
-                                                    </Grid.Column>
-                                                </Grid.Row>
-                                            </Grid>
-                                        </Card.Content>
-                                    </Card>
-                                </Grid.Column>
-                            </Grid.Row>
-                        );
-                    })}
-                </Transition.Group>
-            </Grid>
+                                                You have restricted the possible slots for this
+                                                module.{' '}
+                                            </p>
+                                        </Message>
+                                    </Table.Cell>
+                                </Table.Row>
+                            );
+                        })}
+                        {/* </Transition.Group> */}
+                    </Table.Body>
+                </Table>
+            )}
 
             <Modal onClose={() => setOpen(false)} onOpen={() => setOpen(true)} open={open}>
                 <Modal.Header>
