@@ -14,7 +14,8 @@ Codebase for <a href="https://optimize.sriramsami.com" target="_blank">the NUS T
   - Avoid classes that start too early or end too late
   - Allow certain modules to only be taken ("Optional Modules") if they meet the above constraints
   - Select a combination of modules that meets these constraints but maintain a minimum and maximum workload
-     
+- This works for modules that are on even/odd weeks and even for those held on arbitrary weeks on the academic calendar.
+  - Note: it doesn't work / will fallback to a "weekly" mode for modules outside the academic calendar  
 - Uses the NUSMods API to keep up-to-date.
 - Tries to prevent all students balloting for the same timetable by randomizing the final timetable output.
 - Runs completely on the client browser, which keeps the optimizer responsive regardless of the number of people using the system.
