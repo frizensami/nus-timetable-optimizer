@@ -152,6 +152,7 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
                                                     }
                                                 >
                                                     <GlobalConstraints
+                                                        constraints={constraints}
                                                         onUpdateConstraints={setConstraints}
                                                         numberOfModules={modules.length}
                                                     />
