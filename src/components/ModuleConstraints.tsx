@@ -218,6 +218,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                         control={Button}
                         content="Add Module"
                         primary
+                        disabled={moduleText.length === 0}
                         onClick={handleClick}
                         label="&nbsp;"
                         fluid
