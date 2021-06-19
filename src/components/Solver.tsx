@@ -1,5 +1,6 @@
 import React, { Suspense, useState, useEffect, useMemo } from 'react';
 import { TimetableOutput } from '../core/timetable_to_smtlib2';
+import { Link } from 'react-router-dom';
 import {
     Button,
     Accordion,
@@ -170,7 +171,9 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
                                 <Message info>
                                     <Message.Header>Not sure what to do?</Message.Header>
                                     <p>
-                                        <a href="/how">Click here to go to "How To Use" section</a>
+                                        <Link to="/how">
+                                            Click here to go to "How To Use" section
+                                        </Link>
                                     </p>
                                 </Message>
                             )}

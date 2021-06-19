@@ -21,11 +21,11 @@ function App() {
                 <Router>
                     <Navbar />
                     <Switch>
-                        <Route path="/" exact render={() => <SolverApp />} />
+                        <Route path="/" exact component={SolverApp} />
 
-                        <Route path="/how" exact render={() => <HowToUse />} />
+                        <Route path="/how" component={HowToUse} />
 
-                        <Route path="/about" exact render={() => <About />} />
+                        <Route path="/about" component={About} />
 
                         <Route component={PageNotFound} />
                     </Switch>

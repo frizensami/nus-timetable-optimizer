@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Input, Menu, Icon } from 'semantic-ui-react';
-import { NavLink, withRouter } from 'react-router-dom';
+import { NavLink, useRouteMatch } from 'react-router-dom';
 
 enum ActiveTab {
     SOLVER,
@@ -9,7 +9,9 @@ enum ActiveTab {
 }
 
 export const Navbar: React.FC = () => {
-    let [activeItem, setActiveItem] = useState<ActiveTab>(ActiveTab.SOLVER);
+    let homeMatch = useRouteMatch({ path: '/', exact: true });
+    let howMatch = useRouteMatch({ path: '/how', exact: true });
+    let aboutMatch = useRouteMatch({ path: '/about', exact: true });
 
     return (
         <Menu stackable size="massive">
@@ -23,22 +25,21 @@ export const Navbar: React.FC = () => {
                 to="/"
                 activeClassName="selected"
                 name="Solver"
-                active={activeItem === ActiveTab.SOLVER}
-                onClick={() => setActiveItem(ActiveTab.SOLVER)}
+                active={homeMatch !== null}
             />
             <Menu.Item
                 as={NavLink}
                 to="/how"
+                activeClassName="selected"
                 name="How To Use"
-                active={activeItem === ActiveTab.HOW_TO_USE}
-                onClick={() => setActiveItem(ActiveTab.HOW_TO_USE)}
+                active={howMatch !== null}
             />
             <Menu.Item
                 as={NavLink}
                 to="/about"
+                activeClassName="selected"
                 name="About"
-                active={activeItem === ActiveTab.ABOUT}
-                onClick={() => setActiveItem(ActiveTab.ABOUT)}
+                active={aboutMatch !== null}
             />
         </Menu>
     );
