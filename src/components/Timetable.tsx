@@ -139,8 +139,8 @@ function Timetable({ start_hour, end_hour, timetable }: TimetableProps) {
                 </Segment>
                 <Dimmer active={Object.keys(timetable).length > 0 && !timetable.is_sat}>
                     <Header as="h2" inverted color="red">
-                        There is no timetable that meets these constraints. <br /> <br />
-                        Please change your constraints or module list.
+                        Sorry! No timetable meets these constraints. <br /> <br />
+                        Please change your constraints or the list of modules.
                     </Header>
                 </Dimmer>
                 <Dimmer active={Object.keys(timetable).length === 0}>
