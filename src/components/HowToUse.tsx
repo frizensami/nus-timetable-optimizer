@@ -29,8 +29,8 @@ export const HowToUse: React.FC = () => {
 
                 <p>
                     {' '}
-                    This Optimizer helps you find an ideal timetable from a list of NUS modules that
-                    you enter, based on a set of constraints that you can specify.{' '}
+                    This Optimizer helps you find an ideal timetable from a list of NUS modules and
+                    a set of constraints that you specify.{' '}
                 </p>
                 <p>
                     {' '}
@@ -47,29 +47,21 @@ export const HowToUse: React.FC = () => {
                 <ul>
                     <li>
                         {' '}
-                        The Optimizer will download itself and begin the initialization process.{' '}
-                    </li>
-                    <li>
-                        {' '}
-                        During and after this process, you can use the{' '}
-                        <strong>Module Selector</strong> to add the modules you would like to
-                        eventually create an optimized timetable for.{' '}
-                    </li>
-                    <li>
-                        {' '}
-                        The Optimizer is not a module planner, so you can use something like{' '}
-                        <a href="https://nusmods.com" target="_blank" rel="noreferrer">
-                            NUSMods
-                        </a>{' '}
-                        to browse for your modules first.{' '}
+                        Add modules for your timetable using the <strong>Modules</strong> tab.
                     </li>
 
                     <li>
                         {' '}
-                        Modules can be set as <strong> "Compulsory" </strong> or{' '}
-                        <strong> "Optional" </strong>. A "Compulsory" module must be present in the
-                        final timetable, whereas an "Optional" module may be dropped if other
-                        constraints are violated.{' '}
+                        Set each module as <strong> "Required" </strong> (the default) or{' '}
+                        <strong> "Optional" </strong> by using the Make Required/Optional button. A
+                        "Required" module must be present in the final timetable, whereas an
+                        "Optional" module may be dropped if other constraints are violated.{' '}
+                    </li>
+
+                    <li>
+                        {' '}
+                        If necessary, use the "Restrict Slots" button to manually limit the
+                        timetable slots for each module (for e.g., to sync timetables with friends).
                     </li>
                 </ul>
 
@@ -80,22 +72,19 @@ export const HowToUse: React.FC = () => {
                 <ul>
                     <li>
                         {' '}
-                        After selecting all the modules you are interested in, you can use the{' '}
-                        <strong> Constraints </strong> region to set requirements for your generated
-                        timetable.{' '}
+                        Use the <strong> Constraints </strong> tab to set requirements for your
+                        generated timetable.{' '}
                     </li>
                     <li>
                         {' '}
                         For instance, the "Earliest Lesson Start/End" constraints ensure that no
                         module starts or ends after a certain time.{' '}
                     </li>
-                    <ul>
-                        <li>
-                            {' '}
-                            Note: you must <strong> activate the constraint </strong> (click on the
-                            "No" button to make it "Yes") for it to be used in the optimizer{' '}
-                        </li>
-                    </ul>
+                    <li>
+                        {' '}
+                        Note: you must <strong> enable the constraint </strong> (click on the
+                        toggle) for it to be used in the optimizer{' '}
+                    </li>
                 </ul>
 
                 <Header as="h3" textAlign="left">
@@ -105,14 +94,14 @@ export const HowToUse: React.FC = () => {
                 <ul>
                     <li>
                         {' '}
-                        Once the modules are selected and the constraints are set, press the{' '}
-                        <strong> Run Optimizer </strong> button to run the optimization procedure.{' '}
+                        Press the <strong> Run Optimizer </strong> button to run the optimization
+                        procedure.{' '}
                     </li>
                     <li> This might take a few seconds. </li>
                     <li>
                         {' '}
                         If the optimization succeeds and there are no timetable clashes, the
-                        timetable will update at the top of the screen{' '}
+                        timetable will appear at the top of the screen{' '}
                     </li>
                     <li>
                         {' '}
