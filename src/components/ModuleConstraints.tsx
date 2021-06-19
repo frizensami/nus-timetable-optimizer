@@ -198,6 +198,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                     <Form.Field
                         control={Select}
                         options={ay_xs}
+                        disabled={modules.length > 0}
                         defaultValue={defaultAyValue}
                         label="Academic Year"
                         onChange={(_: any, { value }: any) => setAyText(value as number)}
@@ -208,6 +209,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                         control={Select}
                         options={sem_xs}
                         defaultValue={defaultSemValue}
+                        disabled={modules.length > 0}
                         label="Semester"
                         onChange={(_: any, { value }: any) => setSemText(value as number)}
                         width={3}
