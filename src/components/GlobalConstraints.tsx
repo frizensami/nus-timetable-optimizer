@@ -144,14 +144,12 @@ const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({
     }
 
     function setStartTime(v: any) {
-        console.log(v);
         const timeStr = getTimeStr(v);
         const newState = { ...constraints, startTime: timeStr };
         _setConstraints(newState);
     }
 
     function setEndTime(v: any) {
-        console.log(v);
         const timeStr = getTimeStr(v);
         const newState = { ...constraints, endTime: timeStr };
         _setConstraints(newState);

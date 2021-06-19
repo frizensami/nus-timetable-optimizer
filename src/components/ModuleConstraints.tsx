@@ -16,8 +16,7 @@ import {
 import { NUSModsFrontend } from '../frontends/nusmods_frontend';
 import { getRandomColorFromString } from '../util/utils';
 import ModuleSlotSelector, { LessonTypeConstraints } from './ModuleSlotSelector';
-import { createMedia } from '@artsy/fresnel';
-
+import { Media } from './Responsive';
 interface ModuleConstraintsProps {
     modules: Array<ConstraintModule>;
     onModulesChange(mods: Array<ConstraintModule>): any;
@@ -177,15 +176,6 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
 
     // </Grid.Row>
 
-    const { MediaContextProvider, Media } = createMedia({
-        breakpoints: {
-            sm: 0,
-            md: 768,
-            lg: 1024,
-            xl: 1192,
-        },
-    });
-
     return (
         <div>
             <Header as="h3" textAlign="center">
@@ -249,24 +239,20 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
 
             {modules.length > 0 && (
                 <Table compact>
-                    <MediaContextProvider>
-                        <Media greaterThanOrEqual="md">
-                            {(mediaClassNames, renderChildren) => {
-                                return (
-                                    <Table.Header classNames={mediaClassNames}>
-                                        {renderChildren ? (
-                                            <Table.Row>
-                                                <Table.HeaderCell>Module</Table.HeaderCell>
-                                                <Table.HeaderCell width="5">
-                                                    Actions
-                                                </Table.HeaderCell>
-                                            </Table.Row>
-                                        ) : null}
-                                    </Table.Header>
-                                );
-                            }}
-                        </Media>
-                    </MediaContextProvider>
+                    <Media greaterThanOrEqual="md">
+                        {(mediaClassNames, renderChildren) => {
+                            return (
+                                <Table.Header classNames={mediaClassNames}>
+                                    {renderChildren ? (
+                                        <Table.Row>
+                                            <Table.HeaderCell>Module</Table.HeaderCell>
+                                            <Table.HeaderCell width="5">Actions</Table.HeaderCell>
+                                        </Table.Row>
+                                    ) : null}
+                                </Table.Header>
+                            );
+                        }}
+                    </Media>
 
                     <Table.Body>
                         {/* <Transition.Group duration={1000}> */}
