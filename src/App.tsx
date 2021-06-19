@@ -13,24 +13,27 @@ import Timetable from './components/Timetable';
 import { Solver } from './components/Solver';
 import { Divider } from 'semantic-ui-react';
 import PageNotFound from './components/PageNotFound';
+import { MediaContextProvider } from './components/Responsive';
 
 function App() {
     return (
         <div className="App">
-            <div className="ui basic segment">
-                <Router>
-                    <Navbar />
-                    <Switch>
-                        <Route path="/" exact render={() => <SolverApp />} />
+            <MediaContextProvider>
+                <div className="ui basic segment">
+                    <Router>
+                        <Navbar />
+                        <Switch>
+                            <Route path="/" exact component={SolverApp} />
 
-                        <Route path="/how" exact render={() => <HowToUse />} />
+                            <Route path="/how" component={HowToUse} />
 
-                        <Route path="/about" exact render={() => <About />} />
+                            <Route path="/about" component={About} />
 
-                        <Route component={PageNotFound} />
-                    </Switch>
-                </Router>
-            </div>
+                            <Route component={PageNotFound} />
+                        </Switch>
+                    </Router>
+                </div>
+            </MediaContextProvider>
         </div>
     );
 }

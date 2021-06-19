@@ -5,6 +5,7 @@ import logo from './logo.svg';
 
 import { Solver } from './Solver';
 import { Divider, Message, Container } from 'semantic-ui-react';
+import { Media } from './Responsive';
 const Timetable = React.lazy(() => import('./Timetable'));
 
 export const SolverApp: React.FC = () => {
@@ -16,7 +17,19 @@ export const SolverApp: React.FC = () => {
 
     return (
         <div>
-            <Message error>
+            <Media lessThan="md">
+                {(mediaClassNames, renderChildren) => {
+                    return renderChildren ? (
+                        <Message error>
+                            <Message.Header as="p" style={{ textAlign: 'center' }}>
+                                This application is best viewed on a desktop computer.
+                            </Message.Header>
+                        </Message>
+                    ) : null;
+                }}
+            </Media>
+
+            <Message info>
                 <Message.Header as="p" style={{ textAlign: 'center' }}>
                     The NUS Timetable Optimizer is in <em> Beta Testing Mode</em>. Please report any
                     errors or feedback to{' '}

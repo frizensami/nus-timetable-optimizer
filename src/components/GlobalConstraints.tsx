@@ -1,29 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './Solver.css';
-import {
-    Segment,
-    Button,
-    Container,
-    Divider,
-    Dropdown,
-    Dimmer,
-    Grid,
-    Menu,
-    Input,
-    Form,
-    Select,
-    Header,
-    Message,
-    Card,
-    Checkbox,
-    Item,
-    Transition,
-    Popup,
-} from 'semantic-ui-react';
+import { Divider, Dimmer, Input, Form, Select, Header, Checkbox } from 'semantic-ui-react';
 import * as Constants from '../core/constants';
-import { GlobalConstraintsList, defaultConstraints } from '../core/generic_timetable';
+import { GlobalConstraintsList } from '../core/generic_timetable';
 
 export interface GlobalConstraintsProps {
+    constraints: GlobalConstraintsList;
     onUpdateConstraints(newState: GlobalConstraintsList): any;
     numberOfModules: number;
 }
@@ -32,10 +14,10 @@ export interface GlobalConstraintsProps {
  * Responsible for setting constraints globally for all modules
  * */
 const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({
+    constraints,
     onUpdateConstraints,
     numberOfModules,
 }) => {
-    let [constraints, setConstraints] = useState<GlobalConstraintsList>(defaultConstraints);
     /**
      * GENERATORS
      * */
@@ -94,8 +76,6 @@ const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({
         return times;
     };
     const allLunchLengthSelections = generateLunchLengthSelections();
-    //@ts-ignore
-    // let [lunchLengthSelections, setLunchLengthSelections] = useState<any>(updateLunchLengthList(defaultConstraints.lunchStart, defaultConstraints.lunchEnd, false));
 
     /**
      * Setters / updaters
@@ -103,7 +83,6 @@ const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({
 
     function _setConstraints(newState: GlobalConstraintsList) {
         onUpdateConstraints(newState);
-        setConstraints(newState);
     }
 
     function updateMinWorkload(v: string) {
@@ -165,14 +144,12 @@ const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({
     }
 
     function setStartTime(v: any) {
-        console.log(v);
         const timeStr = getTimeStr(v);
         const newState = { ...constraints, startTime: timeStr };
         _setConstraints(newState);
     }
 
     function setEndTime(v: any) {
-        console.log(v);
         const timeStr = getTimeStr(v);
         const newState = { ...constraints, endTime: timeStr };
         _setConstraints(newState);
@@ -230,9 +207,9 @@ const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({
     }
 
     // Need to process a bit to set initial dropdown value
-    function getLunchStartEndSelectionFromDefaults() {
-        const start = defaultConstraints.lunchStart; // eg 1100
-        const end = defaultConstraints.lunchEnd; // eg 1500
+    function getLunchStartEndSelection() {
+        const start = constraints.lunchStart; // eg 1100
+        const end = constraints.lunchEnd; // eg 1500
         return [getTimeKeyFromStr(start), getTimeKeyFromStr(end)];
     }
 
@@ -254,35 +231,40 @@ const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({
                                 control={Input}
                                 label="Minimum Credits"
                                 type="number"
-                                defaultValue={defaultConstraints.minWorkload}
+                                defaultValue={constraints.minWorkload}
                                 min={0}
                                 step={1}
                                 onChange={(e: any) => updateMinWorkload(e.target.value)}
                                 width={5}
-                                fluid
                             />
                             <Form.Field
                                 id="form-input-max-workload"
                                 control={Input}
                                 label="Maximum Credits"
                                 type="number"
-                                defaultValue={defaultConstraints.maxWorkload}
+                                defaultValue={constraints.maxWorkload}
                                 min="0"
                                 step="1"
                                 onChange={(e: any) => updateMaxWorkload(e.target.value)}
-                                fluid
                                 width={5}
                             />
-                            <Form.Field
-                                control={Button}
-                                label="Constraint Activated?"
-                                toggle
-                                active={constraints.workloadActive}
-                                onClick={toggleWorkloadActive}
-                                content={constraints.workloadActive ? 'Yes' : 'No'}
-                                fluid
-                                width={6}
-                            />
+                            <Form.Field width={6}>
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        height: '100%',
+                                    }}
+                                >
+                                    <Checkbox
+                                        label="Enabled"
+                                        toggle
+                                        checked={constraints.workloadActive}
+                                        onClick={toggleWorkloadActive}
+                                    />
+                                </div>
+                            </Form.Field>
                         </Form.Group>
 
                         <Divider />
@@ -292,10 +274,13 @@ const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({
                                 id="form-input-earliest-start"
                                 control={Select}
                                 options={timeSelections}
-                                defaultValue={timeSelections[0].value}
+                                defaultValue={
+                                    constraints.startTime
+                                        ? getTimeKeyFromStr(constraints.startTime)
+                                        : timeSelections[0].value
+                                }
                                 label="Earliest Lesson Start"
                                 width={5}
-                                fluid
                                 search
                                 onChange={(_: any, { value }: any) => setStartTime(value)}
                             />
@@ -303,23 +288,33 @@ const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({
                                 id="form-input-latest-end"
                                 control={Select}
                                 options={timeSelections}
-                                defaultValue={timeSelections[timeSelections.length - 1].value}
+                                defaultValue={
+                                    constraints.endTime
+                                        ? getTimeKeyFromStr(constraints.endTime)
+                                        : timeSelections[timeSelections.length - 1].value
+                                }
                                 label="Latest Lesson End"
-                                fluid
                                 width={5}
                                 search
                                 onChange={(_: any, { value }: any) => setEndTime(value)}
                             />
-                            <Form.Field
-                                control={Button}
-                                label="Constraint Activated?"
-                                toggle
-                                active={constraints.timeConstraintActive}
-                                onClick={toggleTimeConstraintActive}
-                                content={constraints.timeConstraintActive ? 'Yes' : 'No'}
-                                fluid
-                                width={6}
-                            />
+                            <Form.Field width={6}>
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        height: '100%',
+                                    }}
+                                >
+                                    <Checkbox
+                                        label="Enabled"
+                                        toggle
+                                        checked={constraints.timeConstraintActive}
+                                        onClick={toggleTimeConstraintActive}
+                                    />
+                                </div>
+                            </Form.Field>
                         </Form.Group>
 
                         <Divider />
@@ -329,22 +324,31 @@ const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({
                                 id="form-input-num-free-days"
                                 control={Select}
                                 options={freeDaySelections}
-                                defaultValue={freeDaySelections[0].key}
+                                defaultValue={
+                                    constraints.numRequiredFreeDays || freeDaySelections[0].key
+                                }
                                 label="Number of Free Days Wanted"
                                 width={10}
-                                fluid
                                 onChange={(_: any, { value }: any) => setNumFreeDays(value)}
                             />
-                            <Form.Field
-                                control={Button}
-                                label="Constraint Activated?"
-                                toggle
-                                active={constraints.freeDayActive}
-                                onClick={toggleFreeDayActive}
-                                content={constraints.freeDayActive ? 'Yes' : 'No'}
-                                fluid
-                                width={6}
-                            />
+
+                            <Form.Field width={6}>
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        height: '100%',
+                                    }}
+                                >
+                                    <Checkbox
+                                        label="Enabled"
+                                        toggle
+                                        checked={constraints.freeDayActive}
+                                        onClick={toggleFreeDayActive}
+                                    />
+                                </div>
+                            </Form.Field>
                         </Form.Group>
 
                         <Divider />
@@ -354,23 +358,30 @@ const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({
                                 id="form-input-which-fre-days"
                                 control={Select}
                                 options={freeDayofWeekSelection}
-                                fluid
                                 multiple
                                 selection
+                                defaultValue={constraints.specificFreeDays}
                                 label="Specific Free Days Wanted"
                                 width={10}
                                 onChange={(_: any, { value }: any) => setSpecificFreeDays(value)}
                             />
-                            <Form.Field
-                                control={Button}
-                                label="Constraint Activated?"
-                                toggle
-                                active={constraints.specificFreeDaysActive}
-                                onClick={toggleSpecificFreeDaysActive}
-                                content={constraints.specificFreeDaysActive ? 'Yes' : 'No'}
-                                fluid
-                                width={6}
-                            />
+                            <Form.Field width={6}>
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        height: '100%',
+                                    }}
+                                >
+                                    <Checkbox
+                                        label="Enabled"
+                                        toggle
+                                        checked={constraints.specificFreeDaysActive}
+                                        onClick={toggleSpecificFreeDaysActive}
+                                    />
+                                </div>
+                            </Form.Field>
                         </Form.Group>
 
                         <Divider />
@@ -380,10 +391,9 @@ const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({
                                 id="form-input-lunch-start"
                                 control={Select}
                                 options={timeSelections}
-                                defaultValue={getLunchStartEndSelectionFromDefaults()[0]}
+                                defaultValue={getLunchStartEndSelection()[0]}
                                 label="Lunch Period Start"
                                 width={8}
-                                fluid
                                 search
                                 onChange={(_: any, { value }: any) => updateLunchStart(value)}
                             />
@@ -391,9 +401,8 @@ const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({
                                 id="form-input-lunch-end"
                                 control={Select}
                                 options={timeSelections}
-                                defaultValue={getLunchStartEndSelectionFromDefaults()[1]}
+                                defaultValue={getLunchStartEndSelection()[1]}
                                 label="Lunch Period End"
-                                fluid
                                 width={8}
                                 search
                                 onChange={(_: any, { value }: any) => updateLunchEnd(value)}
@@ -406,35 +415,38 @@ const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({
                                 control={Select}
                                 label="Minimum Lunch Duration within Lunch Period"
                                 options={allLunchLengthSelections}
-                                defaultValue={defaultConstraints.lunchHalfHours}
+                                defaultValue={constraints.lunchHalfHours}
                                 onChange={(_: any, { value }: any) => updateLunchLength(value)}
-                                fluid
                                 width={10}
                             />
-
-                            <Form.Field
-                                control={Button}
-                                label="Constraint Activated?"
-                                toggle
-                                active={constraints.lunchBreakActive}
-                                onClick={toggleLunchBreakActive}
-                                content={constraints.lunchBreakActive ? 'Yes' : 'No'}
-                                fluid
-                                width={6}
-                            />
+                            <Form.Field width={6}>
+                                <div
+                                    style={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        height: '100%',
+                                    }}
+                                >
+                                    <Checkbox
+                                        label="Enabled"
+                                        toggle
+                                        checked={constraints.lunchBreakActive}
+                                        onClick={toggleLunchBreakActive}
+                                    />
+                                </div>
+                            </Form.Field>
                         </Form.Group>
 
                         <Divider />
 
                         <Form.Group widths="equal">
                             <Form.Field
-                                control={Button}
+                                control={Checkbox}
                                 label="Make timetable as compact as possible? Warning: optimizer might become very slow!"
                                 toggle
-                                active={constraints.preferCompactTimetable}
+                                checked={constraints.preferCompactTimetable}
                                 onClick={toggleCompactTimetable}
-                                content={constraints.preferCompactTimetable ? 'Yes' : 'No'}
-                                fluid
                             />
                         </Form.Group>
 
