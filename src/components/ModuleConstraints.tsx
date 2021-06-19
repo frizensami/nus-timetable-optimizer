@@ -18,6 +18,7 @@ import { getRandomColorFromString } from '../util/utils';
 import ModuleSlotSelector, { LessonTypeConstraints } from './ModuleSlotSelector';
 
 interface ModuleConstraintsProps {
+    modules: Array<ConstraintModule>;
     onModulesChange(mods: Array<ConstraintModule>): any;
 }
 
@@ -34,7 +35,7 @@ export interface ConstraintModule {
  * Responsible for setting constraints individually for all selected modules.
  * Also contains a selector (combined here to keep state contained) for the modules
  * */
-const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }) => {
+const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModulesChange }) => {
     let ay_xs: Array<any> = [{ key: 1, text: '2020-2021', value: 1 }];
     let sem_xs: Array<any> = [
         { key: 1, text: '1', value: 1 },
@@ -46,7 +47,6 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }
     let [moduleText, setModuleText] = useState('');
     let [ayValue, setAyText] = useState(defaultAyValue);
     let [semValue, setSemText] = useState(defaultSemValue);
-    let [modules, setModules] = useState<Array<ConstraintModule>>([]);
     let [showModuleAddError, setShowModuleAddError] = useState(false);
     let [activeErrorCancelTimeout, setActiveErrorCancelTimeout] = useState<any>(undefined);
     let [open, setOpen] = useState(false);
@@ -96,20 +96,17 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }
                     if (timetable.some((lesson: any) => !Array.isArray(lesson.weeks))) {
                         setOpen(true);
                         let mods = modules.concat(mod);
-                        setModules(mods);
                         onModulesChange(mods);
                     } else if (modules.length > 0 && mod.semester !== modules[0].semester) {
                         console.log('Diff sem');
                         // Our new module is from a different semester than the rest
                         setOpen2(true);
                         let mods = modules.concat(mod);
-                        setModules(mods);
                         onModulesChange(mods);
                     } else {
                         console.log('Successfully added module!');
                         setShowModuleAddError(false);
                         let mods = modules.concat(mod);
-                        setModules(mods);
                         onModulesChange(mods);
                     }
                 }
@@ -119,10 +116,9 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }
 
     function removeLatestModuleAndClose() {
         let mods = modules.slice(0, -1);
-        setModules(mods);
-        onModulesChange(mods);
         setOpen(false);
         setOpen2(false);
+        onModulesChange(mods);
     }
 
     function cancelErrorAfterInterval() {
@@ -142,13 +138,11 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }
                 return m;
             }
         });
-        setModules(mods);
         onModulesChange(mods);
     }
 
     function removeModule(mod: ConstraintModule) {
         let newmods = modules.filter(m => m !== mod);
-        setModules(newmods);
         onModulesChange(newmods);
     }
 
@@ -174,7 +168,6 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ onModulesChange }
                 return m;
             }
         });
-        setModules(mods);
         onModulesChange(mods);
     }
 

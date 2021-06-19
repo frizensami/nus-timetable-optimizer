@@ -35,8 +35,8 @@ enum Z3State {
 export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNewTimetable }) => {
     let [smtlibInput, setSmtlibInput] = useState<string>('No input yet.');
     let [smtlibOutput, setSmtlibOutput] = useState<string>('No output yet.');
-    let [shouldShowHelp, setShouldShowHelp] = useState<boolean>(true)
-    let [modules, setModules] = useState<Array<ModuleToAdd>>([]);
+    let [shouldShowHelp, setShouldShowHelp] = useState<boolean>(true);
+    let [modules, setModules] = useState<Array<ConstraintModule>>([]);
     let [z3State, setZ3State] = useState<Z3State>(Z3State.PRE_INIT);
     let [constraints, setConstraints] = useState<GlobalConstraintsList>(defaultConstraints);
     let [debugOpen, setDebugOpen] = useState<boolean>(false);
@@ -79,7 +79,16 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
         // console.log(worker)
         let nusmods_fe = new NUSModsFrontend();
 
-        nusmods_fe.add_modules(modules).then(() => {
+        const modules_to_add: Array<ModuleToAdd> = modules.map((mod: ConstraintModule) => {
+            return {
+                module_code: mod.module_code,
+                acad_year: mod.acad_year,
+                semester: mod.semester,
+                is_compulsory: mod.required,
+                lessonConstraints: mod.lessonConstraints,
+            };
+        });
+        nusmods_fe.add_modules(modules_to_add).then(() => {
             console.log(nusmods_fe);
             const gt: GenericTimetable = nusmods_fe.create_timetable(constraints);
             Z3Manager.loadTimetable(gt);
@@ -91,17 +100,7 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
     function onModulesChange(mods: Array<ConstraintModule>) {
         console.log(`onModulesChange: ${mods}`);
         setShouldShowHelp(false);
-        setModules(
-            mods.map((mod: ConstraintModule) => {
-                return {
-                    module_code: mod.module_code,
-                    acad_year: mod.acad_year,
-                    semester: mod.semester,
-                    is_compulsory: mod.required,
-                    lessonConstraints: mod.lessonConstraints,
-                };
-            })
-        );
+        setModules(mods);
     }
 
     return (
@@ -134,6 +133,7 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
                                                     }
                                                 >
                                                     <ModuleConstraints
+                                                        modules={modules}
                                                         onModulesChange={onModulesChange}
                                                     />
                                                 </Suspense>
