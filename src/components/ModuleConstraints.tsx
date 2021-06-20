@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './Solver.css';
 import {
     Button,
@@ -57,6 +57,15 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
     let [openSlotSelector, setOpenSlotSelector] = useState(false);
     let [selectedMod, setSelectedMod] = useState<ConstraintModule | undefined>(undefined);
 
+    useEffect(() => {
+        for (const module of modules) {
+            if (!module.json) {
+                // populate json field and then trigger a re-render
+                populateModuleConstraintJsonField(module).then(_ => onModulesChange([...modules]))
+            }
+        }
+    }, [modules])
+
     /*
      * Try to add a module to the current list of modules
      */
@@ -81,13 +90,20 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
             return;
         }
 
-        NUSModsFrontend.read_module_json(mod.module_code, mod.acad_year, mod.semester).then(
+        populateModuleConstraintJsonField(mod)
+            .then((res: boolean) => res && onModulesChange(modules.concat(mod)))
+    }
+
+    // return a boolean which indicates whether module can be found
+    function populateModuleConstraintJsonField(mod: ConstraintModule) {
+        return NUSModsFrontend.read_module_json(mod.module_code, mod.acad_year, mod.semester).then(
             (moduleJson: any) => {
                 console.log(moduleJson);
                 if (Object.keys(moduleJson).length === 0) {
                     console.log("Couldn't add module!");
                     setShowModuleAddError(true);
                     cancelErrorAfterInterval();
+                    return false;
                 } else {
                     mod.json = moduleJson;
                     const data = mod.json;
@@ -98,20 +114,15 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                     // If any lesson doesn't have a weeks array, show the modal
                     if (timetable.some((lesson: any) => !Array.isArray(lesson.weeks))) {
                         setOpen(true);
-                        let mods = modules.concat(mod);
-                        onModulesChange(mods);
                     } else if (modules.length > 0 && mod.semester !== modules[0].semester) {
                         console.log('Diff sem');
                         // Our new module is from a different semester than the rest
                         setOpen2(true);
-                        let mods = modules.concat(mod);
-                        onModulesChange(mods);
                     } else {
                         console.log('Successfully added module!');
                         setShowModuleAddError(false);
-                        let mods = modules.concat(mod);
-                        onModulesChange(mods);
                     }
+                    return true
                 }
             }
         );
@@ -248,7 +259,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                     <Media greaterThanOrEqual="md">
                         {(mediaClassNames, renderChildren) => {
                             return (
-                                <Table.Header classNames={mediaClassNames}>
+                                <Table.Header className={mediaClassNames}>
                                     {renderChildren ? (
                                         <Table.Row>
                                             <Table.HeaderCell>Module</Table.HeaderCell>
@@ -263,9 +274,10 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                     <Table.Body>
                         {/* <Transition.Group duration={1000}> */}
                         {modules.map((mod: ConstraintModule, idx: number) => {
+                            if (!mod.json) return null // skip if mod.json hasn't been populated
                             let color = getRandomColorFromString(mod.module_code);
                             return (
-                                <Table.Row>
+                                <Table.Row key={mod.module_code}>
                                     <Table.Cell>
                                         <span
                                             style={{
