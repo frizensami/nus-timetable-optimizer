@@ -47,3 +47,5 @@ For production builds, run `npm run build`, which builds all assets into the `bu
 ## Contributing
 - Please do open a new Issue if you encounter a bug, or would like a particular feature added.
 - Feel free to send a pull request to add features as well.
+
+This is an extra line to test pull request templates
