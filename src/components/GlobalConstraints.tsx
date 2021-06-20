@@ -437,7 +437,9 @@ const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({
                                     }}
                                 >
                                     <Checkbox
-                                        label="Enabled"
+                                        label={
+                                            constraints.lunchBreakActive ? 'Enabled' : 'Disabled'
+                                        }
                                         toggle
                                         checked={constraints.lunchBreakActive}
                                         onClick={toggleLunchBreakActive}
