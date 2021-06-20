@@ -258,7 +258,7 @@ const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({
                                     }}
                                 >
                                     <Checkbox
-                                        label="Enabled"
+                                        label={constraints.workloadActive ? 'Enabled' : 'Disabled'}
                                         toggle
                                         checked={constraints.workloadActive}
                                         onClick={toggleWorkloadActive}
@@ -308,7 +308,11 @@ const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({
                                     }}
                                 >
                                     <Checkbox
-                                        label="Enabled"
+                                        label={
+                                            constraints.timeConstraintActive
+                                                ? 'Enabled'
+                                                : 'Disabled'
+                                        }
                                         toggle
                                         checked={constraints.timeConstraintActive}
                                         onClick={toggleTimeConstraintActive}
@@ -342,7 +346,7 @@ const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({
                                     }}
                                 >
                                     <Checkbox
-                                        label="Enabled"
+                                        label={constraints.freeDayActive ? 'Enabled' : 'Disabled'}
                                         toggle
                                         checked={constraints.freeDayActive}
                                         onClick={toggleFreeDayActive}
@@ -375,7 +379,11 @@ const GlobalConstraints: React.FC<GlobalConstraintsProps> = ({
                                     }}
                                 >
                                     <Checkbox
-                                        label="Enabled"
+                                        label={
+                                            constraints.specificFreeDaysActive
+                                                ? 'Enabled'
+                                                : 'Disabled'
+                                        }
                                         toggle
                                         checked={constraints.specificFreeDaysActive}
                                         onClick={toggleSpecificFreeDaysActive}
