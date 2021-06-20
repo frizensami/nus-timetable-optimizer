@@ -36,7 +36,10 @@ export interface ConstraintModule {
  * Also contains a selector (combined here to keep state contained) for the modules
  * */
 const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModulesChange }) => {
-    let ay_xs: Array<any> = [{ key: 1, text: '2020-2021', value: 1 }];
+    let ay_xs: Array<any> = [
+        { key: 1, text: '2021-2022', value: 1 },
+        { key: 2, text: '2020-2021', value: 2 },
+    ];
     let sem_xs: Array<any> = [
         { key: 1, text: '1', value: 1 },
         { key: 2, text: '2', value: 2 },

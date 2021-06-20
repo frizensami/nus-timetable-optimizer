@@ -46,7 +46,7 @@ export const SolverApp: React.FC = () => {
                     </a>
                     .
                     <br />
-                    Modules for AY2021/22 should be updated in sync with NUSMods on 20th June 2021.
+                    Modules for AY2021/22 are now available!
                 </Message.Header>
             </Message>
 
