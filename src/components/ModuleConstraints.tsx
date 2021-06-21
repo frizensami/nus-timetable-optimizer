@@ -12,6 +12,7 @@ import {
     Message,
     Transition,
     Table,
+    Popup,
 } from 'semantic-ui-react';
 import { NUSModsFrontend } from '../frontends/nusmods_frontend';
 import { getRandomColorFromString } from '../util/utils';
@@ -50,6 +51,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
     let [moduleText, setModuleText] = useState('');
     let [ayValue, setAyText] = useState(defaultAyValue);
     let [semValue, setSemText] = useState(defaultSemValue);
+    let [shareUrl, setShareUrl] = useState('');
     let [showModuleAddError, setShowModuleAddError] = useState(false);
     let [showShareLinkError, setShowShareLinkError] = useState(false);
     let [open, setOpen] = useState(false);
@@ -167,8 +169,8 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
         const target = e.target as typeof e.target & {
             shareLink: { value: string };
         };
-        const shareLink = target.shareLink.value;
-        if (parseShareLink(shareLink)) {
+        if (parseShareLink(shareUrl)) {
+            setShareUrl(''); // reset field if successful
             target.shareLink.value = ''; // reset field if successful
         }
     }
@@ -255,6 +257,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                         name="shareLink"
                         control={Input}
                         type="url"
+                        onChange={(e: any) => setShareUrl(e.target.value)}
                         label="NUSMods Share Link"
                         placeholder="e.g., https://nusmods.com/timetable/sem-1/share?CS1010=LEC:1"
                         fluid
@@ -265,6 +268,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                         type="submit"
                         content="Add Modules from Link"
                         primary
+                        disabled={shareUrl.length === 0}
                         label="&nbsp;"
                         fluid
                         width={4}
@@ -331,10 +335,12 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                     </p>
                 </Message>
             </Transition>
-            <Transition visible={showShareLinkError} animation="fade" duration={1000}>
+            <Transition visible={showShareLinkError} animation="fade" duration={3000}>
                 <Message negative>
                     <Message.Header>
-                        {"Seems like the share link you specified isn't in the right format :("}
+                        {
+                            "The share link you specified isn't in the right format :( Please generate it from the Share/Sync button in NUSMods!"
+                        }
                     </Message.Header>
                 </Message>
             </Transition>
@@ -349,12 +355,40 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                                             <Table.HeaderCell>Module</Table.HeaderCell>
                                             <Table.HeaderCell width="5">Actions</Table.HeaderCell>
                                             <Table.HeaderCell width="1">
-                                                <Button basic icon onClick={removeAllModules}>
-                                                    <Icon name="trash" />
-                                                </Button>
+                                                <Popup
+                                                    content="Remove all modules"
+                                                    trigger={
+                                                        <Button
+                                                            color="red"
+                                                            basic
+                                                            icon
+                                                            onClick={removeAllModules}
+                                                        >
+                                                            <Icon name="trash" />
+                                                        </Button>
+                                                    }
+                                                />
                                             </Table.HeaderCell>
                                         </Table.Row>
-                                    ) : null}
+                                    ) : (
+                                        <Table.Row>
+                                            <Table.HeaderCell width="1">
+                                                <Popup
+                                                    content="Remove all modules"
+                                                    trigger={
+                                                        <Button
+                                                            color="red"
+                                                            basic
+                                                            icon
+                                                            onClick={removeAllModules}
+                                                        >
+                                                            <Icon name="trash" />
+                                                        </Button>
+                                                    }
+                                                />
+                                            </Table.HeaderCell>
+                                        </Table.Row>
+                                    )}
                                 </Table.Header>
                             );
                         }}
