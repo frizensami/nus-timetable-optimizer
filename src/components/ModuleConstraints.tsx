@@ -62,10 +62,10 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
         for (const module of modules) {
             if (!module.json) {
                 // populate json field and then trigger a re-render
-                populateModuleConstraintJsonField(module).then(_ => onModulesChange([...modules]))
+                populateModuleConstraintJsonField(module).then(_ => onModulesChange([...modules]));
             }
         }
-    }, [modules])
+    }, [modules]);
 
     /*
      * Try to add a module to the current list of modules
@@ -90,8 +90,9 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
             return;
         }
 
-        populateModuleConstraintJsonField(mod)
-            .then((res: boolean) => res && onModulesChange(modules.concat(mod)))
+        populateModuleConstraintJsonField(mod).then(
+            (res: boolean) => res && onModulesChange(modules.concat(mod))
+        );
     }
 
     // return a boolean which indicates whether module can be found
@@ -121,7 +122,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                         console.log('Successfully added module!');
                         setShowModuleAddError(false);
                     }
-                    return true
+                    return true;
                 }
             }
         );
@@ -130,31 +131,29 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
     // return a boolean which indicates whether link is of the expected type
     function parseShareLink(link: string): boolean {
         try {
-            const url = new URL(link)
+            const url = new URL(link);
             // expected url: /timetable/sem-1/share?
-            const sem = url.pathname.match(/\/timetable\/sem-(?<sem>[1,2])\/share?/)?.groups?.sem
+            const sem = url.pathname.match(/\/timetable\/sem-(?<sem>[1,2])\/share?/)?.groups?.sem;
             if (sem == null) {
-                console.log("Share URL incorrect format!")
+                console.log('Share URL incorrect format!');
                 showErrorThenCancelAfterInterval(setShowShareLinkError);
                 return false;
             }
             const ay = ay_xs.find(x => x.value == ayValue);
-            const params: URLSearchParams = new URLSearchParams(url.search)
-            const mods: Array<ConstraintModule> = [...modules]
+            const params: URLSearchParams = new URLSearchParams(url.search);
+            const mods: Array<ConstraintModule> = [...modules];
             for (const module_code of params.keys()) {
                 // only push if the module wasn't there already
-                if (!mods.some(
-                    (m: ConstraintModule) => m.module_code === module_code
-                )) {
+                if (!mods.some((m: ConstraintModule) => m.module_code === module_code)) {
                     mods.push({
                         module_code: module_code.toUpperCase(),
                         acad_year: ay.text,
                         semester: Number(sem),
                         required: true,
-                    })
+                    });
                 }
             }
-            onModulesChange(mods)
+            onModulesChange(mods);
             return true;
         } catch (e) {
             // catching url mistakes in case html validation doesn't catch
@@ -171,7 +170,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
         };
         const shareLink = target.shareLink.value;
         if (parseShareLink(shareLink)) {
-            target.shareLink.value = '' // reset field if successful
+            target.shareLink.value = ''; // reset field if successful
         }
     }
 
@@ -242,9 +241,8 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
         <div>
             <Header as="h3" textAlign="center">
                 {' '}
-                Module Selector{' '}
+                Add modules using the Share/Sync link from your NUSMods timetable{' '}
             </Header>
-
             {/* Insert NUSMods timetable. This is an uncontrolled React form. */}
             <Form onSubmit={handleShareLink}>
                 <Form.Group>
@@ -261,7 +259,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                     <Form.Field
                         control={Button}
                         type="submit"
-                        content="Populate Module"
+                        content="Add Modules from Link"
                         primary
                         label="&nbsp;"
                         fluid
@@ -270,6 +268,10 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                 </Form.Group>
             </Form>
 
+            <Header as="h3" textAlign="center">
+                {' '}
+                or add them directly{' '}
+            </Header>
             {/* Display module selector */}
             <Form>
                 <Form.Group>
@@ -315,7 +317,6 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                     />
                 </Form.Group>
             </Form>
-
             <Transition visible={showModuleAddError} animation="fade" duration={1000}>
                 <Message negative>
                     <Message.Header>
@@ -326,15 +327,13 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                     </p>
                 </Message>
             </Transition>
-
             <Transition visible={showShareLinkError} animation="fade" duration={1000}>
                 <Message negative>
                     <Message.Header>
-                        {"Seems like the share url you specified isn't quite right [="}
+                        {"Seems like the share link you specified isn't in the right format :("}
                     </Message.Header>
                 </Message>
             </Transition>
-
             {modules.length > 0 && (
                 <Table compact>
                     <Media greaterThanOrEqual="md">
@@ -355,7 +354,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                     <Table.Body>
                         {/* <Transition.Group duration={1000}> */}
                         {modules.map((mod: ConstraintModule, idx: number) => {
-                            if (!mod.json) return null // skip if mod.json hasn't been populated
+                            if (!mod.json) return null; // skip if mod.json hasn't been populated
                             let color = getRandomColorFromString(mod.module_code);
                             return (
                                 <Table.Row key={mod.module_code}>
@@ -412,7 +411,6 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                     </Table.Body>
                 </Table>
             )}
-
             <Modal onClose={() => setOpen(false)} onOpen={() => setOpen(true)} open={open}>
                 <Modal.Header>
                     The module you are adding does not follow the traditional NUS Academic Semester
@@ -446,7 +444,6 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                     </Grid>
                 </Modal.Actions>
             </Modal>
-
             <Modal onClose={() => setOpen2(false)} onOpen={() => setOpen2(true)} open={open2}>
                 <Modal.Header>
                     The module you are adding is from a different semester than the rest of the
@@ -478,7 +475,6 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                     </Grid>
                 </Modal.Actions>
             </Modal>
-
             <ModuleSlotSelector
                 open={openSlotSelector}
                 updateOpen={updateOpenSlotSelector}
