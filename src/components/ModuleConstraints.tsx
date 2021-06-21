@@ -208,7 +208,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
     }
 
     function removeAllModules() {
-        onModulesChange([])
+        onModulesChange([]);
     }
 
     function manualSelect(mod: ConstraintModule) {
@@ -256,7 +256,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                         control={Input}
                         type="url"
                         label="NUSMods Share Link"
-                        placeholder="https://nusmods.com/timetable/sem-1/share?CS1010=LEC:1"
+                        placeholder="e.g., https://nusmods.com/timetable/sem-1/share?CS1010=LEC:1"
                         fluid
                         width={12}
                     />

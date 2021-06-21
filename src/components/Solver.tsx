@@ -11,7 +11,7 @@ import {
     Loader,
     Dimmer,
     Checkbox,
-    Tab
+    Tab,
 } from 'semantic-ui-react';
 import {
     GenericTimetable,
@@ -34,8 +34,12 @@ enum Z3State {
 }
 
 export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNewTimetable }) => {
-    let [smtlibInput, setSmtlibInput] = useState<string>('No input yet.');
-    let [smtlibOutput, setSmtlibOutput] = useState<string>('No output yet.');
+    let [smtlibInput, setSmtlibInput] = useState<string>(
+        'No input yet, please run the optimizer first.'
+    );
+    let [smtlibOutput, setSmtlibOutput] = useState<string>(
+        'No output yet, please run the optimizer first.'
+    );
     let [shouldShowHelp, setShouldShowHelp] = useState<boolean>(true);
     let [modules, setModules] = useState<Array<ConstraintModule>>([]);
     let [z3State, setZ3State] = useState<Z3State>(Z3State.PRE_INIT);
