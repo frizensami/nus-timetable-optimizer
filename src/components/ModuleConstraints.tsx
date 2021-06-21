@@ -52,7 +52,6 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
     let [semValue, setSemText] = useState(defaultSemValue);
     let [showModuleAddError, setShowModuleAddError] = useState(false);
     let [showShareLinkError, setShowShareLinkError] = useState(false);
-    let [activeErrorCancelTimeout, setActiveErrorCancelTimeout] = useState<any>(undefined);
     let [open, setOpen] = useState(false);
     let [open2, setOpen2] = useState(false);
     let [openSlotSelector, setOpenSlotSelector] = useState(false);
@@ -182,12 +181,13 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
     }
 
     function showErrorThenCancelAfterInterval(fn: (a: boolean) => void) {
+        // show error
         fn(true);
-        if (activeErrorCancelTimeout !== undefined) clearTimeout(activeErrorCancelTimeout);
+
+        // set timeout
         let t = setTimeout(() => {
             fn(false);
         }, 3000);
-        setActiveErrorCancelTimeout(t);
     }
 
     function toggleRequired(mod: ConstraintModule) {
