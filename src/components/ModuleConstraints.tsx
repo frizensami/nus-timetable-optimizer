@@ -95,7 +95,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
     }
 
     // return a boolean which indicates whether module can be found
-    function populateModuleConstraintJsonField(mod: ConstraintModule) {
+    function populateModuleConstraintJsonField(mod: ConstraintModule): Promise<boolean> {
         return NUSModsFrontend.read_module_json(mod.module_code, mod.acad_year, mod.semester).then(
             (moduleJson: any) => {
                 console.log(moduleJson);
@@ -126,6 +126,52 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                 }
             }
         );
+    }
+
+    // return a boolean which indicates whether link is of the expected type
+    function parseShareLink(link: string): boolean {
+        try {
+            const url = new URL(link)
+            // expected url: /timetable/sem-1/share?
+            const sem = url.pathname.match(/\/timetable\/sem-(?<sem>[1,2])\/share?/)?.groups?.sem
+            if (sem == null) {
+                alert("Share URL incorrect format!")
+                return false;
+            }
+            const ay = ay_xs.find(x => x.value == ayValue);
+            const params: URLSearchParams = new URLSearchParams(url.search)
+            const mods: Array<ConstraintModule> = [...modules]
+            for (const module_code of params.keys()) {
+                // only push if the module wasn't there already
+                if (!mods.some(
+                    (m: ConstraintModule) => m.module_code === module_code
+                )) {
+                    mods.push({
+                        module_code: module_code.toUpperCase(),
+                        acad_year: ay.text,
+                        semester: Number(sem),
+                        required: true,
+                    })
+                }
+            }
+            onModulesChange(mods)
+            return true;
+        } catch (e) {
+            // catching url mistakes in case html validation is mistakenly deleted
+            console.log(e);
+            return false;
+        }
+    }
+
+    function handleShareLink(e: React.SyntheticEvent) {
+        e.preventDefault();
+        const target = e.target as typeof e.target & {
+            shareLink: { value: string };
+        };
+        const shareLink = target.shareLink.value;
+        if (parseShareLink(shareLink)) {
+            target.shareLink.value = '' // reset field if successful
+        }
     }
 
     function removeLatestModuleAndClose() {
@@ -196,6 +242,31 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                 {' '}
                 Module Selector{' '}
             </Header>
+
+            {/* Insert NUSMods timetable. This is an uncontrolled React form. */}
+            <Form onSubmit={handleShareLink}>
+                <Form.Group>
+                    <Form.Field
+                        id="form-input-share-link"
+                        name="shareLink"
+                        control={Input}
+                        type="url"
+                        label="NUSMods Share Link"
+                        placeholder="https://nusmods.com/timetable/sem-1/share?CS1010=LEC:1"
+                        fluid
+                        width={12}
+                    />
+                    <Form.Field
+                        control={Button}
+                        type="submit"
+                        content="Populate Module"
+                        primary
+                        label="&nbsp;"
+                        fluid
+                        width={4}
+                    />
+                </Form.Group>
+            </Form>
 
             {/* Display module selector */}
             <Form>

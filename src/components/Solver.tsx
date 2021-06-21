@@ -11,9 +11,7 @@ import {
     Loader,
     Dimmer,
     Checkbox,
-    Tab,
-    Form,
-    Input,
+    Tab
 } from 'semantic-ui-react';
 import {
     GenericTimetable,
@@ -40,7 +38,6 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
     let [smtlibOutput, setSmtlibOutput] = useState<string>('No output yet.');
     let [shouldShowHelp, setShouldShowHelp] = useState<boolean>(true);
     let [modules, setModules] = useState<Array<ConstraintModule>>([]);
-    let [shareLink, setShareLink] = useState('');
     let [z3State, setZ3State] = useState<Z3State>(Z3State.PRE_INIT);
     let [constraints, setConstraints] = useState<GlobalConstraintsList>(defaultConstraints);
     let [debugOpen, setDebugOpen] = useState<boolean>(false);
@@ -107,39 +104,6 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
         setModules(mods);
     }
 
-    function parseShareLink(link: string) {
-        try {
-            const url = new URL(link) // expected url: /timetable/sem-1/share?
-            const sem = url.pathname.match(/\/timetable\/sem-(?<sem>[1,2])\/share?/)?.groups?.sem
-            if (sem == null) {
-                alert("Share URL incorrect format!")
-            }
-            const params: URLSearchParams = new URLSearchParams(url.search)
-            const mods: Array<ConstraintModule> = [...modules]
-            for (const module_code of params.keys()) {
-                // only push if the module wasn't there already
-                if (!mods.some(
-                    (m: ConstraintModule) => m.module_code === module_code
-                )) {
-                    mods.push({
-                        module_code: module_code.toUpperCase(),
-                        acad_year: '2021-2022',
-                        semester: Number(sem),
-                        required: true,
-                    })
-                }
-            }
-            onModulesChange(mods)
-        } catch (e) {
-            // catching url mistakes in case html validation is mistakenly deleted
-            console.log(e);
-        }
-    }
-
-    function handlePopulateModule() {
-        parseShareLink(shareLink)
-    }
-
     return (
         <div className="solver">
             <Container>
@@ -152,36 +116,6 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
                     </Dimmer>
                 )}
                 <Grid>
-                    <Grid.Row>
-                        <Grid.Column>
-                            {/* Insert NUSMods timetable */}
-                            <Form>
-                                <Form.Group>
-                                    <Form.Field
-                                        id="form-input-share-link"
-                                        control={Input}
-                                        type="url"
-                                        label="NUSMods Share Link"
-                                        placeholder="https://nusmods.com/timetable/sem-1/share?CS1010=LEC:1"
-                                        onChange={(e: any) => setShareLink(e.target.value)}
-                                        fluid
-                                        width={12}
-                                    />
-                                    <Form.Field
-                                        id="form-button-control-public"
-                                        control={Button}
-                                        content="Populate Module"
-                                        primary
-                                        disabled={shareLink.length === 0}
-                                        onClick={handlePopulateModule}
-                                        label="&nbsp;"
-                                        fluid
-                                        width={4}
-                                    />
-                                </Form.Group>
-                            </Form>
-                        </Grid.Column>
-                    </Grid.Row>
                     <Grid.Row>
                         <Grid.Column>
                             <Tab
