@@ -62,15 +62,19 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
     useEffect(() => {
         async function populateJsonField() {
             // populate the modules where no json data is found, otherwise ignore
-            const promises = modules.map(mod => mod.json === undefined ? populateModuleConstraintJsonField(mod) : Promise.resolve(true))
+            const promises = modules.map(mod =>
+                mod.json === undefined
+                    ? populateModuleConstraintJsonField(mod)
+                    : Promise.resolve(true)
+            );
             // resolved will contain the results whether json data is successfully fetched
-            const resolved = await Promise.all(promises)
+            const resolved = await Promise.all(promises);
 
             // we remove all modules where json data failed to be fetched (e.g. because of wrong module code)
             // and trigger a re-render
-            const newMods: ConstraintModule[] = []
-            resolved.forEach((res, idx) => res && newMods.push(modules[idx]))
-            onModulesChange(newMods)
+            const newMods: ConstraintModule[] = [];
+            resolved.forEach((res, idx) => res && newMods.push(modules[idx]));
+            onModulesChange(newMods);
         }
         populateJsonField();
     }, [modules.length]);
@@ -335,7 +339,9 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
             <Transition visible={showModuleAddError} animation="fade" duration={1000}>
                 <Message negative>
                     <Message.Header>
-                        {"The module you specified doesn't exist or is already added."}
+                        {
+                            "One or more of the module(s) you specified doesn't exist or is already added."
+                        }
                     </Message.Header>
                     <p>
                         Please try another module or check the academic year / semester in NUSMods{' '}
