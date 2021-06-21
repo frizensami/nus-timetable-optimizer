@@ -60,13 +60,20 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
     let [selectedMod, setSelectedMod] = useState<ConstraintModule | undefined>(undefined);
 
     useEffect(() => {
-        for (const module of modules) {
-            if (!module.json) {
-                // populate json field and then trigger a re-render
-                populateModuleConstraintJsonField(module).then(_ => onModulesChange([...modules]));
-            }
+        async function populateJsonField() {
+            // populate the modules where no json data is found, otherwise ignore
+            const promises = modules.map(mod => mod.json === undefined ? populateModuleConstraintJsonField(mod) : Promise.resolve(true))
+            // resolved will contain the results whether json data is successfully fetched
+            const resolved = await Promise.all(promises)
+
+            // we remove all modules where json data failed to be fetched (e.g. because of wrong module code)
+            // and trigger a re-render
+            const newMods: ConstraintModule[] = []
+            resolved.forEach((res, idx) => res && newMods.push(modules[idx]))
+            onModulesChange(newMods)
         }
-    }, [modules]);
+        populateJsonField();
+    }, [modules.length]);
 
     /*
      * Try to add a module to the current list of modules
