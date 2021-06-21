@@ -207,6 +207,10 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
         onModulesChange(newmods);
     }
 
+    function removeAllModules() {
+        onModulesChange([])
+    }
+
     function manualSelect(mod: ConstraintModule) {
         setSelectedMod(mod);
         setOpenSlotSelector(true);
@@ -344,6 +348,11 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                                         <Table.Row>
                                             <Table.HeaderCell>Module</Table.HeaderCell>
                                             <Table.HeaderCell width="5">Actions</Table.HeaderCell>
+                                            <Table.HeaderCell width="1">
+                                                <Button basic icon onClick={removeAllModules}>
+                                                    <Icon name="trash" />
+                                                </Button>
+                                            </Table.HeaderCell>
                                         </Table.Row>
                                     ) : null}
                                 </Table.Header>
@@ -389,9 +398,6 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                                         <Button basic onClick={() => manualSelect(mod)}>
                                             Restrict Slots
                                         </Button>
-                                        <Button basic icon onClick={() => removeModule(mod)}>
-                                            <Icon name="delete" />
-                                        </Button>
                                         <Message
                                             visible={mod.lessonConstraints !== undefined}
                                             hidden={mod.lessonConstraints === undefined}
@@ -403,6 +409,11 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                                                 module.{' '}
                                             </p>
                                         </Message>
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        <Button basic icon onClick={() => removeModule(mod)}>
+                                            <Icon name="delete" />
+                                        </Button>
                                     </Table.Cell>
                                 </Table.Row>
                             );
