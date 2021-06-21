@@ -51,6 +51,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
     let [ayValue, setAyText] = useState(defaultAyValue);
     let [semValue, setSemText] = useState(defaultSemValue);
     let [showModuleAddError, setShowModuleAddError] = useState(false);
+    let [showShareLinkError, setShowShareLinkError] = useState(false);
     let [activeErrorCancelTimeout, setActiveErrorCancelTimeout] = useState<any>(undefined);
     let [open, setOpen] = useState(false);
     let [open2, setOpen2] = useState(false);
@@ -85,8 +86,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
         );
         if (containsModAlready) {
             console.log("Couldn't add module, exists already");
-            setShowModuleAddError(true);
-            cancelErrorAfterInterval();
+            showErrorThenCancelAfterInterval(setShowModuleAddError);
             return;
         }
 
@@ -101,8 +101,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                 console.log(moduleJson);
                 if (Object.keys(moduleJson).length === 0) {
                     console.log("Couldn't add module!");
-                    setShowModuleAddError(true);
-                    cancelErrorAfterInterval();
+                    showErrorThenCancelAfterInterval(setShowModuleAddError);
                     return false;
                 } else {
                     mod.json = moduleJson;
@@ -135,7 +134,8 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
             // expected url: /timetable/sem-1/share?
             const sem = url.pathname.match(/\/timetable\/sem-(?<sem>[1,2])\/share?/)?.groups?.sem
             if (sem == null) {
-                alert("Share URL incorrect format!")
+                console.log("Share URL incorrect format!")
+                showErrorThenCancelAfterInterval(setShowShareLinkError);
                 return false;
             }
             const ay = ay_xs.find(x => x.value == ayValue);
@@ -157,8 +157,9 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
             onModulesChange(mods)
             return true;
         } catch (e) {
-            // catching url mistakes in case html validation is mistakenly deleted
+            // catching url mistakes in case html validation doesn't catch
             console.log(e);
+            showErrorThenCancelAfterInterval(setShowShareLinkError);
             return false;
         }
     }
@@ -181,10 +182,11 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
         onModulesChange(mods);
     }
 
-    function cancelErrorAfterInterval() {
+    function showErrorThenCancelAfterInterval(fn: (a: boolean) => void) {
+        fn(true);
         if (activeErrorCancelTimeout !== undefined) clearTimeout(activeErrorCancelTimeout);
         let t = setTimeout(() => {
-            setShowModuleAddError(false);
+            fn(false);
         }, 3000);
         setActiveErrorCancelTimeout(t);
     }
@@ -322,6 +324,14 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                     <p>
                         Please try another module or check the academic year / semester in NUSMods{' '}
                     </p>
+                </Message>
+            </Transition>
+
+            <Transition visible={showShareLinkError} animation="fade" duration={1000}>
+                <Message negative>
+                    <Message.Header>
+                        {"Seems like the share url you specified isn't quite right [="}
+                    </Message.Header>
                 </Message>
             </Transition>
 
