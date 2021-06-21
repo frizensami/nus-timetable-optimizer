@@ -36,7 +36,7 @@ For production builds, run `npm run build`, which builds all assets into the `bu
 - There is a two-phase solving process, one to decide which weeks to simulate in the academic calendar based on the modules selected, and one to actually solve for the final timetable.
 - The timetable and constraints specified by the user translated into SMTLIB2 code, which is passed to the WebWorker, and eventually the solver.
 - The results are passed back to the display components, which populate the timetable.
-- A separate document will be written to explain the technical details of how this problem was encoded into the Z3 SMT (SMTLIB2) format. Some ideas for the encoding were taking from <a href="https://github.com/raynoldng/orbital-splashdown/blob/master/Splashdown_Technical_Report.pdf" target="_blank">this technical report</a> by another attempt to solve this problem.
+- A separate document will be written to explain the technical details of how this problem was encoded into the Z3 SMT (SMTLIB2) format. Some ideas for the encoding were taken from <a href="https://github.com/raynoldng/orbital-splashdown/blob/master/Splashdown_Technical_Report.pdf" target="_blank">this technical report</a> by another attempt to solve this problem.
 
 ## Temporary Disclaimers
 - The code style / linting / other tools for this project are still being set up. Prettier will run to format code on every commit. 
