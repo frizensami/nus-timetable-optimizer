@@ -220,9 +220,6 @@ export class NUSModsFrontend {
             .map((modName: string) => {
                 const lessonNames = Object.keys(lessons[modName])
                     .map((lessonType: string) => {
-                        console.log(lessonType);
-                        console.log(LESSON_TYPE_ABBREV);
-                        console.log(LESSON_TYPE_ABBREV[lessonType]);
                         return `${LESSON_TYPE_ABBREV[lessonType]}:${lessons[modName][lessonType]}`;
                     })
                     .join(',');
