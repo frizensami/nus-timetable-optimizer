@@ -48,7 +48,6 @@ export const SolverApp: React.FC = () => {
                     </a>
                     .
                     <br />
-                    Modules for AY2021/22 are now available!
                 </Message.Header>
             </Message>
 
