@@ -22,6 +22,7 @@ import { Z3Manager, Z3Callbacks } from '../core/z3_manager';
 import { NUSModsFrontend, ModuleToAdd } from '../frontends/nusmods_frontend';
 import { ConstraintModule } from './ModuleConstraints';
 import './Solver.css';
+import { recordButtonClick, recordPerf } from '../util/analytics';
 //@ts-ignore
 const CodeDisplay = React.lazy(() => import('./CodeDisplay'));
 const GlobalConstraints = React.lazy(() => import('./GlobalConstraints'));
@@ -32,6 +33,9 @@ enum Z3State {
     INITIALIZED = 1,
     SOLVING = 2,
 }
+
+let z3StartInitTime = -100000000;
+let z3SolveStartTime = -10000000;
 
 export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNewTimetable }) => {
     let [smtlibInput, setSmtlibInput] = useState<string>(
@@ -46,37 +50,44 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
     let [constraints, setConstraints] = useState<GlobalConstraintsList>(defaultConstraints);
     let [debugOpen, setDebugOpen] = useState<boolean>(false);
 
-    const callbacks: Z3Callbacks = useMemo(() => {
-        function onZ3Initialized() {
-            setZ3State(Z3State.INITIALIZED);
-        }
-
-        function updateInputSmtlib2(smtStr: string) {
-            setSmtlibInput(smtStr);
-        }
-
-        function onOutput(smtStr: string) {
-            setSmtlibOutput(smtStr);
-        }
-
-        function onTimetableOutput(timetable: TimetableOutput) {
-            // setSmtlibOutput(smtStr)
-            console.log(timetable);
-            setZ3State(Z3State.INITIALIZED);
-            onNewTimetable(timetable);
-        }
-        return {
-            onZ3Initialized: onZ3Initialized,
-            onSmtlib2InputCreated: updateInputSmtlib2,
-            onOutput: onOutput,
-            onTimetableOutput: onTimetableOutput,
-        };
-    }, [onNewTimetable]);
-
+    const callbacks: Z3Callbacks = {
+        onZ3Initialized: onZ3Initialized,
+        onSmtlib2InputCreated: updateInputSmtlib2,
+        onOutput: onOutput,
+        onTimetableOutput: onTimetableOutput,
+    };
     // Runs once to init the z3 module
     useEffect(() => {
+        const currentTime = performance.now();
+        z3StartInitTime = currentTime; // Start timer for perf recording
+        console.log('Starting to time Z3 init at = ' + currentTime);
         Z3Manager.initZ3(callbacks);
-    }, [callbacks]);
+    }, []);
+
+    /// Z3 Callbacks
+    function onZ3Initialized() {
+        const timeElapsedMs = Math.floor(performance.now() - z3StartInitTime);
+        recordPerf('Z3 Solver Performance', 'initTime', timeElapsedMs);
+        setZ3State(Z3State.INITIALIZED);
+    }
+
+    function updateInputSmtlib2(smtStr: string) {
+        setSmtlibInput(smtStr);
+    }
+
+    function onOutput(smtStr: string) {
+        setSmtlibOutput(smtStr);
+    }
+
+    function onTimetableOutput(timetable: TimetableOutput) {
+        // setSmtlibOutput(smtStr)
+        const timeElapsedMs = Math.floor(performance.now() - z3SolveStartTime);
+        recordPerf('Z3 Solver Performance', 'solveTime', timeElapsedMs);
+        console.log('Timetable:');
+        console.log(timetable);
+        setZ3State(Z3State.INITIALIZED);
+        onNewTimetable(timetable);
+    }
 
     // Runs on button pressed
     function onSubmit() {
@@ -93,6 +104,17 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
                 lessonConstraints: mod.lessonConstraints,
             };
         });
+
+        // Metrics
+        recordButtonClick(
+            'Run Optimizer',
+            JSON.stringify({ mods: modules_to_add, constraints: constraints })
+        );
+        const currentTime = performance.now();
+        z3SolveStartTime = currentTime;
+        console.log('Starting to time Z3 solve at = ' + currentTime);
+
+        // Add modules to timetable and solve
         nusmods_fe.add_modules(modules_to_add).then(() => {
             console.log(nusmods_fe);
             const gt: GenericTimetable = nusmods_fe.create_timetable(constraints);

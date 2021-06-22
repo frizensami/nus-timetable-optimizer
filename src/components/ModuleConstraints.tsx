@@ -18,6 +18,8 @@ import { NUSModsFrontend } from '../frontends/nusmods_frontend';
 import { getRandomColorFromString } from '../util/utils';
 import ModuleSlotSelector, { LessonTypeConstraints } from './ModuleSlotSelector';
 import { Media } from './Responsive';
+import { recordButtonClick } from '../util/analytics';
+
 interface ModuleConstraintsProps {
     modules: Array<ConstraintModule>;
     onModulesChange(mods: Array<ConstraintModule>): any;
@@ -85,7 +87,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
     function handleClick() {
         const ay = ay_xs.find(x => x.value == ayValue);
         const sem = sem_xs.find(x => x.value == semValue);
-        console.log(`${moduleText} - ${ay.text} - ${sem.text}`);
+        const moduleStr = `${moduleText} - AY ${ay.text} - Sem ${sem.text}`;
         let mod: ConstraintModule = {
             module_code: moduleText.toUpperCase(),
             acad_year: ay.text,
@@ -99,12 +101,18 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
         if (containsModAlready) {
             console.log("Couldn't add module, exists already");
             showErrorThenCancelAfterInterval(setShowModuleAddError);
+            recordButtonClick('Add Module (Direct)', `Failed: ${moduleStr}: Already Exists`);
             return;
         }
 
-        populateModuleConstraintJsonField(mod).then(
-            (res: boolean) => res && onModulesChange(modules.concat(mod))
-        );
+        populateModuleConstraintJsonField(mod).then((res: boolean) => {
+            if (res) {
+                onModulesChange(modules.concat(mod));
+                recordButtonClick('Add Module (Direct)', `Success: ${moduleStr}: Added`);
+            } else {
+                recordButtonClick('Add Module (Direct)', `Failed: ${moduleStr}: Doesn't exist?`);
+            }
+        });
     }
 
     // return a boolean which indicates whether module can be found
@@ -181,8 +189,11 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
             shareLink: { value: string };
         };
         if (parseShareLink(shareUrl)) {
+            recordButtonClick('Add Modules from Link', `Success: ${shareUrl}`);
             setShareUrl(''); // reset field if successful
             target.shareLink.value = ''; // reset field if successful
+        } else {
+            recordButtonClick('Add Modules from Link', `Failed: ${shareUrl}`);
         }
     }
 
