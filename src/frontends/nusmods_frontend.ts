@@ -18,17 +18,17 @@ export interface ModuleToAdd {
 }
 
 const LESSON_TYPE_ABBREV: any = {
-    'Design Lecture': 'DLEC',
+    DesignLecture: 'DLEC',
     Laboratory: 'LAB',
     Lecture: 'LEC',
-    'Packaged Lecture': 'PLEC',
-    'Packaged Tutorial': 'PTUT',
+    PackagedLecture: 'PLEC',
+    PackagedTutorial: 'PTUT',
     Recitation: 'REC',
-    'Sectional Teaching': 'SEC',
-    'Seminar-Style Module Class': 'SEM',
+    SectionalTeaching: 'SEC',
+    'Seminar-StyleModuleClass': 'SEM',
     Tutorial: 'TUT',
-    'Tutorial Type 2': 'TUT2',
-    'Tutorial Type 3': 'TUT3',
+    TutorialType2: 'TUT2',
+    TutorialType3: 'TUT3',
     Workshop: 'WS',
 };
 
@@ -220,6 +220,9 @@ export class NUSModsFrontend {
             .map((modName: string) => {
                 const lessonNames = Object.keys(lessons[modName])
                     .map((lessonType: string) => {
+                        console.log(lessonType);
+                        console.log(LESSON_TYPE_ABBREV);
+                        console.log(LESSON_TYPE_ABBREV[lessonType]);
                         return `${LESSON_TYPE_ABBREV[lessonType]}:${lessons[modName][lessonType]}`;
                     })
                     .join(',');
