@@ -42,7 +42,7 @@ function Timetable({ start_hour, end_hour, timetable, nusmodsLink }: TimetablePr
                                 className="ui primary button"
                                 style={{ backgroundColor: '#ff5138' }}
                             >
-                                Click to view timetable in NUSMods!
+                                Click to see timetable in NUSMods!
                             </a>
                         ) : null}
                     </Header>
