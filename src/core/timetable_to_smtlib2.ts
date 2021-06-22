@@ -1,7 +1,7 @@
 import { Lesson, Module, GenericTimetable } from './generic_timetable';
 import { Z3WeekSolver } from './z3_weeksolver';
 
-import { flipRecord, StringIdGenerator } from '../util/utils';
+import { flipRecord, StringIdGenerator, nestObject } from '../util/utils';
 import { Z3Timetable, SlotConstraint, UNASSIGNED, FREE, TOOEARLY_LATE } from './z3_timetable';
 import { DAYS, DAY_IDXS, HOURS_PER_DAY, IDX_DAYS, HOURS_PER_WEEK, NUM_WEEKS } from './constants';
 
@@ -474,7 +474,7 @@ export class TimetableSmtlib2Converter {
         const parsed_expr = parse(z3_output);
         // console.log(parsed_expr)
         const is_sat = parsed_expr[0].content === 'sat'; // parsed_expr[0] === {type: "atom", content: "sat", location: {…}}
-        if (!is_sat) return { is_sat: false, tt: [] }; // Nothing to do here
+        if (!is_sat) return { is_sat: false, tt: [], lessons: {} }; // Nothing to do here
 
         let variable_assignments_exprs = parsed_expr[1].content; // parsed_expr[1] === {type: "list", content: Array(19), location: {…}}
         variable_assignments_exprs.shift(); // Removes first "model" expr: {type: "atom", content: "model", location: {…}}
@@ -513,6 +513,11 @@ export class TimetableSmtlib2Converter {
             }
         }
 
+        // Lessons chosen in the end
+        // Raw inputs will be of the form [LSM1301, Lecture, 1]  [LSM1301, Tutorial, 03B]
+        // We want that to be {"LSM1301": {"Lecture": 1, "Tutorial": 03B}}
+        let lessons = {};
+
         // Create the final output timetable based on hour assignments
         Object.keys(variable_assignments).forEach((key: string) => {
             // Hour assignment
@@ -530,18 +535,22 @@ export class TimetableSmtlib2Converter {
                 console.log(
                     `For z3 t${halfhouridx}, offset: ${offset}, day: ${day}, week: ${week}`
                 );
-                const modname = assignment.split('__').join('\n');
-                if (!tt[day][offset].includes(modname)) {
-                    tt[day][offset].push(modname);
+                const lesson_details = assignment.split('__');
+                nestObject(lessons, lesson_details);
+                const lesson_string = lesson_details.join('\n');
+                if (!tt[day][offset].includes(lesson_string)) {
+                    tt[day][offset].push(lesson_string);
                 }
             }
         });
 
         console.log(tt);
+        console.log(lessons);
 
         const output: TimetableOutput = {
             is_sat: is_sat,
             tt: tt,
+            lessons: lessons,
         };
         return output;
     }
@@ -550,4 +559,5 @@ export class TimetableSmtlib2Converter {
 export interface TimetableOutput {
     is_sat: boolean;
     tt: Array<Array<string>>;
+    lessons: any;
 }

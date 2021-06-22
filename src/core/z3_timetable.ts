@@ -378,7 +378,7 @@ export class Z3Timetable {
         let solveStr = '(check-sat)\n(get-model)\n(get-objectives)\n(exit)';
         // Overall SMTLIB2 string to return
         const finalStr = randomPrefix + variablesStr + constraintStr + fixBugStr + solveStr;
-        console.log(finalStr);
+        // console.log(finalStr);
         return finalStr;
     }
 }

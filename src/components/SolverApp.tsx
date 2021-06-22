@@ -10,9 +10,11 @@ const Timetable = React.lazy(() => import('./Timetable'));
 
 export const SolverApp: React.FC = () => {
     let [tt, setTT] = useState({});
+    let [nusmodsLink, setNusmodsLink] = useState('');
 
-    function onNewTimetable(timetable: any) {
+    function onNewTimetable(timetable: any, nusmodsLink: string) {
         setTT(timetable);
+        setNusmodsLink(nusmodsLink);
     }
 
     return (
@@ -57,7 +59,7 @@ export const SolverApp: React.FC = () => {
                     </Container>
                 }
             >
-                <Timetable start_hour={8} end_hour={22} timetable={tt} />
+                <Timetable start_hour={8} end_hour={22} timetable={tt} nusmodsLink={nusmodsLink} />
             </Suspense>
             <Divider />
             <Solver onNewTimetable={onNewTimetable} />

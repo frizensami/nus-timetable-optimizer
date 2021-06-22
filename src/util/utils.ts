@@ -91,6 +91,21 @@ export function arrayEquals(a: any, b: any) {
     );
 }
 
+// Assign an array of properties to an object - creating nested levels
+// E.g., nestObject({}, [a, b, c]) ==> {a: {b: c}}
+export function nestObject(obj: any, keyPath: Array<any>) {
+    const value = keyPath[keyPath.length - 1];
+    let lastKeyIndex = Math.max(0, keyPath.length - 2);
+    for (var i = 0; i < lastKeyIndex; ++i) {
+        let key = keyPath[i];
+        if (!(key in obj)) {
+            obj[key] = {};
+        }
+        obj = obj[key];
+    }
+    obj[keyPath[lastKeyIndex]] = value;
+}
+
 /** *
  * Usage:
  * const ids = new StringIdGenerator();

@@ -6,9 +6,10 @@ interface TimetableProps {
     start_hour: number;
     end_hour: number;
     timetable: any;
+    nusmodsLink: string;
 }
 
-function Timetable({ start_hour, end_hour, timetable }: TimetableProps) {
+function Timetable({ start_hour, end_hour, timetable, nusmodsLink }: TimetableProps) {
     // let [dimmerActive, setDimmerActive] = useState(false);
     let hours: Array<String> = [];
     const days = 6;
@@ -32,7 +33,20 @@ function Timetable({ start_hour, end_hour, timetable }: TimetableProps) {
                 <Segment raised style={{ overflow: 'auto', maxWidth: '100%' }}>
                     <Header as="h2" textAlign="center">
                         Timetable Output
+                        <br />
+                        {nusmodsLink != '' ? (
+                            <a
+                                href={nusmodsLink}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="ui primary button"
+                                style={{ backgroundColor: '#ff5138' }}
+                            >
+                                Click to view timetable in NUSMods!
+                            </a>
+                        ) : null}
                     </Header>
+
                     <Table unstackable celled definition striped columns={16} compact>
                         <Table.Header>
                             <Table.Row textAlign="center">

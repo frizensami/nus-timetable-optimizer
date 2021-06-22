@@ -17,6 +17,21 @@ export interface ModuleToAdd {
     lessonConstraints?: LessonTypeConstraints;
 }
 
+const LESSON_TYPE_ABBREV: any = {
+    'Design Lecture': 'DLEC',
+    Laboratory: 'LAB',
+    Lecture: 'LEC',
+    'Packaged Lecture': 'PLEC',
+    'Packaged Tutorial': 'PTUT',
+    Recitation: 'REC',
+    'Sectional Teaching': 'SEC',
+    'Seminar-Style Module Class': 'SEM',
+    Tutorial: 'TUT',
+    'Tutorial Type 2': 'TUT2',
+    'Tutorial Type 3': 'TUT3',
+    Workshop: 'WS',
+};
+
 export class NUSModsFrontend {
     modules: Array<Module> = [];
 
@@ -176,6 +191,42 @@ export class NUSModsFrontend {
         } catch {
             return {};
         }
+    }
+
+    /*
+     * Takes lessons output from timetable in this format:
+     * {
+        "CS1101S": {
+            "Tutorial": "01B",
+            "Recitation": "03B",
+            "Lecture": "1"
+        },
+        "CS3230": {
+            "Tutorial": "07",
+            "Lecture": "1"
+        },
+        "CS3203": {
+            "Lecture": "1",
+            "Recitation": "02"
+        }
+       }
+     * and converts it to a format like:
+     * https://nusmods.com/timetable/sem-1/share?CS1101S=REC:03B,TUT:01B,LEC:1&CS3203=REC:02,LEC:1&CS3230=LEC:1,TUT:07
+     *
+     */
+    static output_lessons_to_nusmods_link(lessons: any, sem: string): string {
+        let baseUrl = `https://nusmods.com/timetable/sem-${sem}/share?`;
+        const lessonString = Object.keys(lessons)
+            .map((modName: string) => {
+                const lessonNames = Object.keys(lessons[modName])
+                    .map((lessonType: string) => {
+                        return `${LESSON_TYPE_ABBREV[lessonType]}:${lessons[modName][lessonType]}`;
+                    })
+                    .join(',');
+                return `${modName}=${lessonNames}`;
+            })
+            .join('&');
+        return `${baseUrl}${lessonString}`;
     }
 
     /**

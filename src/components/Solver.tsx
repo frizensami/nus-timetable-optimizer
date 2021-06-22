@@ -36,8 +36,11 @@ enum Z3State {
 
 let z3StartInitTime = -100000000;
 let z3SolveStartTime = -10000000;
+let latestSem: string | null = null;
 
-export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNewTimetable }) => {
+export const Solver: React.FC<{ onNewTimetable(timetable: any, nusmods_link: string): any }> = ({
+    onNewTimetable,
+}) => {
     let [smtlibInput, setSmtlibInput] = useState<string>(
         'No input yet, please run the optimizer first.'
     );
@@ -85,8 +88,21 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
         recordPerf('Z3 Solver Performance', 'solveTime', timeElapsedMs);
         console.log('Timetable:');
         console.log(timetable);
+
+        // Get the NUSMods output link
+        console.log(`Modules: ${modules}, length: ${modules.length}`);
+        console.log(`Semester: ${latestSem}`);
+        let nusmods_link = '';
+        if (latestSem && timetable.tt.length > 0) {
+            console.log(`Running link generation`);
+            nusmods_link = NUSModsFrontend.output_lessons_to_nusmods_link(
+                timetable.lessons,
+                latestSem
+            );
+        }
+        console.log(`Nusmods Link from Solver: ${nusmods_link}`);
+        onNewTimetable(timetable, nusmods_link);
         setZ3State(Z3State.INITIALIZED);
-        onNewTimetable(timetable);
     }
 
     // Runs on button pressed
@@ -96,6 +112,7 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any): any }> = ({ onNe
         let nusmods_fe = new NUSModsFrontend();
 
         const modules_to_add: Array<ModuleToAdd> = modules.map((mod: ConstraintModule) => {
+            latestSem = mod.semester.toString();
             return {
                 module_code: mod.module_code,
                 acad_year: mod.acad_year,
