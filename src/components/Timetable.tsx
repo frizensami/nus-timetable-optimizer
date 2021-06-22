@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Segment, Table, Header, Dimmer } from 'semantic-ui-react';
 import { getRandomColorFromString } from '../util/utils';
+var ReactGA = require('react-ga');
 
 interface TimetableProps {
     start_hour: number;
@@ -35,15 +36,16 @@ function Timetable({ start_hour, end_hour, timetable, nusmodsLink }: TimetablePr
                         Timetable Output
                         <br />
                         {nusmodsLink != '' ? (
-                            <a
-                                href={nusmodsLink}
+                            <ReactGA.OutboundLink
+                                eventLabel="Viewed timetable in NUSMods"
+                                to={nusmodsLink}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="ui primary button"
                                 style={{ backgroundColor: '#ff5138' }}
                             >
                                 Click to see timetable in NUSMods!
-                            </a>
+                            </ReactGA.OutboundLink>
                         ) : null}
                     </Header>
 
