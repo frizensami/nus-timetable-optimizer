@@ -288,7 +288,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({
                         type="url"
                         onChange={(e: any) => setShareUrl(e.target.value)}
                         label="NUSMods Share Link"
-                        placeholder="e.g., https://nusmods.com/timetable/sem-1/share?CS1010=LEC:1"
+                        placeholder="e.g., https://nusmods.com/timetable/sem-1/share?CS1010=LEC:1 (use the Share/Sync button in NUSMods!)"
                         fluid
                         width={12}
                     />
