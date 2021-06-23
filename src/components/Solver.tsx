@@ -52,6 +52,7 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any, nusmods_link: str
     let [z3State, setZ3State] = useState<Z3State>(Z3State.PRE_INIT);
     let [constraints, setConstraints] = useState<GlobalConstraintsList>(defaultConstraints);
     let [debugOpen, setDebugOpen] = useState<boolean>(false);
+    let [hasExamClash, setHasExamClash] = useState<boolean>(false);
 
     const callbacks: Z3Callbacks = {
         onZ3Initialized: onZ3Initialized,
@@ -143,8 +144,15 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any, nusmods_link: str
 
     function onModulesChange(mods: Array<ConstraintModule>) {
         console.log(`onModulesChange: ${JSON.stringify(mods.map(x => x.module_code))}`);
+        let examDates = new Set();
+        var hasDuplicates = mods
+            .filter(mod => mod.examDate !== undefined)
+            .some(function(currentObject) {
+                return examDates.size === examDates.add(currentObject.examDate).size;
+            });
         setShouldShowHelp(false);
         setModules(mods);
+        setHasExamClash(hasDuplicates);
     }
 
     return (
@@ -179,6 +187,7 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any, nusmods_link: str
                                                     <ModuleConstraints
                                                         modules={modules}
                                                         onModulesChange={onModulesChange}
+                                                        hasExamClash={hasExamClash}
                                                     />
                                                 </Suspense>
                                             </Tab.Pane>

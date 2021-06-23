@@ -23,6 +23,7 @@ import { recordButtonClick } from '../util/analytics';
 interface ModuleConstraintsProps {
     modules: Array<ConstraintModule>;
     onModulesChange(mods: Array<ConstraintModule>): any;
+    hasExamClash: boolean;
 }
 
 export interface ConstraintModule {
@@ -30,6 +31,7 @@ export interface ConstraintModule {
     acad_year: string;
     semester: number;
     json?: any;
+    examDate?: string;
     required: boolean;
     lessonConstraints?: LessonTypeConstraints; // JSON after constraints have
 }
@@ -38,7 +40,11 @@ export interface ConstraintModule {
  * Responsible for setting constraints individually for all selected modules.
  * Also contains a selector (combined here to keep state contained) for the modules
  * */
-const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModulesChange }) => {
+const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({
+    modules,
+    onModulesChange,
+    hasExamClash,
+}) => {
     let ay_xs: Array<any> = [
         { key: 1, text: '2021-2022', value: 1 },
         { key: 2, text: '2020-2021', value: 2 },
@@ -130,6 +136,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                     const semdata = data['semesterData'].find(
                         (v: any) => v.semester === mod.semester
                     );
+                    mod.examDate = semdata['examDate'];
                     const timetable = semdata['timetable'];
                     // If any lesson doesn't have a weeks array, show the modal
                     if (timetable.some((lesson: any) => !Array.isArray(lesson.weeks))) {
@@ -368,6 +375,16 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                     </Message.Header>
                 </Message>
             </Transition>
+
+            <Transition visible={hasExamClash} animation="fade" duration={500}>
+                <Message negative>
+                    <Message.Header>
+                        {
+                            'Two or more of your modules have clashing exams! You can choose to ignore this by running the optimizer.'
+                        }
+                    </Message.Header>
+                </Message>
+            </Transition>
             {modules.length > 0 && (
                 <Table compact>
                     <Media greaterThanOrEqual="md">
@@ -447,6 +464,17 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({ modules, onModule
                                                 mod.json['moduleCredit'] +
                                                 ' MC ' +
                                                 (mod.required ? '' : '| Optional')}
+                                        </div>
+                                        <div style={{ fontSize: '0.875rem', color: 'grey' }}>
+                                            {' '}
+                                            {mod.examDate != undefined
+                                                ? 'Exam Date: ' +
+                                                  new Date(mod.examDate!).toLocaleString('en-SG', {
+                                                      hour12: true,
+                                                      timeStyle: 'short',
+                                                      dateStyle: 'medium',
+                                                  })
+                                                : 'No Exam'}
                                         </div>
                                     </Table.Cell>
                                     <Table.Cell>
