@@ -277,7 +277,9 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({
     return (
         <div>
             <Segment basic>
-                <Header as="h3" disabled={modules.length > 0}>1. Select academic semester</Header>
+                <Header as="h3" disabled={modules.length > 0}>
+                    1. Select academic semester
+                </Header>
                 <Form>
                     <Form.Group>
                         <Form.Field
@@ -308,14 +310,9 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({
                 {/* Insert NUSMods timetable. This is an uncontrolled React form. */}
                 <Grid columns={2} relaxed="very" stackable>
                     <Grid.Column>
-                        <Message
-                            header="a. Import from NUSMods"
-                            attached
-                        >
-                        </Message>
+                        <Message header="a. Import from NUSMods" attached></Message>
                         <Segment attached="bottom">
                             <Form onSubmit={handleShareLink}>
-                                
                                 <Form.Group>
                                     <Form.Field
                                         id="form-input-share-link"
@@ -325,11 +322,10 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({
                                         onChange={(e: any) => setShareUrl(e.target.value)}
                                         label={
                                             <label>
-                                                NUSMods Share Link
-                                                {' '}
+                                                NUSMods Share Link{' '}
                                                 <Popup
-                                                    content='Copy the link using the Share/Sync button on NUSMods!'
-                                                    trigger={<Icon name='info circle'/>}
+                                                    content="Copy the link using the Share/Sync button on NUSMods!"
+                                                    trigger={<Icon name="info circle" />}
                                                 />
                                             </label>
                                         }
@@ -350,16 +346,13 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({
                                 </Form.Group>
                             </Form>
                         </Segment>
-                    <Media lessThan="md">
+                        <Media lessThan="md">
                             <Divider horizontal>Or</Divider>
-                    </Media>
+                        </Media>
                     </Grid.Column>
                     {/* Display module selector */}
                     <Grid.Column>
-                        <Message
-                            header="b. Add directly"
-                            attached
-                        />
+                        <Message header="b. Add directly" attached />
                         <Segment attached="bottom">
                             <Form>
                                 <Form.Group>
@@ -433,7 +426,9 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({
                                         {renderChildren ? (
                                             <Table.Row>
                                                 <Table.HeaderCell>Name</Table.HeaderCell>
-                                                <Table.HeaderCell width="5">Actions</Table.HeaderCell>
+                                                <Table.HeaderCell width="5">
+                                                    Actions
+                                                </Table.HeaderCell>
                                                 <Table.HeaderCell width="1">
                                                     <Popup
                                                         content="Remove all modules"
@@ -507,11 +502,14 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({
                                                 {' '}
                                                 {mod.examDate != undefined
                                                     ? 'Exam Date: ' +
-                                                      new Date(mod.examDate!).toLocaleString('en-SG', {
-                                                          hour12: true,
-                                                          timeStyle: 'short',
-                                                          dateStyle: 'medium',
-                                                      })
+                                                      new Date(mod.examDate!).toLocaleString(
+                                                          'en-SG',
+                                                          {
+                                                              hour12: true,
+                                                              timeStyle: 'short',
+                                                              dateStyle: 'medium',
+                                                          }
+                                                      )
                                                     : 'No Exam'}
                                             </div>
                                         </Table.Cell>
