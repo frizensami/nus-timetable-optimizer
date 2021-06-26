@@ -16,7 +16,7 @@ export const CustomCookieConsent: React.FC = () => {
             location="top"
             buttonText="I understand"
             enableDeclineButton
-            declineButtonText="I decline"
+            declineButtonText="No cookies"
             overlay={true}
             overlayStyle={{ 'background-color': 'rgba(0, 0, 0, 0.7' }}
             buttonClasses="ui primary padded button"
@@ -29,8 +29,8 @@ export const CustomCookieConsent: React.FC = () => {
         >
             <h3>
                 {' '}
-                We use Google Analytics cookies to improve your user experience and the optimizer's
-                speed over time.{' '}
+                We use Google Analytics cookies exclusively to improve your user experience and the
+                optimizer's speed over time. No ads, ever. {''}
             </h3>
         </CookieConsent>
     );
