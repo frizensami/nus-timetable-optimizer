@@ -278,7 +278,7 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({
         <div>
             <Segment basic>
                 <Header as="h3" disabled={modules.length > 0}>
-                    1. Select academic semester
+                    1. Select academic year and semester
                 </Header>
                 <Form>
                     <Form.Group>
