@@ -5,8 +5,7 @@ import { Navbar } from './components/Navbar';
 import { SolverApp } from './components/SolverApp';
 import { HowToUse } from './components/HowToUse';
 import { About } from './components/About';
-// import './App.css';
-// import 'semantic-ui-less/semantic.less'
+import CookieConsent from 'react-cookie-consent';
 import 'semantic-ui-css/semantic.min.css';
 
 import Timetable from './components/Timetable';
@@ -15,6 +14,7 @@ import { Divider } from 'semantic-ui-react';
 import PageNotFound from './components/PageNotFound';
 import { MediaContextProvider } from './components/Responsive';
 import { usePageTracking } from './util/analytics';
+import { CustomCookieConsent } from './components/CustomCookieConsent';
 
 function App() {
     usePageTracking();
@@ -35,6 +35,7 @@ function App() {
                     </Switch>
                 </div>
             </MediaContextProvider>
+            <CustomCookieConsent />
         </div>
     );
 }

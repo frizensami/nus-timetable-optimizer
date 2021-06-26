@@ -162,7 +162,7 @@ export const Solver: React.FC<{ onNewTimetable(timetable: any, nusmods_link: str
                     <Dimmer active page>
                         <Loader
                             indeterminate
-                            content="Optimizer Initializing... (this can take one or two minutes)"
+                            content="Optimizer Initializing... (this can take a minute)"
                         />
                     </Dimmer>
                 )}
