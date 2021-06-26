@@ -13,6 +13,8 @@ import {
     Transition,
     Table,
     Popup,
+    Divider,
+    Segment,
 } from 'semantic-ui-react';
 import { NUSModsFrontend } from '../frontends/nusmods_frontend';
 import { getRandomColorFromString } from '../util/utils';
@@ -274,86 +276,122 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({
 
     return (
         <div>
-            <Header as="h3" textAlign="center">
-                {' '}
-                Add modules using the Share/Sync link from your NUSMods timetable{' '}
-            </Header>
-            {/* Insert NUSMods timetable. This is an uncontrolled React form. */}
-            <Form onSubmit={handleShareLink}>
-                <Form.Group>
-                    <Form.Field
-                        id="form-input-share-link"
-                        name="shareLink"
-                        control={Input}
-                        type="url"
-                        onChange={(e: any) => setShareUrl(e.target.value)}
-                        label="NUSMods Share Link"
-                        placeholder="e.g., https://nusmods.com/timetable/sem-1/share?CS1010=LEC:1 (use the Share/Sync button in NUSMods!)"
-                        fluid
-                        width={12}
-                    />
-                    <Form.Field
-                        control={Button}
-                        type="submit"
-                        content="Add Modules from Link"
-                        primary
-                        disabled={shareUrl.length === 0}
-                        label="&nbsp;"
-                        fluid
-                        width={4}
-                    />
-                </Form.Group>
-            </Form>
-
-            <Header as="h3" textAlign="center">
-                {' '}
-                or add them directly{' '}
-            </Header>
-            {/* Display module selector */}
-            <Form>
-                <Form.Group>
-                    <Form.Field
-                        id="form-input-module-name"
-                        control={Input}
-                        label="Module Code"
-                        placeholder="(e.g., CS3230)"
-                        onChange={(e: any) => setModuleText(e.target.value)}
-                        fluid
-                        width={5}
-                    />
-                    <Form.Field
-                        control={Select}
-                        options={ay_xs}
-                        disabled={modules.length > 0}
-                        defaultValue={defaultAyValue}
-                        label="Academic Year"
-                        onChange={(_: any, { value }: any) => setAyText(value as number)}
-                        width={4}
-                        fluid
-                    />
-                    <Form.Field
-                        control={Select}
-                        options={sem_xs}
-                        defaultValue={defaultSemValue}
-                        disabled={modules.length > 0}
-                        label="Semester"
-                        onChange={(_: any, { value }: any) => setSemText(value as number)}
-                        width={3}
-                        fluid
-                    />
-                    <Form.Field
-                        id="form-button-control-public"
-                        control={Button}
-                        content="Add Module"
-                        primary
-                        disabled={moduleText.length === 0}
-                        onClick={handleClick}
-                        label="&nbsp;"
-                        fluid
-                        width={4}
-                    />
-                </Form.Group>
-            </Form>
+            <Segment basic>
+                <Header as="h3" disabled={modules.length > 0}>1. Select academic semester</Header>
+                <Form>
+                    <Form.Group>
+                        <Form.Field
+                            control={Select}
+                            options={ay_xs}
+                            disabled={modules.length > 0}
+                            defaultValue={defaultAyValue}
+                            label="Academic Year"
+                            onChange={(_: any, { value }: any) => setAyText(value as number)}
+                            width={4}
+                            fluid
+                        />
+                        <Form.Field
+                            control={Select}
+                            options={sem_xs}
+                            disabled={modules.length > 0}
+                            defaultValue={defaultSemValue}
+                            label="Semester"
+                            onChange={(_: any, { value }: any) => setSemText(value as number)}
+                            width={4}
+                            fluid
+                        />
+                    </Form.Group>
+                </Form>
+            </Segment>
+            <Segment basic>
+                <Header as="h3">2. Add modules</Header>
+                {/* Insert NUSMods timetable. This is an uncontrolled React form. */}
+                <Grid columns={2} relaxed="very" stackable>
+                    <Grid.Column>
+                        <Message
+                            header="a. Import from NUSMods"
+                            attached
+                        >
+                        </Message>
+                        <Segment attached="bottom">
+                            <Form onSubmit={handleShareLink}>
+                                
+                                <Form.Group>
+                                    <Form.Field
+                                        id="form-input-share-link"
+                                        name="shareLink"
+                                        control={Input}
+                                        type="url"
+                                        onChange={(e: any) => setShareUrl(e.target.value)}
+                                        label={
+                                            <label>
+                                                NUSMods Share Link
+                                                {' '}
+                                                <Popup
+                                                    content='Copy the link using the Share/Sync button on NUSMods!'
+                                                    trigger={<Icon name='info circle'/>}
+                                                />
+                                            </label>
+                                        }
+                                        placeholder="e.g., https://nusmods.com/timetable/sem-1/share?CS1010=LEC:1"
+                                        fluid
+                                        width={10}
+                                    />
+                                    <Form.Field
+                                        control={Button}
+                                        type="submit"
+                                        content="Import"
+                                        primary
+                                        disabled={shareUrl.length === 0}
+                                        label="&nbsp;"
+                                        fluid
+                                        width={6}
+                                    />
+                                </Form.Group>
+                            </Form>
+                        </Segment>
+                    <Media lessThan="md">
+                            <Divider horizontal>Or</Divider>
+                    </Media>
+                    </Grid.Column>
+                    {/* Display module selector */}
+                    <Grid.Column>
+                        <Message
+                            header="b. Add directly"
+                            attached
+                        />
+                        <Segment attached="bottom">
+                            <Form>
+                                <Form.Group>
+                                    <Form.Field
+                                        id="form-input-module-name"
+                                        control={Input}
+                                        label="Module Code"
+                                        placeholder="e.g., CS3230"
+                                        onChange={(e: any) => setModuleText(e.target.value)}
+                                        fluid
+                                        width={10}
+                                    />
+                                    <Form.Field
+                                        id="form-button-control-public"
+                                        control={Button}
+                                        content="Add"
+                                        primary
+                                        disabled={moduleText.length === 0}
+                                        onClick={handleClick}
+                                        label="&nbsp;"
+                                        fluid
+                                        width={6}
+                                    />
+                                </Form.Group>
+                            </Form>
+                        </Segment>
+                    </Grid.Column>
+                </Grid>
+                <Media greaterThanOrEqual="md">
+                    <Divider vertical>Or</Divider>
+                </Media>
+            </Segment>
             <Transition visible={showModuleAddError} animation="fade" duration={1000}>
                 <Message negative>
                     <Message.Header>
@@ -375,7 +413,6 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({
                     </Message.Header>
                 </Message>
             </Transition>
-
             <Transition visible={hasExamClash} animation="fade" duration={500}>
                 <Message negative>
                     <Message.Header>
@@ -386,127 +423,129 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({
                 </Message>
             </Transition>
             {modules.length > 0 && (
-                <Table compact>
-                    <Media greaterThanOrEqual="md">
-                        {(mediaClassNames, renderChildren) => {
-                            return (
-                                <Table.Header className={mediaClassNames}>
-                                    {renderChildren ? (
-                                        <Table.Row>
-                                            <Table.HeaderCell>Module</Table.HeaderCell>
-                                            <Table.HeaderCell width="5">Actions</Table.HeaderCell>
-                                            <Table.HeaderCell width="1">
-                                                <Popup
-                                                    content="Remove all modules"
-                                                    trigger={
-                                                        <Button
-                                                            color="red"
-                                                            basic
-                                                            icon
-                                                            onClick={removeAllModules}
-                                                        >
-                                                            <Icon name="trash" />
-                                                        </Button>
-                                                    }
-                                                />
-                                            </Table.HeaderCell>
-                                        </Table.Row>
-                                    ) : (
-                                        <Table.Row>
-                                            <Table.HeaderCell width="1">
-                                                <Popup
-                                                    content="Remove all modules"
-                                                    trigger={
-                                                        <Button
-                                                            color="red"
-                                                            basic
-                                                            icon
-                                                            onClick={removeAllModules}
-                                                        >
-                                                            <Icon name="trash" />
-                                                        </Button>
-                                                    }
-                                                />
-                                            </Table.HeaderCell>
-                                        </Table.Row>
-                                    )}
-                                </Table.Header>
-                            );
-                        }}
-                    </Media>
-
-                    <Table.Body>
-                        {/* <Transition.Group duration={1000}> */}
-                        {modules.map((mod: ConstraintModule, idx: number) => {
-                            if (!mod.json) return null; // skip if mod.json hasn't been populated
-                            let color = getRandomColorFromString(mod.module_code);
-                            return (
-                                <Table.Row key={mod.module_code}>
-                                    <Table.Cell>
-                                        <span
-                                            style={{
-                                                display: 'inline-block',
-                                                backgroundColor: color,
-                                                height: '1em',
-                                                width: '1em',
-                                                borderRadius: '0.125rem',
-                                                marginRight: '0.5rem',
-                                            }}
-                                        />
-                                        {mod.module_code + ' ' + mod.json['title']}{' '}
-                                        <div style={{ fontSize: '0.875rem', color: 'grey' }}>
-                                            {' '}
-                                            {'AY ' +
-                                                mod.acad_year +
-                                                ' | Semester ' +
-                                                mod.semester +
-                                                ' | Workload: ' +
-                                                mod.json['moduleCredit'] +
-                                                ' MC ' +
-                                                (mod.required ? '' : '| Optional')}
-                                        </div>
-                                        <div style={{ fontSize: '0.875rem', color: 'grey' }}>
-                                            {' '}
-                                            {mod.examDate != undefined
-                                                ? 'Exam Date: ' +
-                                                  new Date(mod.examDate!).toLocaleString('en-SG', {
-                                                      hour12: true,
-                                                      timeStyle: 'short',
-                                                      dateStyle: 'medium',
-                                                  })
-                                                : 'No Exam'}
-                                        </div>
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        <Button basic onClick={() => toggleRequired(mod)}>
-                                            Make {mod.required ? 'Optional' : 'Required'}
-                                        </Button>
-                                        <Button basic onClick={() => manualSelect(mod)}>
-                                            Restrict Slots
-                                        </Button>
-                                        <Message
-                                            visible={mod.lessonConstraints !== undefined}
-                                            hidden={mod.lessonConstraints === undefined}
-                                            info
-                                        >
-                                            <p>
+                <Segment basic>
+                    <Header as="h3">3. View modules</Header>
+                    <Table compact>
+                        <Media greaterThanOrEqual="md">
+                            {(mediaClassNames, renderChildren) => {
+                                return (
+                                    <Table.Header className={mediaClassNames}>
+                                        {renderChildren ? (
+                                            <Table.Row>
+                                                <Table.HeaderCell>Name</Table.HeaderCell>
+                                                <Table.HeaderCell width="5">Actions</Table.HeaderCell>
+                                                <Table.HeaderCell width="1">
+                                                    <Popup
+                                                        content="Remove all modules"
+                                                        trigger={
+                                                            <Button
+                                                                color="red"
+                                                                basic
+                                                                icon
+                                                                onClick={removeAllModules}
+                                                            >
+                                                                <Icon name="trash" />
+                                                            </Button>
+                                                        }
+                                                    />
+                                                </Table.HeaderCell>
+                                            </Table.Row>
+                                        ) : (
+                                            <Table.Row>
+                                                <Table.HeaderCell width="1">
+                                                    <Popup
+                                                        content="Remove all modules"
+                                                        trigger={
+                                                            <Button
+                                                                color="red"
+                                                                basic
+                                                                icon
+                                                                onClick={removeAllModules}
+                                                            >
+                                                                <Icon name="trash" />
+                                                            </Button>
+                                                        }
+                                                    />
+                                                </Table.HeaderCell>
+                                            </Table.Row>
+                                        )}
+                                    </Table.Header>
+                                );
+                            }}
+                        </Media>
+                        <Table.Body>
+                            {/* <Transition.Group duration={1000}> */}
+                            {modules.map((mod: ConstraintModule, idx: number) => {
+                                if (!mod.json) return null; // skip if mod.json hasn't been populated
+                                let color = getRandomColorFromString(mod.module_code);
+                                return (
+                                    <Table.Row key={mod.module_code}>
+                                        <Table.Cell>
+                                            <span
+                                                style={{
+                                                    display: 'inline-block',
+                                                    backgroundColor: color,
+                                                    height: '1em',
+                                                    width: '1em',
+                                                    borderRadius: '0.125rem',
+                                                    marginRight: '0.5rem',
+                                                }}
+                                            />
+                                            {mod.module_code + ' ' + mod.json['title']}{' '}
+                                            <div style={{ fontSize: '0.875rem', color: 'grey' }}>
                                                 {' '}
-                                                You have restricted the possible slots for this
-                                                module.{' '}
-                                            </p>
-                                        </Message>
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        <Button basic icon onClick={() => removeModule(mod)}>
-                                            <Icon name="delete" />
-                                        </Button>
-                                    </Table.Cell>
-                                </Table.Row>
-                            );
-                        })}
-                        {/* </Transition.Group> */}
-                    </Table.Body>
-                </Table>
+                                                {'AY ' +
+                                                    mod.acad_year +
+                                                    ' | Semester ' +
+                                                    mod.semester +
+                                                    ' | Workload: ' +
+                                                    mod.json['moduleCredit'] +
+                                                    ' MC ' +
+                                                    (mod.required ? '' : '| Optional')}
+                                            </div>
+                                            <div style={{ fontSize: '0.875rem', color: 'grey' }}>
+                                                {' '}
+                                                {mod.examDate != undefined
+                                                    ? 'Exam Date: ' +
+                                                      new Date(mod.examDate!).toLocaleString('en-SG', {
+                                                          hour12: true,
+                                                          timeStyle: 'short',
+                                                          dateStyle: 'medium',
+                                                      })
+                                                    : 'No Exam'}
+                                            </div>
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            <Button basic onClick={() => toggleRequired(mod)}>
+                                                Make {mod.required ? 'Optional' : 'Required'}
+                                            </Button>
+                                            <Button basic onClick={() => manualSelect(mod)}>
+                                                Restrict Slots
+                                            </Button>
+                                            <Message
+                                                visible={mod.lessonConstraints !== undefined}
+                                                hidden={mod.lessonConstraints === undefined}
+                                                info
+                                            >
+                                                <p>
+                                                    {' '}
+                                                    You have restricted the possible slots for this
+                                                    module.{' '}
+                                                </p>
+                                            </Message>
+                                        </Table.Cell>
+                                        <Table.Cell>
+                                            <Button basic icon onClick={() => removeModule(mod)}>
+                                                <Icon name="delete" />
+                                            </Button>
+                                        </Table.Cell>
+                                    </Table.Row>
+                                );
+                            })}
+                            {/* </Transition.Group> */}
+                        </Table.Body>
+                    </Table>
+                </Segment>
             )}
             <Modal onClose={() => setOpen(false)} onOpen={() => setOpen(true)} open={open}>
                 <Modal.Header>
