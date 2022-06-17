@@ -31,10 +31,9 @@ export const SolverApp: React.FC = () => {
                 }}
             </Media>
 
-            <Message info>
+            <Message positive>
                 <Message.Header as="p" style={{ textAlign: 'center' }}>
-                    The NUS Timetable Optimizer is in <em> Beta Testing Mode</em>. Please report any
-                    errors or feedback to{' '}
+                    Updated for AY 2022/23! Please report any feedback to{' '}
                     <a href="mailto:sriramsami@nus.edu.sg?subject=NUS Timetable Optimizer Feedback">
                         sriramsami@nus.edu.sg
                     </a>{' '}
@@ -46,7 +45,6 @@ export const SolverApp: React.FC = () => {
                     >
                         open an Issue on GitHub
                     </a>
-                    .
                     <br />
                 </Message.Header>
             </Message>
