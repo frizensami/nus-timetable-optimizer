@@ -48,9 +48,10 @@ const ModuleConstraints: React.FC<ModuleConstraintsProps> = ({
     hasExamClash,
 }) => {
     let ay_xs: Array<any> = [
-        { key: 1, text: '2022-2023', value: 1 },
-        { key: 2, text: '2021-2022', value: 2 },
-        { key: 3, text: '2020-2021', value: 3 },
+        { key: 1, text: '2023-2024', value: 1 },
+        { key: 2, text: '2022-2023', value: 2 },
+        { key: 3, text: '2021-2022', value: 3 },
+        { key: 4, text: '2020-2021', value: 4 },
     ];
     let sem_xs: Array<any> = [
         { key: 1, text: '1', value: 1 },
