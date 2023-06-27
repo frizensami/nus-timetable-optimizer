@@ -22,6 +22,7 @@
     "react-cookie-consent": "^6.2.4",
     "react-dom": "^17.0.2",
     "react-ga": "^3.3.0",
+    "react-ga4": "^2.1.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "semantic-ui-css": "^2.4.1",
@@ -35,7 +36,7 @@
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "start": "craco --openssl-legacy-provider start",
-    "build": "craco build",
+    "build": "craco --openssl-legacy-provider build",
     "test": "craco test",
     "eject": "craco eject",
     "lint": "eslint src/",

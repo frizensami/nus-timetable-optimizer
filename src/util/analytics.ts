@@ -1,4 +1,4 @@
-import ReactGA from 'react-ga';
+import ReactGA from 'react-ga4';
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { getCookieConsentValue } from 'react-cookie-consent';
@@ -11,13 +11,14 @@ export const BUTTON_CATEGORY = 'User Button Click';
 export function initGA() {
     if (process.env.NODE_ENV === 'production') {
         console.log('Initializing production google analytics');
-        ReactGA.initialize('UA-126704116-2');
+        ReactGA.initialize('G-2SQL38L2S1');
     } else if (window.location.href.includes('localhost')) {
         console.log('Initializing local google analytics');
-        ReactGA.initialize('UA-126704116-3');
+        ReactGA.initialize('G-GZ4MYB33G0');
     }
     // Initial page ping after an init
-    ReactGA.pageview(window.location.pathname + window.location.search);
+    // ReactGA.pageview(window.location.pathname + window.location.search);
+    ReactGA.send({hitType: "pageview", page: window.location.pathname + window.location.search, title: "Initial page ping"});
 
     // If you want to start measuring performance in your app, pass a function
     // to log results (for example: reportWebVitals(console.log))
@@ -55,7 +56,8 @@ export function usePageTracking() {
     // Try to send a pageview when location changes. If ReactGA is not initialized, won't do anything
     useEffect(() => {
         if (isCookieConsentGranted()) {
-            ReactGA.pageview(location.pathname + location.search);
+            // ReactGA.pageview(location.pathname + location.search);
+            ReactGA.send({hitType: "pageview", page: window.location.pathname + window.location.search});
         }
     }, [location]);
 }
@@ -94,11 +96,12 @@ export function recordPerf(
     if (isCookieConsentGranted()) {
         const eventDetails = {
             category: category,
+            action: variable,
             variable: variable,
             value: numMillis,
             label: extraInfo,
         };
         // console.log(eventDetails);
-        ReactGA.timing(eventDetails);
+        ReactGA.event(eventDetails);
     }
 }
