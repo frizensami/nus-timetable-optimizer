@@ -33,7 +33,7 @@ export const SolverApp: React.FC = () => {
 
             <Message positive>
                 <Message.Header as="p" style={{ textAlign: 'center' }}>
-                    Updated for AY 2024/25! Please report any feedback to{' '}
+                    NEW: Updated for AY 2025/26! Please report any feedback to{' '}
                     <a href="mailto:sriramsami@nus.edu.sg?subject=NUS Timetable Optimizer Feedback">
                         sriramsami@nus.edu.sg
                     </a>{' '}
